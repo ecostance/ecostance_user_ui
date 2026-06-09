@@ -1,0 +1,444 @@
+.featured--image {
+  justify-content: center;
+  max-height: 400px;
+  width: auto;
+}
+
+.countdown-image img {
+  height: 448px;
+}
+
+.postion-relative {
+  position: relative;
+}
+
+.cart-overlay__close-icon svg {
+  font-size: 35px !important;
+}
+
+.cart-overlay__close-icon {
+  top: 14px !important;
+  right: 10px !important;
+}
+
+.product-modal-cross {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  transition: all 0.3s;
+}
+
+.product-modal-cross:hover {
+  transform: rotate(90deg);
+  cursor: pointer;
+}
+
+.product-list__floating-badges span,
+.product-list__floating-badges span.hot svg {
+  cursor: pointer !important;
+}
+.product-grid__floating-badges span.hot,
+.product-list__floating-badges span.hot {
+  background-color: #f8796c !important;
+}
+
+.product-grid__floating-badges .out-of-stock svg {
+  max-width: 20px;
+  font-size: 20px;
+  color: #fff;
+  fill: #fff;
+  cursor: pointer;
+}
+
+.product-grid__floating-badges .fivestar {
+  /* margin-bottom: 2px !important; */
+  /* height: unset !important; */
+  background-color: #fff;
+  /* width: 48px;
+  height: 48px; */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  /* border: 1px solid #e7e7e7; */
+}
+.product-grid__floating-badges .fivestar img {
+  max-width: 32px;
+  max-height: 32px;
+  cursor: pointer;
+}
+
+.product-grid__floating-badges .hot.fivestar {
+  /* margin-bottom: 2px !important; */
+  cursor: pointer;
+}
+
+@media (max-width: 500px) {
+  .spinner-border-sm {
+    width: 8px !important;
+    height: 8px !important;
+  }
+  span .spinner-border-sm {
+    height: 1rem !important;
+    width: 1rem !important;
+  }
+}
+
+.bg--2 {
+  background-image: url(/assets/images/backgrounds/background-bg-2/index.png) !important;
+}
+
+.bg--1 {
+  background-image: url(/assets/images/backgrounds/background-bg-1/index.png) !important;
+}
+
+.bg--4 {
+  background-image: url(/assets/images/backgrounds/background-bg-4/index.png) !important;
+}
+
+.bg--3 {
+  background-image: url(/assets/images/backgrounds/background-bg-3/index.png) !important;
+}
+
+.bg--6 {
+  background-image: url(/assets/images/backgrounds/background-bg-6/index.png) !important;
+}
+
+.bg--7 {
+  background-image: url(/assets/images/backgrounds/background-bg-7/index.png) !important;
+}
+
+.bg--8 {
+  background-image: url(/assets/images/backgrounds/background-bg-8/index.png) !important;
+}
+
+@media (max-width: 1770px) {
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/big-big.png) !important;
+  }
+}
+
+@media (max-width: 1750px) {
+  .bg--2 {
+    background-image: url(/assets/images/backgrounds/background-bg-2/big-big.png) !important;
+  }
+
+  .bg--3 {
+    background-image: url(/assets/images/backgrounds/background-bg-3/big-big.png) !important;
+  }
+
+  .bg--1 {
+    background-image: url(/assets/images/backgrounds/background-bg-1/big-big.png) !important;
+  }
+
+  .bg--6 {
+    background-image: url(/assets/images/backgrounds/background-bg-6/big-big.png) !important;
+  }
+
+  .bg--8 {
+    background-image: url(/assets/images/backgrounds/background-bg-8/big-big.png) !important;
+  }
+
+  .bg--7 {
+    background-image: url(/assets/images/backgrounds/background-bg-7/big-big.png) !important;
+  }
+}
+
+@media (max-width: 1725px) {
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/xtra-big-med.png) !important;
+  }
+}
+
+@media (max-width: 1575px) {
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/xtra-big-sm.png) !important;
+  }
+}
+
+@media (max-width: 1550px) {
+  .bg--2 {
+    background-image: url(/assets/images/backgrounds/background-bg-2/big-med.png) !important;
+  }
+
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/big-med.png) !important;
+  }
+
+  .bg--3 {
+    background-image: url(/assets/images/backgrounds/background-bg-3/big-med.png) !important;
+  }
+
+  .bg--1 {
+    background-image: url(/assets/images/backgrounds/background-bg-1/big-med.png) !important;
+  }
+
+  .bg--6 {
+    background-image: url(/assets/images/backgrounds/background-bg-6/big-med.png) !important;
+  }
+
+  .bg--8 {
+    background-image: url(/assets/images/backgrounds/background-bg-8/big-med.png) !important;
+  }
+
+  .bg--7 {
+    background-image: url(/assets/images/backgrounds/background-bg-7/big-med.png) !important;
+  }
+}
+
+@media (max-width: 1440px) {
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/big-sm.png) !important;
+  }
+}
+
+@media (max-width: 1350px) {
+  .bg--2 {
+    background-image: url(/assets/images/backgrounds/background-bg-2/big-sm.png) !important;
+  }
+  .bg--3 {
+    background-image: url(/assets/images/backgrounds/background-bg-3/med-sm.png) !important;
+  }
+  .bg--1 {
+    background-image: url(/assets/images/backgrounds/background-bg-1/big-sm.png) !important;
+  }
+
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/xtra-med-big.png) !important;
+  }
+
+  .bg--6 {
+    background-image: url(/assets/images/backgrounds/background-bg-6/big-sm.png) !important;
+  }
+
+  .bg--8 {
+    background-image: url(/assets/images/backgrounds/background-bg-8/big-sm.png) !important;
+  }
+
+  .bg--7 {
+    background-image: url(/assets/images/backgrounds/background-bg-7/big-sm.png) !important;
+  }
+}
+
+@media (max-width: 1220px) {
+  .bg--2 {
+    background-image: url(/assets/images/backgrounds/background-bg-2/med-big.png) !important;
+  }
+
+  .bg--3 {
+    background-image: url(/assets/images/backgrounds/background-bg-3/med-big.png) !important;
+  }
+
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/med-big.png) !important;
+  }
+
+  .bg--1 {
+    background-image: url(/assets/images/backgrounds/background-bg-1/med-big.png) !important;
+  }
+
+  .bg--6 {
+    background-image: url(/assets/images/backgrounds/background-bg-6/med-big.png) !important;
+  }
+
+  .bg--8 {
+    background-image: url(/assets/images/backgrounds/background-bg-8/med-big.png) !important;
+  }
+
+  .bg--7 {
+    background-image: url(/assets/images/backgrounds/background-bg-7/med-big.png) !important;
+  }
+}
+
+@media (max-width: 1145px) {
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/med-med.png) !important;
+  }
+}
+
+@media (max-width: 1060px) {
+  .bg--2 {
+    background-image: url(/assets/images/backgrounds/background-bg-2/med-med.png) !important;
+  }
+
+  .bg--3 {
+    background-image: url(/assets/images/backgrounds/background-bg-3/med-med.png) !important;
+  }
+
+  .bg--1 {
+    background-image: url(/assets/images/backgrounds/background-bg-1/med-med.png) !important;
+  }
+
+  .bg--6 {
+    background-image: url(/assets/images/backgrounds/background-bg-6/med-med.png) !important;
+  }
+
+  .bg--8 {
+    background-image: url(/assets/images/backgrounds/background-bg-8/med-med.png) !important;
+  }
+
+  .bg--7 {
+    background-image: url(/assets/images/backgrounds/background-bg-7/med-med.png) !important;
+  }
+}
+
+@media (max-width: 880px) {
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/med-sm.png) !important;
+  }
+}
+
+@media (max-width: 800px) {
+  .bg--2 {
+    background-image: url(/assets/images/backgrounds/background-bg-2/med-sm.png) !important;
+  }
+
+  .bg--3 {
+    background-image: url(/assets/images/backgrounds/background-bg-3/med-sm.png) !important;
+  }
+
+  .bg--1 {
+    background-image: url(/assets/images/backgrounds/background-bg-1/med-sm.png) !important;
+  }
+
+  .bg--6 {
+    background-image: url(/assets/images/backgrounds/background-bg-6/med-sm.png) !important;
+  }
+
+  .bg--8 {
+    background-image: url(/assets/images/backgrounds/background-bg-8/med-sm.png) !important;
+  }
+
+  .bg--7 {
+    background-image: url(/assets/images/backgrounds/background-bg-7/med-sm.png) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .bg--2 {
+    background-image: url(/assets/images/backgrounds/background-bg-2/sm-big.png) !important;
+  }
+
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/sm-big.png) !important;
+  }
+
+  .bg--3 {
+    background-image: url(/assets/images/backgrounds/background-bg-3/sm-big.png) !important;
+  }
+
+  .bg--1 {
+    background-image: url(/assets/images/backgrounds/background-bg-1/sm-big.png) !important;
+  }
+
+  .bg--6 {
+    background-image: url(/assets/images/backgrounds/background-bg-6/sm-big.png) !important;
+  }
+
+  .bg--8 {
+    background-image: url(/assets/images/backgrounds/background-bg-8/sm-big.png) !important;
+  }
+
+  .bg--7 {
+    background-image: url(/assets/images/backgrounds/background-bg-7/sm-big.png) !important;
+  }
+}
+
+@media (max-width: 650px) {
+  .bg--2 {
+    background-image: url(/assets/images/backgrounds/background-bg-2/sm-med.png) !important;
+  }
+
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/sm-med.png) !important;
+  }
+
+  .bg--3 {
+    background-image: url(/assets/images/backgrounds/background-bg-3/sm-med.png) !important;
+  }
+
+  .bg--1 {
+    background-image: url(/assets/images/backgrounds/background-bg-1/sm-med.png) !important;
+  }
+
+  .bg--6 {
+    background-image: url(/assets/images/backgrounds/background-bg-6/sm-med.png) !important;
+  }
+  .bg--8 {
+    background-image: url(/assets/images/backgrounds/background-bg-8/sm-med.png) !important;
+  }
+
+  .bg--7 {
+    background-image: url(/assets/images/backgrounds/background-bg-7/sm-med.png) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .bg--2 {
+    background-image: url(/assets/images/backgrounds/background-bg-2/sm-sm.png) !important;
+  }
+
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/xtra-med-sm.png) !important;
+  }
+
+  .bg--3 {
+    background-image: url(/assets/images/backgrounds/background-bg-3/sm-sm.png) !important;
+  }
+
+  .bg--1 {
+    background-image: url(/assets/images/backgrounds/background-bg-1/sm-sm.png) !important;
+  }
+
+  .bg--6 {
+    background-image: url(/assets/images/backgrounds/background-bg-6/sm-sm.png) !important;
+  }
+
+  .bg--8 {
+    background-image: url(/assets/images/backgrounds/background-bg-8/sm-sm.png) !important;
+  }
+
+  .bg--7 {
+    background-image: url(/assets/images/backgrounds/background-bg-7/sm-sm.png) !important;
+  }
+}
+
+@media (max-width: 405px) {
+  .bg--2 {
+    background-image: url(/assets/images/backgrounds/background-bg-2/sm-xtra-sm.png) !important;
+  }
+
+  .bg--3 {
+    background-image: url(/assets/images/backgrounds/background-bg-3/sm-xtra-sm.png) !important;
+  }
+
+  .bg--1 {
+    background-image: url(/assets/images/backgrounds/background-bg-1/sm-xtra-sm.png) !important;
+  }
+
+  .bg--4 {
+    background-image: url(/assets/images/backgrounds/background-bg-4/sm-xtra-sm.png) !important;
+  }
+
+  .bg--6 {
+    background-image: url(/assets/images/backgrounds/background-bg-6/sm-xtra-sm.png) !important;
+  }
+
+  .bg--8 {
+    background-image: url(/assets/images/backgrounds/background-bg-8/sm-xtra-sm.png) !important;
+  }
+
+  .bg--7 {
+    background-image: url(/assets/images/backgrounds/background-bg-7/sm-xtra-sm.png) !important;
+  }
+}
+
+.scrollbar--change::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar--change {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

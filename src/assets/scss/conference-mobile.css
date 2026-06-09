@@ -1,0 +1,595 @@
+/* Conference Carbon Offset - Mobile View */
+
+.mobile-conference-wizard {
+  padding: 0 16px 100px 16px;
+  min-height: 100vh;
+}
+
+/* =============================================
+   Step Indicator — text + line only
+   ============================================= */
+.m-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 8px 14px;
+}
+
+.m-stepper__label {
+  font-size: 13px;
+  color: #c0c0c0;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.m-stepper__label--active {
+  color: #222;
+  font-weight: 700;
+}
+
+.m-stepper__label--done {
+  color: #38a169;
+  font-weight: 600;
+}
+
+.m-stepper__track {
+  flex: 1;
+  height: 2px;
+  background: #e2e2e2;
+  border-radius: 1px;
+  margin: 0 12px;
+  overflow: hidden;
+  min-width: 20px;
+}
+
+.m-stepper__track-fill {
+  width: 0%;
+  height: 100%;
+  background: #38a169;
+  border-radius: 1px;
+  transition: width 0.4s ease;
+}
+
+.m-stepper__track-fill--done {
+  width: 100%;
+}
+
+/* Step Content */
+.mobile-step-content {
+  padding: 8px 0;
+}
+
+.mobile-step-content .section-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #000;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.mobile-step-content .field-group {
+  margin-bottom: 24px;
+}
+
+.mobile-step-content .field-group label,
+.mobile-step-content .field-group > span.section-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.mobile-step-content input[type="text"],
+.mobile-step-content input[type="date"],
+.mobile-step-content select {
+  font-size: 16px !important;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+}
+
+.mobile-step-content input[type="text"]:focus,
+.mobile-step-content input[type="date"]:focus,
+.mobile-step-content select:focus {
+  outline: none;
+  border-color: #38a169;
+  box-shadow: 0 0 0 2px rgba(56, 161, 105, 0.15);
+}
+
+/* Conference box on mobile */
+.mobile-step-content .conference-box {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+  background: #f9f9f9;
+  word-break: break-word;
+}
+
+.mobile-step-content .conference-box h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.mobile-step-content .conference-box .field {
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-step-content .conference-box .field .label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 600;
+}
+
+.mobile-step-content .conference-box .field .value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* =============================================
+   Pill / Toggle Button Styling
+   Override carbon-calculator.css which uses
+   .calculator--radio-button-holder .houseisrent
+   ============================================= */
+.mobile-step-content .calculator--radio-button-holder {
+  width: 100%;
+}
+
+.mobile-step-content .calculator--radio-button-holder .houseisrent,
+.mobile-step-content .houseisrent,
+.mobile-step-content .btn-group {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  justify-content: flex-start !important;
+  width: 100%;
+  border: none !important;
+  background-color: transparent !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.mobile-step-content .calculator--radio-button-holder .houseisrent .form-control-label,
+.mobile-step-content .calculator--radio-button-holder .houseisrent .btn,
+.mobile-step-content .calculator--radio-button-holder .houseisrent .form-control-label:active,
+.mobile-step-content .houseisrent .form-control-label,
+.mobile-step-content .houseisrent .btn,
+.mobile-step-content .btn-group .btn {
+  flex: 0 0 auto;
+  min-width: 0;
+  height: auto !important;
+  padding: 9px 18px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  white-space: nowrap;
+  border-radius: 24px !important;
+  border: 1.5px solid #d4d4d4 !important;
+  background-color: #fff !important;
+  background: #fff !important;
+  color: #333 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: all 0.15s ease;
+  line-height: 1.4;
+  margin: 0 !important;
+}
+
+.mobile-step-content .calculator--radio-button-holder .houseisrent .form-control-label.active,
+.mobile-step-content .calculator--radio-button-holder .houseisrent .btn.active,
+.mobile-step-content .calculator--radio-button-holder .houseisrent .active,
+.mobile-step-content .houseisrent .form-control-label.active,
+.mobile-step-content .houseisrent .btn.active,
+.mobile-step-content .btn-group .btn.active {
+  background-color: #38a169 !important;
+  background: #38a169 !important;
+  color: #fff !important;
+  border-color: #38a169 !important;
+  font-weight: 600 !important;
+}
+
+/* Ensure span text inside pills inherits color */
+.mobile-step-content .calculator--radio-button-holder .houseisrent .form-control-label span,
+.mobile-step-content .calculator--radio-button-holder .houseisrent .btn span,
+.mobile-step-content .houseisrent span {
+  color: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  padding: 0 !important;
+}
+
+/* Remove Bootstrap's connected button look */
+.mobile-step-content .houseisrent .btn:first-child,
+.mobile-step-content .houseisrent .btn:last-child,
+.mobile-step-content .btn-group .btn:first-child,
+.mobile-step-content .btn-group .btn:last-child {
+  border-radius: 24px !important;
+}
+
+.mobile-step-content .houseisrent .btn + .btn,
+.mobile-step-content .btn-group .btn + .btn {
+  margin-left: 0 !important;
+}
+
+/* Airport dropdown on mobile */
+.mobile-step-content .dropdown-box {
+  position: absolute;
+  z-index: 100;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  width: 100%;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-step-content .airport-names {
+  padding: 10px 12px;
+  font-size: 14px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+}
+
+.mobile-step-content .airport-names:active {
+  background: #f0f0f0;
+}
+
+.mobile-step-content .airports-loader {
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Transfer airports side by side on mobile */
+.mobile-step-content .transfer-airports-row {
+  display: flex;
+  gap: 12px;
+}
+
+.mobile-step-content .transfer-airports-row > div {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Slider holder on mobile */
+.mobile-step-content .transport-slider-holder {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-step-content .transport-slider-holder p {
+  margin: 0;
+  min-width: 24px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Country selector on mobile */
+.mobile-step-content .country-selector-mobile {
+  position: relative;
+  margin-bottom: 4px;
+}
+
+.mobile-step-content .country-selector-mobile select {
+  padding-left: 44px !important;
+  width: 100%;
+}
+
+.mobile-step-content .country-selector-mobile__flag {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  pointer-events: none;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.mobile-step-content .country-selector-mobile__helper {
+  font-size: 12px;
+  color: #888;
+  margin: 4px 0 0 0;
+}
+
+/* Validation text */
+.mobile-step-content .valid-text {
+  color: green;
+  font-size: 13px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.mobile-step-content .invalid-text {
+  color: red;
+  font-size: 13px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.mobile-step-content .optional-text {
+  color: #999;
+  font-size: 13px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.mobile-step-content .error-msg-calc {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* =============================================
+   Bottom Bar + Expandable Card
+   ============================================= */
+
+/* Overlay behind expanded card */
+.mobile-bottom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-bottom-overlay--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Bottom bar container */
+.mobile-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease;
+}
+
+/* Collapsed state (default) */
+.mobile-bottom-bar__collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.mobile-bottom-bar__carbon {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-bottom-bar__carbon-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.2;
+}
+
+.mobile-bottom-bar__carbon-label {
+  font-size: 11px;
+  color: #666;
+}
+
+.mobile-bottom-bar__actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mobile-bottom-bar__btn {
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mobile-bottom-bar__btn--back {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.mobile-bottom-bar__btn--next {
+  background: #38a169;
+  color: #fff;
+}
+
+.mobile-bottom-bar__btn--continue {
+  background: #333;
+  color: #fff;
+}
+
+.mobile-bottom-bar__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Chevron toggle hint */
+.mobile-bottom-bar__toggle {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 14px;
+  background: #fff;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid #e0e0e0;
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.mobile-bottom-bar__toggle svg {
+  transition: transform 0.3s ease;
+}
+
+.mobile-bottom-bar__toggle--flipped svg {
+  transform: rotate(180deg);
+}
+
+/* Expanded card panel */
+.mobile-bottom-bar__expanded {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.35s ease;
+  padding: 0 0;
+}
+
+.mobile-bottom-bar__expanded--open {
+  max-height: 500px;
+  padding: 0 0;
+}
+
+/* Card content inside expanded */
+.mobile-expanded-card {
+  background: #fff;
+}
+
+.mobile-expanded-card__header {
+  position: relative;
+  height: 80px;
+  overflow: hidden;
+}
+
+.mobile-expanded-card__header img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mobile-expanded-card__header-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.mobile-expanded-card__header-value {
+  font-size: 40px;
+  font-weight: 700;
+  color: #fff;
+  margin-right: 16px;
+  line-height: 1;
+}
+
+.mobile-expanded-card__header-text {
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.mobile-expanded-card__per-person {
+  text-align: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.mobile-expanded-card__per-person-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  display: block;
+}
+
+.mobile-expanded-card__per-person-label {
+  font-size: 13px;
+  color: #888;
+}
+
+.mobile-expanded-card__emissions {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.mobile-expanded-card__emissions-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.mobile-expanded-card__emissions-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.mobile-expanded-card__emissions-item {
+  text-align: center;
+}
+
+.mobile-expanded-card__emissions-item-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #333;
+  display: block;
+}
+
+.mobile-expanded-card__emissions-item-label {
+  font-size: 12px;
+  color: #888;
+}
+
+.mobile-expanded-card__continue {
+  padding: 16px 20px 20px;
+}
+
+.mobile-expanded-card__continue-btn {
+  width: 100%;
+  padding: 16px;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.mobile-expanded-card__continue-btn:hover {
+  background: #222;
+}
+
+.mobile-expanded-card__continue-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

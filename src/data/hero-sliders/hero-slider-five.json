@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1",
+    "subtitle": "The climate crisis is here and it’s time to act. We provide frictionless experience for everyone to reduce their greenhouse gas emissions.",
+    "title": "Climate action simplified",
+    "url": "carbon-offsets-simplified-what-are-they-how-do-they-work-and-why-are-they-important-for-everyone",
+    "bgImage": "assets/images/banners/hero-slider-1.webp"
+  },
+  {
+    "id": "2",
+    "subtitle": "Every individual can combat climate change by easily reducing their carbon footprint.",
+    "title": "Empowering Individuals",
+    "url": "carbon-offsets-simplified-what-are-they-how-do-they-work-and-why-are-they-important-for-everyone",
+    "bgImage": "assets/images/banners/hero-slider-2.webp"
+  },
+  {
+    "id": "3",
+    "subtitle": "Every business can become carbon neutral and sustainable while engaging their customers.",
+    "title": "Empowering Businesses",
+    "url": "carbon-offsets-simplified-what-are-they-how-do-they-work-and-why-are-they-important-for-everyone",
+    "bgImage": "assets/images/banners/hero-slider-3.webp"
+  }
+]

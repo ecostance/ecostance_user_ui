@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="58" height="58" viewBox="0 0 58 58">
+  <defs>
+    <filter id="Ellipse_428" x="0" y="0" width="58" height="58" filterUnits="userSpaceOnUse">
+      <feOffset dy="4" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.271"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="check" transform="translate(9.333 5)">
+    <g transform="matrix(1, 0, 0, 1, -9.33, -5)" filter="url(#Ellipse_428)">
+      <circle id="Ellipse_428-2" data-name="Ellipse 428" cx="20" cy="20" r="20" transform="translate(9 5)" fill="#71b467"/>
+    </g>
+    <path id="Icon_material-check" data-name="Icon material-check" d="M13.06,23.422,7.133,17.5l-2.018,2,7.945,7.945L30.115,10.389l-2-2Z" transform="translate(1.583 0.619)" fill="#fff" stroke="#fff" stroke-width="1"/>
+  </g>
+</svg>

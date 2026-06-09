@@ -1,0 +1,74 @@
+.userLogin-holder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 85vh;
+  /* margin: 100px 0px; */
+  /* margin-top: 34px;
+  margin-bottom: 125px; */
+  gap: 35px;
+  font-family: "Work Sans";
+  font-style: normal;
+  margin-left: 21px;
+  margin-right: 21px;
+}
+
+.userLogin-text-holder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+
+.userLogin-text-holder h2 {
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 38px;
+  text-align: center;
+  color: #333;
+}
+
+.userLogin-text-holder h3 {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 122.3%;
+  text-align: center;
+  color: #7e7e7e;
+}
+
+.userLogin-holder .button-text-holder {
+  display: flex;
+  flex-direction: column;
+  margin-top: 25px;
+}
+
+.userLogin-holder .button-text-holder button {
+  padding: 14.5px 28.5px;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 122.3%;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #333;
+}
+
+.userLogin-holder .button-text-holder {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.userLogin-holder .button-text-holder a {
+  cursor: pointer;
+  text-align: center;
+  font-weight: 500;
+  font-size: 18px;
+  color: #7e7e7e;
+}
+
+.userLogin-holder .button-text-holder button:hover {
+  color: #333;
+  background-color: #fff;
+}

@@ -1,0 +1,73 @@
+@media screen and (max-width: 400px) {
+  .standard-popup-holder img {
+    max-height: 200px !important;
+  }
+}
+
+@media screen and (max-width: 1300px) {
+  .sustainability--popup-sure-text.changeSlug {
+    font-size: 24px;
+    line-height: 38px;
+  }
+
+  .sustainability--confirm-popup-holder img {
+    max-height: 200px;
+  }
+
+  .sustainability--popup-button-holder.changeSlug button {
+    font-size: 16px;
+  }
+}
+
+@media screen and (max-width: 925px) {
+  .sustainability--popup-button-holder.changeSlug {
+    flex-direction: column;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .sustainability--popup-button-holder.changeSlug button {
+    font-size: 14px;
+  }
+
+  .sustainability-cross-icon.changeSlug {
+    right: 6%;
+  }
+
+  .sustainability--confirm-popup-holder img {
+    max-height: 100px;
+  }
+
+  .review-popup-submit-btn-container {
+    margin-top: 18px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .signup-connect-heading {
+    font-size: 21px !important;
+  }
+  .standard-popup-holder .verify-primary-email--popup-img {
+    max-height: 150px !important;
+  }
+
+  .verify-primary-email-heading {
+    font-size: 20px;
+    line-height: 25px;
+  }
+}
+
+@media screen and (max-height: 750px) {
+  .login-registration-popup-info h1 {
+    font-size: 31px !important;
+  }
+  .login-register-cross-icon {
+    top: 23px !important;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .standard-popup-holder img {
+    max-height: 250px !important;
+  }
+}

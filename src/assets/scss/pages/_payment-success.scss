@@ -1,0 +1,279 @@
+.mt-space--140{
+    margin-top: 140px;
+}
+.order-details-custom{
+    background-color: #F2F2F2;
+    margin-top: 30px;
+    padding: 50px 30px;
+    // border-bottom: 1px solid #D1D1D1;
+    h5{
+        color: #777777;
+        font-size: 20px;
+        margin-bottom: 16px;
+        font-weight: 400;
+    }
+    &-details{
+        color: #000;
+        font-size: 18px;
+        font-weight: 400;
+        b{
+            font-weight: 600;
+        }
+    }
+    &-divider{
+        height: 1px;
+        background: #D1D1D1;
+        width: 100%;
+    }
+    &-product{
+        
+        &-list{
+            display: flex;
+        justify-content: space-between;
+        margin-bottom: 45px;
+        &-name{
+            font-size: 18px;
+            color: #000;
+            width: 400px;
+        }
+        &-qty{
+            font-size: 16px;
+            color: #000;
+            opacity: 0.4;
+        }
+        &-price{
+            font-size: 18px;
+            color: #000;
+        }
+        }
+    }
+    &-total{
+        font-size: 18px;
+        color: #000;
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #D1D1D1;
+    }
+    table{
+        thead{
+            font-size: 18px;
+            font-weight: 400;
+            color: #333;
+            border-bottom: 1px solid #D1D1D1;
+            th{
+                padding-bottom: 20px;
+            }
+            @include respond(extra-small-mobile) {
+                font-size: 15px;
+            }
+        }
+        tbody{
+            color: #333;
+            font-size: 18px;
+            td{
+
+                padding-top: 23px;
+            }
+            @include respond(extra-small-mobile) {
+                font-size: 14px;
+            }
+        }
+    }
+    .sub-total{
+        border-bottom: 1px solid #D1D1D1;
+        padding-bottom: 25px;
+        color: #333;
+        font-size: 18px;
+        font-weight: 500;
+        @include respond(extra-small-mobile) {
+            font-size: 15px;
+        }
+    }
+    .total{
+        border-bottom: 1px solid #D1D1D1;
+        padding-bottom: 25px;
+        color: #333;
+        font-size: 18px;
+        font-weight: 700;
+        padding-top: 20px;
+        @include respond(extra-small-mobile) {
+            font-size: 15px;
+        }
+    }
+    .certificate{
+        font-weight: 700;
+        font-size: 18px;
+        
+        color: #333;
+        span{
+            width: 45px !important;
+            height: 45px !important;
+        }
+        img{
+            width: 100% !important;
+            height: 100% !important;
+        }
+        &__pdf-wrapper{
+            flex-basis: 100%;
+            @include respond(extra-large-desktop) {
+                flex-basis: 65%;
+            }
+            @include respond(large-desktop) {
+                flex-basis: 65%;
+            }
+            @include respond(small-desktop) {
+                flex-basis: 65%;
+            }
+        }
+        &__pdf {
+            width: 80%;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+    }
+    @include respond(extra-small-mobile) {
+        padding: 50px 15px;
+    }
+}
+.purchase-details{
+    background-color: #F2F2F2;
+    margin-top: 30px;
+    padding: 0px 0px;
+    border-bottom: 1px solid #D1D1D1;
+    // border-bottom: 1px solid #D1D1D1;
+    
+    h6{
+        color: #333333;
+        font-size: 20px;
+        margin-bottom: 24px;
+        font-weight: 500;
+    }
+    p{
+        line-height: 30px !important;
+        margin-bottom: 30px !important;
+        color: #333333;
+        font-size: 18px;
+        b{
+            font-weight: 600 !important;
+        }
+    }
+    &-details{
+        color: #000;
+        font-size: 18px;
+        font-weight: 400;
+        b{
+            font-weight: 400;
+
+        }
+    }
+    &-divider{
+        height: 1px;
+        background: #D1D1D1;
+        width: 100%;
+    }
+    &-product{
+        
+        &-list{
+            display: flex;
+        justify-content: space-between;
+        margin-bottom: 45px;
+        &-name{
+            font-size: 18px;
+            color: #000;
+            width: 400px;
+        }
+        &-qty{
+            font-size: 16px;
+            color: #000;
+            opacity: 0.4;
+        }
+        &-price{
+            font-size: 18px;
+            color: #000;
+        }
+        }
+    }
+    &-total{
+        font-size: 18px;
+        color: #000;
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #D1D1D1;
+    }
+    table{
+        thead{
+            font-size: 18px;
+            font-weight: 400;
+            color: #333;
+            border-bottom: 1px solid #D1D1D1;
+            th{
+                padding-bottom: 20px;
+            }
+        }
+        tbody{
+            color: #333;
+            font-size: 18px;
+            td{
+
+                padding-top: 23px;
+            }
+        }
+    }
+    .sub-total{
+        border-bottom: 1px solid #D1D1D1;
+        padding-bottom: 25px;
+        color: #333;
+        font-size: 18px;
+        font-weight: 500;
+    }
+    .total{
+        border-bottom: 1px solid #D1D1D1;
+        padding-bottom: 25px;
+        color: #333;
+        font-size: 18px;
+        font-weight: 700;
+        padding-top: 20px;
+    }
+    .certificate{
+        font-weight: 700;
+        font-size: 18px;
+        
+        color: #333;
+        span{
+            width: 45px !important;
+            height: 45px !important;
+        }
+        img{
+            width: 45px !important;
+            height: 45px !important;
+        }
+    }
+}
+.mb-space--100{
+    margin-bottom: 100px;
+}
+.mt-space--100{
+    margin-top: 100px;
+}
+
+.success-order-details {
+    margin-top: 50px;
+    padding: 15px 25px;
+    h5 {
+      font-weight: 500 !important;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 18px;
+      color: #333;
+      b {
+        color: #333;
+        font-weight: 500 !important;
+      }
+    }
+  }

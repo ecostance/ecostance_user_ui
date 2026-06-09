@@ -1,0 +1,694 @@
+.carbon-calculator {
+  display: flex;
+}
+
+.carbon-calculator-content-from {
+  margin-left: 0px;
+}
+
+.carbon-calculator-content-from .country-holder {
+  margin-bottom: 54px;
+}
+
+.carbon-calculator-content-from .calculator--title-holder span {
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 38px;
+  color: #333;
+}
+
+.carbon-calculator-content {
+  margin: 0 auto;
+  display: flex;
+  gap: 114px;
+}
+
+.life-style-section {
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+}
+
+.filter-section .offset--input-holder {
+  border-radius: 0px;
+  font-weight: 500;
+  font-size: 18px !important;
+  line-height: 122.3%;
+  color: #333333 !important;
+}
+
+.calculator--radio-button-holder .houseisrent {
+  background-color: #f2f2f2;
+  border-radius: 68px;
+}
+
+.carbon-calculator-content-from .houseisrent {
+  margin-bottom: 0px !important;
+}
+
+.calculator--radio-button-holder .houseisrent .form-control-label {
+  margin: 0px !important;
+  /* width: 33.3%; */
+  display: flex;
+  justify-content: center;
+  height: 33px;
+  background-color: #f2f2f2;
+  color: #333;
+  border: none;
+  box-shadow: none;
+  border-radius: 68px !important;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 146.3%;
+}
+
+.calculator--radio-button-holder .houseisrent .form-control-label:active {
+  background-color: #f2f2f2 !important;
+  color: #333 !important;
+  font-size: 16px;
+  line-height: 156.3%;
+}
+
+.basic-calculator {
+  width: 15%;
+}
+
+.basic-d-flex-cal {
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.carbon-calculator-content-from .houseisrent span {
+  font-family: "Work Sans";
+  color: #333;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 156.3%;
+}
+
+.lifestyle--section-holder .lifeStyle-span span {
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 122.3%;
+
+  color: #333333;
+}
+
+.calculator--radio-button-holder .houseisrent .active {
+  background: #7ba986 !important;
+  border-radius: 68px !important;
+  color: #fff;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 156.3%;
+}
+
+.houseisrent .form-control-label span {
+  padding: 0px !important;
+}
+
+.carbon-calculator-content-output {
+  margin-left: 10px !important;
+}
+
+.carbon-calculator-content-output-title {
+  margin-bottom: 45px;
+}
+
+.life-style-section span {
+  font-size: 18px;
+}
+
+.houseisrent span {
+  font-size: 16px;
+}
+
+.annual--carbon--box b {
+  font-weight: normal;
+  color: #000;
+  /* font-size: 18px ; */
+}
+
+.carbon-calculator-content-output-title {
+  margin-bottom: 0px;
+}
+
+.my-household-holder {
+  padding: 17px 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20.5px;
+}
+
+.my-household-holder b {
+  font-weight: 500;
+  font-size: 16px;
+  color: #333;
+}
+
+.total-household--holder {
+  display: flex;
+  gap: 120px;
+}
+
+.total-household--holder .per-person-holder,
+.total-household--holder .my-household-total-holder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.total-household--holder .per-person-holder p,
+.total-household--holder .my-household-total-holder p {
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 38px;
+  color: #333333;
+  margin-bottom: 1px;
+}
+
+.total-household--holder span {
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 146.3%;
+  color: #7e7e7e;
+}
+
+.transport-slider-holder {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.transport-slider-holder p {
+  margin-bottom: 3.5px !important;
+}
+
+.calculator--rc-slider {
+  height: 40px !important;
+}
+
+.calculator--rc-slider .rc-slider-rail {
+  background-color: #f2f2f2;
+}
+
+.calculator--rc-slider .rc-slider-track {
+  background-color: #7ba986;
+}
+
+.carbon-calculator-content-from .transport-slider-holder .rc-slider-rail,
+.carbon-calculator-content-from .transport-slider-holder .rc-slider-track {
+  height: 30px !important;
+  border-radius: 68px;
+  cursor: pointer;
+}
+
+.carbon-calculator-content-from .transport-slider-holder .rc-slider-handle {
+  opacity: 0%;
+  top: 25%;
+  height: 30px;
+  width: 30px;
+  transform: translate(-75%) !important;
+  /* left: 58% !important; */
+}
+
+/* .carbon-calculator-content-from .transport-slider-holder .MuiSlider-thumb {
+  display: none;
+}
+
+.carbon-calculator-content-from .transport-slider-holder .MuiSlider-root {
+  height: 30px;
+}
+
+.carbon-calculator-content-from .transport-slider-holder .MuiSlider-track {
+  background-color: #7ba986;
+} */
+
+.transport-slider-holder .slider--main {
+  margin: 0 20px;
+}
+
+.top-header-calculator {
+  display: flex;
+  background-color: #daeae6;
+  position: relative;
+}
+
+.carbon-calculator-content-from .calculator--household-info-holder {
+  margin-left: 0px;
+}
+
+.top-header-calculator .content {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  height: 100%;
+}
+
+.top-header-calculator .content .main-content {
+  justify-content: space-around;
+  gap: 19px;
+  align-items: center;
+  height: 100%;
+  display: flex;
+  color: #333;
+}
+
+.top-header-calculator .content h3 {
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 56px;
+}
+
+.my-household-holder .continue-button {
+  font-family: "Work Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 122.3%;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  background-color: #333;
+  padding: 17px 174px;
+  transition: all 0.3s;
+  text-transform: uppercase;
+}
+
+.life-style-section .houseisrent {
+  display: flex;
+  justify-content: space-between;
+}
+
+.lifestyle--section-holder {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.calculator--radio-button-holder {
+  width: 100%;
+}
+
+.my-household-holder .continue-button:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+.top-header-calculator .content .empty-div {
+  width: 85px;
+}
+
+.people--household-holder,
+.people--public-transport-holder {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.carbon-calculator-content-from .people--household-holder span,
+.carbon-calculator-content-from .people--public-transport-holder span {
+  font-weight: 500;
+}
+
+.top-header-calculator .content p {
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 146.3%;
+  max-width: 200px;
+}
+
+.carbon-calculator-content-output {
+  padding: 0px !important;
+  width: unset !important;
+}
+
+.carbon-calculator-content-output .main-holder {
+  width: 466px !important;
+}
+
+.carbon-calculator-content-output-title {
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 2px;
+  padding: 20px 0px !important;
+  margin-bottom: 0px !important;
+}
+
+.carbon-calculator-content-output-title .annual-box-quantity {
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 38px;
+}
+
+.carbon-calculator-content-output-title .annual-box-country {
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 146.3%;
+  color: #7e7e7e;
+}
+
+.carbon-calculator-content-from .empty-breaker {
+  width: 100%;
+  border-bottom: 1px solid #dddce1;
+}
+
+.filter-section-image {
+  top: 32% !important;
+  left: 10px !important;
+  pointer-events: none;
+}
+
+.country-holder .metricton-per-person {
+  font-weight: 500;
+  color: #333;
+  margin-top: 5px;
+}
+
+@media (max-width: 1300px) {
+  .calculator--container {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .carbon-calculator-content {
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .carbon-calculator-content-output {
+    padding-left: 18px;
+    padding-right: 18px;
+    padding-top: 25px;
+    padding-bottom: 50px;
+  }
+
+  .carbon-calculator-content-from,
+  .carbon-calculator-content-output {
+    margin: 0px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .calculator--container {
+    max-width: 100% !important;
+  }
+
+  .life-style-section {
+    text-align: center;
+  }
+
+  .lifeStyle-span {
+    align-self: flex-start;
+    justify-self: flex-start;
+  }
+
+  .lifeStyle-holder {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .lifestyle--section-holder {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .progress {
+    margin-top: 20px;
+  }
+
+  .lifeStyle-holder {
+    padding: 0px 32px;
+  }
+
+  .lifestyle--section-holder {
+    width: 100%;
+    max-width: 650px;
+  }
+
+  .calculator--radio-button-holder {
+    width: 100%;
+  }
+
+  .houseisrent {
+    justify-content: space-between;
+  }
+
+  .carbon-calculator-content-from {
+    max-width: 100%;
+    width: auto;
+    margin: 0px;
+  }
+
+  /* .carbon-calculator-content-output {
+    margin: 0 auto;
+    width: 100%;
+    padding-left: 18px;
+    padding-right: 18px;
+    padding-top: 25px;
+    padding-bottom: 50px;
+    margin: 0 auto;
+  } */
+
+  .carbon-calculator-content-from {
+    padding: 0px 15px;
+  }
+
+  .calculator--container {
+    /* padding-left: 15px; */
+    padding: 0px;
+  }
+
+  .carbon-calculator-content {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 500px) {
+  .calculator--container {
+    margin: 0px;
+  }
+
+  .filter-section .offset--input-holder {
+    font-weight: 400;
+  }
+
+  .filter-section-image {
+    top: 25% !important;
+  }
+
+  .calculator--container {
+    max-width: 100% !important;
+  }
+
+  .carbon-calculator-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .carbon-calculator-content-from {
+    padding: 0px 16px;
+  }
+
+  .transport-slider-holder p,
+  .carbon-calculator-content-from span {
+    font-size: 14px;
+  }
+
+  .transport-slider-holder p {
+    margin-bottom: 2.2px !important;
+  }
+
+  .my-household-holder .continue-button {
+    padding: 17px 140px;
+  }
+
+  .people--household-holder span,
+  .people--public-transport-holder span {
+    text-align: center;
+  }
+
+  .calculator--household-info-holder {
+    padding: 0px;
+  }
+
+  .carbon-calculator-content-output {
+    margin-left: 0px;
+  }
+
+  .life-style-section {
+    text-align: center;
+  }
+
+  .lifeStyle-span {
+    width: 100%;
+  }
+
+  .lifeStyle-holder {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .lifestyle--section-holder {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .annual--carbon-emission {
+    text-align: center;
+  }
+
+  .carbon-calculator-content-output-title {
+    padding-bottom: 17px;
+    margin-bottom: 0px;
+  }
+
+  .annual--carbon--box {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .total-household--holder {
+    gap: 72px;
+  }
+
+  .carbon-calculator-content {
+    gap: 48px;
+  }
+
+  .annual--carbon--box b {
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  .carbon--total-household {
+    font-size: 14px;
+  }
+
+  .carbon-calculator-content-from select {
+    border-radius: 0px;
+  }
+
+  .people--household-holder,
+  .people--public-transport-holder {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .carbon-calculator-content-from span {
+    line-height: 147.8%;
+  }
+
+  .carbon-calculator-content-output .main-holder,
+  .carbon-calculator-content-output {
+    width: 100% !important;
+  }
+
+  .annual-box-quantity {
+    font-size: 32px !important;
+  }
+
+  .people--household-holder span,
+  .people--public-transport-holder span {
+    font-weight: 500 !important;
+    font-size: 16px !important;
+  }
+
+  .carbon-calculator-content-from .calculator--title-holder span {
+    display: flex;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 20px;
+  }
+
+  .lifestyle--section-holder .lifeStyle-span span {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 370px) {
+  .my-household-holder .continue-button {
+    padding: 17px 0px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.filter-section,
+.filter-section select {
+  min-height: 51px;
+  margin-top: 0px !important;
+}
+
+.country-holder .filter-section select {
+  border: 1px solid #dddce1;
+}
+
+.filter-section {
+  position: relative;
+}
+
+.calculator--svg-arrow {
+  position: absolute;
+  top: 35%;
+  right: 3.5%;
+  z-index: -1;
+}
+
+select.offset--input-holder {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.active-nav {
+  font-weight: 900 !important;
+  border: 1px solid lightgray !important;
+  background: white !important;
+  color: #000 !important;
+  border-bottom: none !important;
+}
+
+.nav-tab-links {
+  padding: 15px 25px !important;
+}
+
+.dropdown-box {
+  position: absolute;
+  background: white;
+  border: 1px solid lightgray;
+  height: 200px;
+  overflow: scroll;
+  width: 100%;
+  z-index: 2;
+}
+
+.error-msg-calc {
+  color: red !important;
+  font-weight: 300 !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  margin-top: 3px;
+  margin-bottom: 20px !important;
+}
+
+.airport-names:hover {
+  background-color: lightgray;
+}
+
+.airport-names {
+  padding: 11px;
+  cursor: pointer;
+}
+
+

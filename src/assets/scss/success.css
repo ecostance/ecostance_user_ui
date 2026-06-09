@@ -1,0 +1,128 @@
+.main-row-col-success-page {
+  max-width: 1500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 100px auto;
+}
+
+.width--1200--success {
+  max-width: 1200px;
+}
+
+.order-total-text-holder--success {
+  font-size: 21px !important;
+}
+
+.share-holder-success {
+  /* margin-right: 10px; */
+}
+
+.share-holder-success button svg circle,
+.share-holder-success a svg circle {
+  transition: 0.3s all;
+}
+
+.share-holder-success button:nth-child(1):hover svg circle {
+  fill: white !important;
+}
+
+.share-holder-success button:nth-child(1):hover svg path {
+  fill: #00aced !important;
+}
+
+.share-holder-success button:nth-child(2):hover svg circle {
+  fill: white !important;
+}
+
+.share-holder-success button:nth-child(2):hover svg path {
+  fill: #3b5998 !important;
+}
+
+.share-holder-success button:nth-child(3):hover svg circle {
+  fill: white !important;
+}
+
+.share-holder-success button:nth-child(3):hover svg path {
+  fill: #25d366 !important;
+}
+
+.share-holder-success a:nth-child(4):hover svg circle {
+  fill: white !important;
+}
+
+.share-holder-success a:nth-child(4):hover svg path {
+  fill: #007fb1 !important;
+}
+
+.share-holder-success a:nth-child(5):hover svg circle {
+  fill: white !important;
+}
+
+.share-holder-success a:nth-child(5):hover svg path {
+  fill: #007fb1 !important;
+}
+.copyButton {
+  /* margin-right: 10px; */
+  margin: 0;
+  background-color: transparent;
+  /* text-transform: uppercase; */
+  color: #333333;
+  padding: 5px 0px;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 156.3%;
+  font-family: "Work Sans";
+  border: none;
+  display: flex;
+  align-items: center;
+  /* text-transform: uppercase; */
+}
+.copyButtonSvg {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  /* margin-bottom: -2px; */
+}
+.copyButton:hover .copyButtonSvg {
+  /* background-color: black;
+  border: none;
+  color: white; */
+
+  background-color: black;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.copyButton span {
+  margin-left: 5px;
+  /* font-weight: 600; */
+  /* transition: all 0.3s ease; */
+}
+
+.copyButton:hover span {
+  margin-left: 5px;
+  font-weight: 600;
+  /* transition: all 0.3s ease; */
+}
+
+.downloadQR {
+  background-color: white;
+  text-transform: uppercase;
+  color: black;
+  padding: 5px 10px;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 156.3%;
+  font-family: "Work Sans";
+  border: 1px solid #333;
+  /* text-transform: uppercase; */
+}
+.downloadQR:hover {
+  background-color: black;
+  border: 1px solid black;
+  color: white;
+}

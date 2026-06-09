@@ -1,0 +1,21 @@
+.rotating-images-bg{
+    background: #F8F8F8;
+    padding: 70px;
+    width: 80%;
+    border-radius: 20px;
+    margin: auto;
+}
+
+.img-adjust{
+    height: 380px !important;
+    width: 200px !important;
+}
+
+.img-dpp4{
+    width: 265px !important;
+    height: 380px !important;
+}
+
+.blog-img-width{
+    width: 250px !important;
+}

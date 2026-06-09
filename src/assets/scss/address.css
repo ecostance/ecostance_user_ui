@@ -1,0 +1,193 @@
+.address--section--profile.editDisabled input,
+.address--section--profile.editDisabled select {
+  /* border: 1px solid #fff !important; */
+
+  pointer-events: none;
+}
+
+.address--section--profile select {
+  appearance: none !important;
+  moz-appearance: none;
+  -webkit-appearance: none;
+
+  /* padding: 20px; */
+  border: 1px solid #e8e8e8;
+  background: #fff;
+  color: #333 !important;
+}
+
+.address--section--profile .select--container--address {
+  position: relative;
+}
+
+.address--section--profile input,
+.address--section--profile select {
+  font-weight: 400;
+  color: #7e7e7e !important;
+  font-family: "Work Sans";
+}
+
+.address--section--profile input::placeholder {
+  color: #333 !important;
+}
+
+.address--section--profile .select--container--address svg {
+  position: absolute;
+  right: 1%;
+  /* top: 24px; */
+  bottom: 12px;
+  pointer-events: none;
+}
+
+.address--section--profile.editDisabled .select--container--address svg {
+  /* padding-left: 19px !important;
+  padding-right: 19px !important; */
+  /* height: 50px !important; */
+  display: none;
+}
+
+.address--page--main {
+  border: 1px solid #ccc;
+  padding: 30px;
+  width: 100%;
+}
+
+.change--address--main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.no--border {
+  border: none !important;
+}
+
+.change--address--main .button--holder {
+  margin-bottom: 28px;
+  margin-top: 15.5px;
+}
+
+.change--address--main .button--holder button {
+  min-width: 194px !important;
+  padding: 12.33px 16.5px;
+  height: unset !important;
+  border: 1px solid #999999 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Work Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px !important;
+  line-height: 23px;
+  text-transform: uppercase;
+}
+
+.single-input-item.standard--input--box {
+  width: 408px !important;
+}
+
+.address--section--profile .single-input-item.standard--input--box input {
+  padding: 0px !important;
+}
+
+.d-flex-row {
+  display: flex;
+  justify-content: center;
+  /* margin-bottom: 60px; */
+}
+
+.gap--41 {
+  gap: 41px;
+}
+
+.mb--60 {
+  margin-bottom: 60px;
+}
+
+.address--section--profile .single-input-item label {
+  margin-bottom: 0.5rem !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #333 !important;
+}
+
+.my-account-area__content .account-details-address {
+  margin-top: 60px !important;
+}
+
+.business-name{
+  font-size: 28px;
+  text-decoration: underline;
+  margin-top: 70px;
+  margin-left: 0px;
+}
+
+.theCountryList {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.eachCountry {
+  border: 1px solid;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 20px;
+  margin-bottom: 0 !important;
+}
+
+.delCountry {
+  cursor: pointer;
+}
+
+.delCountry:hover {
+  color: black;
+  transform: scale(1.1);
+  transition: cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+@media (max-width: 500px) {
+  .address--section--profile .single-input-item label {
+    font-size: 14px !important;
+  }
+
+  .change--address--main .button--holder {
+    padding: 0px !important;
+    margin-right: 5px !important;
+  }
+
+  .change--address--main {
+    margin-top: 23px;
+  }
+
+  .change--address--main .button--holder {
+    margin-top: 0px;
+  }
+
+  .change--address--main .button--holder button {
+    width: 150.58px !important;
+    height: 30.12px !important;
+    font-family: "Work Sans";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px !important;
+    line-height: 14px;
+    min-width: unset !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .button--holder div {
+    gap: 7.96px !important;
+  }
+}
+
+@media (max-width:1000px) {
+  .d-flex-row{
+    display: block
+  }
+  .my-account-area__content .account-details-form .single-input-item{
+    margin-bottom: 60px !important;
+  }
+}

@@ -1,0 +1,359 @@
+.login-register--main-popup-holder {
+  display: flex;
+  justify-content: space-between;
+  height: unset !important;
+}
+
+.login-register--main-popup-holder .login-reg-image {
+  width: 42%;
+}
+
+.login-registration-popup-info {
+  width: 54.5%;
+  padding: 0px;
+}
+
+.login-registration-popup-info h1 {
+  font-family: "Work Sans";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 32px;
+  line-height: 38px;
+  color: #333;
+  max-width: 320px;
+  padding-bottom: 25px;
+}
+
+.login-registration-popup-info h1 span {
+  font-weight: 500;
+}
+
+.login-reg-popup-nav {
+  display: flex;
+  gap: 45px;
+  padding-top: 14px;
+  padding-bottom: 16px;
+}
+
+.login-reg-popup-nav.registerActive {
+  padding-top: 23px;
+  padding-bottom: 15px;
+}
+
+.login-reg-popup-nav div {
+  width: 68px;
+  padding-bottom: 2px;
+  text-align: center;
+  font-family: "Work Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 146.3%;
+  transition: all 0.1s;
+  color: #333;
+  cursor: pointer;
+}
+
+.login-reg-popup-nav .active {
+  font-weight: 500;
+  font-size: 16px;
+  /* transition: all 0.1s; */
+  /* color: #333; */
+  border-bottom: 2px solid #333;
+}
+
+.login-registration--input-holder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding-bottom: 27px;
+}
+
+.login-registration--input-holder input {
+  padding-bottom: 9px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  color: #7e7e7e;
+  font-family: "Work Sans";
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 146.3%;
+  letter-spacing: 0em;
+  text-align: left;
+  width: 100%;
+  background-color: transparent;
+  transition: all 0.3s ease-in-out;
+}
+
+.login-registration--input-holder input:hover,
+.login-registration--input-holder input:active {
+  border-bottom-color: #333;
+  transition: all 0.3s ease-in-out;
+}
+
+.login-registration--input-holder input::placeholder {
+  color: #7e7e7e !important;
+  font-family: "Work Sans" !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 146.3% !important;
+  letter-spacing: 0em !important;
+}
+
+.login-res-popup-input-holder {
+  width: 100%;
+  padding-right: 55px;
+}
+
+.login-registration--input-holder input {
+  color: #7e7e7e;
+}
+
+.login-registration--input-holder input::placeholder {
+  color: #7e7e7e;
+  font-weight: 400;
+  font-size: 15px;
+}
+
+.login-reg-remember-checkbox-holder label {
+  margin-bottom: 0px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #333;
+}
+
+.login-reg-remember-checkbox-holder {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 39px;
+  align-items: center;
+}
+
+.login-register--main-popup-holder .login--forgot-pasword-holder {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+  align-items: flex-start;
+  /* align-items: center; */
+  /* padding-right: 55px; */
+  padding-bottom: 24px;
+  padding-top: 11px;
+}
+
+.login-register--main-popup-holder button {
+  /* padding: 8px 38px; */
+  /* width: 125px; */
+  height: 38px;
+  background-color: #333;
+  color: #fff;
+  font-family: "Work Sans";
+  border: none;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 146.3%;
+  padding: 0px 38px;
+}
+
+.login-reg-remember-checkbox-holder input {
+  width: 17px;
+  height: 17px;
+  min-width: 17px;
+  min-height: 17px;
+}
+
+.login-register--main-popup-holder .login--forgot-pasword-holder button:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+.login-reg-forgot-holder {
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 146.3%;
+  color: #777777;
+  cursor: pointer;
+}
+
+.login-reg-forgot-holder:hover {
+  color: #333;
+}
+
+.login-reg-popup-register--holder .login-reg-remember-login-holder {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  /* justify-content: space-between; */
+  /* padding-right: 55px; */
+  /* align-items: center; */
+}
+
+.login-reg-popup-register--holder .login-reg-remember-checkbox-holder {
+  padding-bottom: 0px;
+}
+
+.login-register-svg-holder {
+  position: absolute;
+  right: calc(2%);
+  top: calc(2%);
+}
+
+@media only screen and (max-width: 900px) {
+  .login-register--main-popup-holder {
+    flex-direction: column-reverse;
+    max-height: 800px;
+    overflow: auto;
+  }
+
+  .login-registration-popup-info h1 {
+    padding-bottom: 28px;
+  }
+
+  .login-reg-popup-nav {
+    justify-content: center;
+  }
+
+  .login-registration-popup-info {
+    width: 100%;
+  }
+
+  .login-register--main-popup-holder .login-reg-image {
+    width: unset;
+    max-width: 320px;
+  }
+
+  .login-reg-popup-register--holder,
+  .login-reg-popup-login--holder {
+    padding: 0px 16px;
+  }
+
+  .login-reg-popup-nav {
+    padding-top: 36.22px;
+    padding-bottom: 20.15px;
+    margin: 0 auto;
+  }
+
+  .login-register--main-popup-holder .login--forgot-pasword-holder {
+    justify-content: space-between;
+  }
+
+  .login-reg-popup-register--holder .login-reg-remember-login-holder,
+  .login-register--main-popup-holder .login--forgot-pasword-holder,
+  .login-res-popup-input-holder {
+    padding-right: 0px;
+  }
+
+  .login-register-svg-holder {
+    position: absolute;
+    right: calc(3%);
+    top: calc(1.4%);
+  }
+
+  .login-reg-remember-checkbox-holder {
+    padding-bottom: 34px;
+  }
+}
+
+.login-reg-remember-checkbox-holder input {
+  min-width: 17px;
+  min-height: 17px;
+}
+
+.error-msg.tos {
+  margin-bottom: 7px;
+  margin-top: -8px;
+  margin-left: 24px;
+}
+
+.login-res-popup-input-holder label {
+  margin-bottom: 10px;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 146.3%;
+  color: #7e7e7e;
+}
+
+.login-reg-popup-register--holder {
+  padding-bottom: 26px;
+}
+
+.eye-icon.login-reg-modal {
+  transform: unset;
+}
+
+.reg-input-holder {
+  gap: 26px;
+  padding-bottom: 18px;
+}
+
+.login-register-cross-icon {
+  top: 14px !important;
+  right: 19px !important;
+}
+
+@media (max-width: 500px) {
+  .login-registration--input-holder {
+    gap: 45px;
+    padding-bottom: 69px;
+  }
+
+  .login-register--main-popup-holder button {
+    padding: 0px;
+  }
+
+  .login-res-popup-input-holder label {
+    display: none;
+  }
+
+  .login-registration--input-holder input {
+    border-bottom: 1px solid #7e7e7e;
+  }
+
+  .login-registration--input-holder input,
+  .login-registration--input-holder input::placeholder {
+    font-size: 15px !important;
+  }
+
+  .login-registration-popup-info h1 {
+    padding-bottom: 52px;
+  }
+
+  .login-register--main-popup-holder .login--forgot-pasword-holder {
+    padding-top: 0;
+    padding-bottom: 0;
+    flex-direction: row-reverse;
+    align-items: center;
+  }
+
+  .login-register--main-popup-holder .login-reg-image {
+    max-width: 280px;
+  }
+
+  .login-reg-popup-nav.registerActive {
+    padding-top: 36px;
+    padding-bottom: 20px;
+  }
+
+  .reg-input-holder {
+    gap: 35px;
+    padding-bottom: 49px;
+  }
+
+  .login-reg-popup-register--holder {
+    padding-bottom: 0px;
+  }
+
+  .login-register--main-popup-holder button {
+    width: 155px;
+    height: 45px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 156.3%;
+  }
+
+  .login-register-cross-icon {
+    top: 15px !important;
+    right: 15px !important;
+  }
+}

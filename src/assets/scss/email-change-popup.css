@@ -1,0 +1,283 @@
+.verify-primary-email-content-wrapper {
+  display: flex;
+  gap: 34px;
+  padding-left: 28px;
+  padding-right: 44px;
+}
+
+.verify-primary-email--popup-img-area {
+  padding-top: 35px;
+  display: flex;
+  flex-direction: column;
+  gap: 38px;
+}
+
+.verify-primary-email--popup-img-area.verify-recovery-email--popup-img-area {
+  gap: 0px;
+}
+
+.txt-step {
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 146.3%;
+  color: #333333;
+  margin-bottom: 2px;
+}
+
+.steps-bar-container {
+  display: flex;
+  gap: 4px;
+}
+
+.steps-bar {
+  width: 185px;
+  height: 4px;
+  background: #f2f2f2;
+  border-radius: 30px;
+}
+
+.steps-bar.completed {
+  background: #75b1dc;
+}
+
+.verify-primary-email--popup-img-container {
+  max-width: 384px;
+  max-height: 266px;
+  width: 100%;
+  height: 100%;
+}
+
+.verify-primary-email--popup-img {
+  width: 100%;
+  height: 100%;
+}
+
+.verify-primary-email-text-area {
+  padding: 31px 0px 5px 0;
+}
+
+.verify-primary-email-heading {
+  max-width: 377px;
+  font-weight: 300;
+  font-size: 32px;
+  line-height: 38px;
+  color: #333333;
+  margin-bottom: 25px;
+}
+
+.verify-primary-email-heading.recovery-email-heading {
+  max-width: unset;
+}
+
+.verify-primary-email-message {
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 146.3%;
+  color: #7e7e7e;
+  margin-bottom: 30px;
+}
+
+.verify-primary-email-button-container {
+  margin-top: 32px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: center;
+}
+
+.verify-primary-email-button {
+  width: 181px;
+  height: 49px;
+  background: #333333;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 156.3%;
+  text-align: center;
+  color: #ffffff;
+}
+
+.step-two .verify-primary-email-button:first-child {
+  padding: 0px 69px;
+  width: unset !important;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.verify-primary-email-button.ghost {
+  width: 195px;
+}
+
+.verify-primary-email-resend-container {
+  text-align: center;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 148.3%;
+  color: #333333;
+}
+
+.verify-primary-email-resend-container span {
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.verify-primary-email-heading.step-two {
+  max-width: 401px;
+  margin-bottom: 14px;
+}
+
+.verify-primary-email-message.step-two {
+  color: #333333;
+  margin-bottom: 20px;
+}
+
+.verify-primary-email--password-holder {
+  padding-right: 0px;
+}
+
+.verify-primary-email--password-holder input {
+  color: #7e7e7e;
+  padding-bottom: 9px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  color: #7e7e7e;
+  font-family: "Work Sans";
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 146.3%;
+  letter-spacing: 0em;
+  text-align: left;
+  width: 100%;
+  transition: all 0.3s ease-in-out;
+}
+
+.verify-primary-email--password-holder input:hover,
+.verify-primary-email--password-holder input:active {
+  border-bottom-color: #333333;
+  transition: all 0.3s ease-in-out;
+}
+
+.verify-primary-email-button-container.step-two {
+  margin-top: 60px;
+  margin-bottom: 24px;
+  justify-content: space-between;
+}
+
+.forgot-password {
+  font-weight: 400 !important;
+  text-decoration: none !important;
+}
+
+.verify-primary-email--popup-img-area.step-two {
+  gap: 13px;
+}
+
+.verify-primary-email--popup-steps-container.recovery-email-steps-container {
+  visibility: hidden;
+}
+
+.timer-text.recovery-email-popup {
+  margin-bottom: 0;
+  margin-top: 14px;
+}
+
+.disabled {
+  cursor: not-allowed !important;
+}
+
+@media (max-width: 901px) {
+  .verify-primary-email-content-wrapper {
+    flex-direction: column;
+    gap: 14px;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  .verify-primary-email--popup-img-area {
+    flex-direction: column-reverse;
+    gap: 0px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .verify-primary-email--popup-steps-container {
+    padding-left: 11px;
+    padding-right: 5px;
+  }
+
+  .verify-primary-email--popup-img-container {
+    max-width: 338px;
+    max-height: 235px;
+  }
+
+  .steps-bar {
+    width: unset;
+    flex: 1;
+  }
+
+  .verify-primary-email-text-area {
+    padding-top: 0px;
+    padding-bottom: 22px;
+    padding-left: 19px;
+    padding-right: 13px;
+  }
+
+  .verify-primary-email-heading {
+    max-width: 322px;
+    margin-bottom: 20px;
+  }
+
+  .verify-primary-email-message {
+    margin-bottom: 28px;
+  }
+
+  .verify-email-otp-container.verify-primary-email {
+    margin-bottom: 0px !important;
+  }
+
+  .verify-primary-email-button-container {
+    margin-top: 0px;
+    margin-bottom: 20px;
+  }
+
+  .verify-primary-email-button {
+    width: 100%;
+  }
+
+  .verify-primary-email--popup-img-area.step-two {
+    gap: 0px;
+  }
+
+  .verify-primary-email-heading.step-two {
+    margin-bottom: 7px;
+  }
+
+  .verify-primary-email-message.step-two {
+    margin-bottom: 25px;
+  }
+
+  .verify-primary-email--password-holder label {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .verify-primary-email-button-container.step-two {
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 54px;
+    margin-bottom: 34px;
+  }
+
+  .verify-primary-email-button.ghost {
+    width: 100%;
+  }
+
+  .verify-primary-email-text-area.step-two {
+    padding-bottom: 9px;
+  }
+
+  .timer-text.recovery-email-popup {
+    margin-bottom: 12px;
+  }
+}

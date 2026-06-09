@@ -1,0 +1,212 @@
+.verify-email-heading {
+    margin-bottom: 12px !important;
+    font-family: 'Work Sans';
+    font-style: normal;
+    font-weight: 300 !important;
+    font-size: 32px !important;
+    line-height: 38px !important;
+    width: auto !important;
+}
+
+.verify-email-heading span {
+    font-weight: 500 !important;
+}
+
+.verify-email-message {
+    font-family: Work Sans;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 146%;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #333333;
+    margin-bottom: 11px;
+    color: #7E7E7E !important;
+    width: auto !important;
+    padding-right: 20px !important;
+}
+
+.verify-email-user-email {
+    color: #333333 !important;
+    font-weight: 500 !important;
+}
+
+.verify-email-txt-verify {
+    color: #333333 !important;
+    font-weight: 500 !important;
+}
+
+.verify-email-button {
+    border: none !important;
+    outline: none !important;
+    width: 195px !important;
+    height: 49px !important;
+    font-family: 'Work Sans' !important;
+    font-style: normal;
+    font-weight: 500 !important;
+    font-size: 16px !important;
+    line-height: 156.3% !important;
+    color: #FFFFFF !important;
+}
+
+.resend:hover {
+    background-color: #333333 !important;
+}
+
+.do-it-later {
+    /* background: transparent !important; */
+    /* color: #333333 !important; */
+    /* border: 1px solid #333333 !important; */
+    /* margin-left: 25px; */
+    line-height: 110.3% !important;
+    word-wrap: break-word;
+}
+
+.do-it-later:hover {
+    background-color: #333333 !important;
+    border: none !important;
+}
+
+.verify-email-content-wrapper {
+    display: flex;
+    padding: 0 30px !important;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.verify-email-text-area {
+    width: 50%;
+}
+
+.registration--popup-img-area {}
+
+.verify-email-button-container {
+    display: flex;
+    align-items: 'center';
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.verify-email-otp-container {
+    display: flex;
+    justify-content: space-between;
+    /* margin-bottom: 31px; */
+}
+
+.input-box {
+    width: 47.36px;
+    height: 74px;
+    border: 1px solid #DDDCE1;
+    text-align: center;
+    font-family: 'Work Sans';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 32px;
+}
+
+.input-box:focus {
+    border-color: #1b74e4;
+    box-shadow: 0 0 0 2px #e7f3ff;
+    caret-color: #1b74e4;
+}
+
+.err-box {
+    border: 1px solid #f02849;
+}
+
+.err-box:focus {
+    border-color: #f02849;
+    box-shadow: none;
+    caret-color: unset;
+}
+
+.verify-email-resend-container {
+    text-align: center;
+    font-family: 'Work Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    color: #333333;
+}
+
+.verify-email-resend-container span {
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.invalid-otp-msg {
+    font-family: "Work Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1;
+    color: #333333;
+    padding: 7px 0px 7px 0px;
+}
+
+.timer-text {
+    font-family: 'Work Sans';
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0em;
+    color: #7E7E7E !important;
+    text-align: center;
+    line-height: 1;
+    margin-bottom: 12px;
+}
+
+.verify-popup-holder {
+    height: unset !important;
+    min-height: 445px !important;
+    padding: 12px 0;
+}
+
+@media (max-width: 500px) {
+    .verify-email-content-wrapper {
+        padding-left: 0px !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .verify-email-message {
+        padding-right: 0px !important;
+        margin-bottom: 17px !important;
+    }
+
+    .verify-email-heading {
+        margin-bottom: 17px !important;
+    }
+
+    .verify-email-button {
+        width: 100% !important;
+    }
+
+    .do-it-later {
+        margin-top: 14px;
+        margin-left: 0px !important;
+    }
+
+    .verify-email-content-wrapper {
+        flex-direction: column;
+        padding-top: 50px !important;
+        padding-bottom: 50px !important;
+        padding-left: 10px !important;
+        width: 100%;
+        gap: 10px !important;
+    }
+
+    .verify-email-text-area {
+        flex: 1;
+        width: 100%;
+        padding-right: 10px;
+    }
+
+    .verify-email-button-container {
+        flex-direction: column;
+        margin-bottom: 34px !important;
+    }
+
+    .verify-email-otp-container {
+        margin-bottom: 24px !important;
+    }
+}

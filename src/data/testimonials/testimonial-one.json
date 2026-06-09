@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1",
+    "name": "Lori Jackson",
+    "designation": "Boston, MA",
+    "image": "/assets/images/testimonial-img-1.jpg",
+    "content": "I was able to reduce our family’s carbon footprint with an easy calculator and purchase experience."
+  },
+  {
+    "id": "2",
+    "name": "Giovanni Bianchi",
+    "designation": "Florence, Italy",
+    "image": "/assets/images/testimonial/testimonial-2-80x80.jpg",
+    "content": "This is my 2nd time purchasing three more carbon offsetting projects. I shared my Eco Stance page on soc media."
+  },
+  {
+    "id": "3",
+    "name": "Jeff Brogan",
+    "designation": "Birmingham, UK",
+    "image": "/assets/images/testimonial/testimonial-3-80x80.jpg",
+    "content": "The “easy” button to becoming carbon neutral. We’ve increased our sales and customer base."
+  }
+]

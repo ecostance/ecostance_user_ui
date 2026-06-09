@@ -1,0 +1,10 @@
+.each--product--standard {
+  display: flex;
+  align-items: center;
+}
+
+@media screen and (max-width: 500px) {
+  .each--product--standard {
+    flex-wrap: wrap;
+  }
+}

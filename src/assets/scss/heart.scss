@@ -1,0 +1,31 @@
+// TWITTER HEART
+.heart {
+  z-index: 9999;
+  width: 100px;
+  height: 100px;
+  transform: scale(0.6);
+  background: url('https://cssanimation.rocks/images/posts/steps/heart.png')
+    no-repeat;
+  background-position: 0 0;
+  cursor: pointer;
+  transition: background-position 1s steps(28);
+  transition-duration: 0s;
+  position: absolute;
+  top: -23%;
+  left: -75%;
+
+  &.is-active {
+    top: -75%;
+    transition-duration: 1s;
+    background-position: -2800px 0;
+    filter: invert(24%) sepia(54%) saturate(4735%) hue-rotate(340deg)
+      brightness(80%) contrast(111%);
+  }
+}
+
+// .stage {
+//   position: fixed;
+//   top: 50%;
+//   left: 50%;
+//   transform: translate(-50%, -50%);
+// }

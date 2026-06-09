@@ -1,0 +1,54 @@
+.circle-icon--header {
+  width: 16px;
+  height: 16px;
+  font-size: 14.6px;
+  border-radius: 50%;
+  text-align: center;
+  background-color: #d3122a;
+  position: absolute;
+  right: -14px;
+  top: -8px;
+}
+
+.green-circle {
+  width: 16px;
+  height: 16px;
+  font-size: 14.6px;
+  border-radius: 50%;
+  text-align: center;
+  background-color: green;
+  position: absolute;
+  left: 35px;
+  top: -10px;
+  align-items: center;
+}
+
+.my--account--header {
+  position: relative;
+}
+
+.circle-icon--header svg {
+  fill: #fff !important;
+  transform: scale(1.5);
+}
+
+.green-circle svg {
+  fill: #fff !important;
+  transform: scale(1.5);
+}
+
+
+.circle-green-icon--header {
+  border-radius: 50%;
+  text-align: center;
+  background-color: green;
+  position: relative;
+}
+
+.circle-green-icon--header svg {
+  fill: #fff !important;
+  transform: scale(1.5);
+  margin-top: -3px;
+  margin-left: 1px;
+  margin-right: 1px;
+}

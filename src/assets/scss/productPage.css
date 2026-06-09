@@ -1,0 +1,23 @@
+@media (max-width: 400px) {
+  .linkItems {
+    width: 50px;
+    text-overflow: ellipsis;
+  }
+  .productPage.standards--section {
+    flex-direction: column !important;
+  }
+  .productPage.standards--section1 {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+}
+
+.product-description-tab__navigation.nav.nav-pills {
+  overflow: auto;
+  flex-wrap: nowrap;
+  justify-content: unset !important;
+}
+
+.product-description-tab__navigation.nav.nav-pills .nav-item a {
+  white-space: nowrap;
+}

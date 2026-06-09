@@ -1,0 +1,39 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ecostance.ecostance1",
+      "sha256_cert_fingerprints": [
+        "49:BF:58:C1:84:81:38:B7:B9:ED:29:41:0C:27:3F:66:7E:17:E5:44:65:4D:B4:83:8C:13:F7:D9:D2:67:06:DE"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ecostance.ecostance1",
+      "sha256_cert_fingerprints": [
+        "6D:D7:04:6F:A0:E3:D4:B0:E9:34:62:15:A4:61:32:D7:5B:26:78:56:B3:1C:16:A5:EB:C1:7E:F0:D7:11:F1:F7"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ecostance.ecostance1",
+      "sha256_cert_fingerprints": [
+        "7F:99:FD:9D:FF:BA:8A:B3:3B:1E:EA:B6:72:65:8A:9F:9A:F7:9A:EA:3F:F4:61:C2:87:22:92:84:B0:71:B4:4B"
+      ]
+    }
+  }
+]

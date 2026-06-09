@@ -1,0 +1,437 @@
+@import url("https://fonts.googleapis.com/css?family=Work+Sans:400,700,600,500");
+.certificate--main-holder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* min-width: 100vw;
+  min-height: 100vh; */
+}
+.certificate--title {
+  font-family: Work Sans;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: 0em;
+  text-align: center;
+}
+.certificate-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 3px solid #71b467;
+  width: 517px;
+}
+.certificate--main {
+  display: flex;
+  gap: 43px;
+  flex-direction: row;
+  width: 100%;
+  font-family: "Work Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 28px;
+  justify-content: center;
+}
+.certificate--content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+.certificate--title {
+  height: 65px;
+  background-color: #71b467;
+  color: #ffffff;
+}
+.certificate--section1 {
+  flex-direction: column;
+  padding-bottom: 21px;
+  gap: 4px;
+}
+
+.certificate--section-common {
+  padding: 20px 0px;
+}
+
+.certificate--section1 p {
+  font-family: Work Sans;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 19px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #333;
+}
+
+.certificate--section1 > p {
+  margin: 0px;
+  font-size: 16px;
+}
+.certificate--section1 h3 {
+  font-family: Work Sans;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 19px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #333;
+}
+
+.certificate--section-common .buyer {
+  font-weight: 400;
+}
+.certificate-divider {
+  width: 90%;
+  border: 1px solid #efefef;
+  background: #000000;
+  /* transform: rotate(-90deg); */
+}
+.certificate--section-common {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 15%;
+}
+.certificate-section_child {
+  display: flex;
+  flex-direction: column;
+  max-width: 145px;
+  gap: 8px;
+  /* max-width: 150px; */
+}
+/* .certificate--section-common:first-child {
+  max-width: 150px;
+} */
+/* .section_child:last-child {
+  max-width: 145px;
+} */
+
+.image-section {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 43px;
+}
+
+.certificate--section-common {
+  font-family: Work Sans;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0em;
+  color: #a8a8a8;
+  display: flex;
+}
+
+.certificate--section-common b {
+  font-family: Work Sans;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0em;
+  text-align: left;
+  color: #333;
+  max-width: 145px;
+  /* width: 145px; */
+}
+
+/* .certificate--section-common b:first-child {
+  mar
+} */
+
+.certificate-section_child {
+  flex-direction: column;
+  /* max-width: 150px; */
+}
+.certificate-section_child > p {
+  margin: 0px;
+  padding: 0px;
+}
+
+.certificate--information-holder {
+  padding: 27px 80px;
+  padding-right: 36px;
+  width: 100%;
+}
+
+.certificate--first-common,
+.certificate--second-common,
+.certificate--third-common {
+  display: flex;
+}
+
+.certificate--first-common {
+  gap: 65px;
+}
+
+.certificate--second-common {
+  gap: 65px;
+}
+
+.certificate--third-common {
+  gap: 65px;
+}
+
+.certificate--information-holder p {
+  white-space: nowrap;
+}
+
+.chain-of-custody-info-holder {
+  padding: 22px 52px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.chain-of-custody-info-holder b {
+  font-family: Work Sans;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0em;
+  text-align: left;
+  color: #333;
+}
+
+.certificate--number-holder {
+  display: flex;
+  flex-direction: column;
+  font-family: Work Sans;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #b1b1b1;
+  margin-bottom: 31px;
+}
+
+.certificate--number-holder b {
+  font-family: Work Sans;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: 0em;
+  text-align: center;
+
+  color: #333;
+}
+
+.delivered--date-holder {
+  margin-bottom: 37px;
+}
+
+.delivered--date-holder p {
+  font-family: Work Sans;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #b1b1b1;
+}
+
+.delivered--date-holder b {
+  font-family: Work Sans;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0em;
+  /* text-align: right; */
+  color: #333;
+}
+
+.certificate--authenticity-holder {
+  padding: 18px 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.certificate--authenticity-holder p {
+  font-family: Work Sans;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #a8a8a8;
+}
+
+.certificate--image-holder {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.certificate--main-holder {
+  display: flex;
+  flex-direction: column;
+  gap: 62px;
+  padding-top: 40px;
+}
+.certificate--certificate-info-holder {
+  font-family: Work Sans;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 12px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #333;
+}
+.delivered--date-holder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (max-width: 1000px) {
+  .certificate--main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+  }
+
+  .delivered--date-holder b {
+    text-align: center;
+  }
+}
+
+@media (max-width: 575px) {
+  .certificate--information-holder {
+    padding: 9px 6px;
+    display: flex;
+    /* justify-content: center; */
+    flex-direction: column;
+    align-items: center;
+  }
+  .certificate-box {
+    border: 6px solid #71b467;
+    width: 450px;
+  }
+}
+
+@media (max-width: 480px) {
+  .certificate-divider {
+    display: none;
+  }
+  .certificate--information-text-holder {
+    margin: 0 auto;
+  }
+  .certificate--section-common {
+    align-self: flex-start;
+  }
+  .certificate--third-common {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 29px;
+  }
+
+  .chain-of-custody-info-holder {
+    padding: 33px 15px;
+  }
+
+  .certificate-box {
+    width: 370px;
+  }
+
+  .certificate--first-common,
+  .certificate--second-common {
+    gap: 42px;
+  }
+  .certificate--certificate-info-holder p {
+    font-size: 10px;
+    word-wrap: break-word;
+    padding: 0px 12px;
+  }
+  .certificate--certificate-info-holder {
+    max-width: 100%;
+    width: 100%;
+  }
+  .certificate-box {
+    width: 100%;
+  }
+  .certificate--main-holder {
+    margin: 0 auto;
+    gap: 15px;
+  }
+  .certificate--check-img {
+    width: 40px;
+  }
+  .certificate-deliver--holder {
+    display: flex;
+    gap: 23px;
+  }
+  .certificate-deliver--holder {
+    font-size: 14px;
+  }
+
+  .certificate-deliver--holder b {
+    font-size: 14px;
+    text-align: start;
+  }
+  .certificate-deliver--holder p {
+    color: #333;
+  }
+  .certificate--authenticity-holder p {
+    color: #333;
+  }
+  .delivered--date-holder {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: end;
+  }
+  .certificate--main {
+    width: auto;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 400px) {
+  .certificate--authenticity-holder b {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 373px) {
+  .certificate--number-holder,
+  .delivered--date-holder {
+    font-size: 12px;
+  }
+  .chain-of-custody-info-holder {
+    padding: 33px 0px;
+  }
+  .image-section img {
+    max-width: 320px;
+  }
+  .certificate-box {
+    /* max-width: 350px; */
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 345px) {
+  .certificate--section-common {
+    gap: 20px;
+  }
+  .image-section img {
+    max-width: 291px;
+  }
+
+  .certificate--authenticity-holder b,
+  .delivered--date-holder b,
+  .certificate--number-holder b,
+  .certificate--number-holder p,
+  .delivered--date-holder p,
+  .certificate--section-common b,
+  .certificate--section-common {
+    font-size: 11px;
+  }
+}
