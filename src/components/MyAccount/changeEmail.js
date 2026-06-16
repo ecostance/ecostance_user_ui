@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { useToasts } from "react-toast-notifications";
 
@@ -36,6 +36,31 @@ const ChangeEmail = ({
   const EMAIL_REGEX =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
+  const resetPrimaryEmail = useCallback(
+    () => setEmail(profileRelatedData?.email || ""),
+    [profileRelatedData?.email]
+  );
+  const resetRecoveryEmail = useCallback(
+    () => setRecoveryEmail(profileRelatedData?.recoveryEmail || ""),
+    [profileRelatedData?.recoveryEmail]
+  );
+
+  // meData often arrives after mount (client /me fetch, tab switch). useState
+  // initializers only run once — keep fields in sync when profile loads.
+  useEffect(() => {
+    if (!profileRelatedData) return;
+    if (!emailEditEnabled) {
+      setEmail(profileRelatedData.email || "");
+    }
+    if (!recoveryEmailEditEnabled) {
+      setRecoveryEmail(profileRelatedData.recoveryEmail || "");
+    }
+  }, [
+    profileRelatedData,
+    emailEditEnabled,
+    recoveryEmailEditEnabled,
+  ]);
+
   useEffect(() => () => removeAllToasts(), []);
 
   useEffect(() => {
@@ -52,22 +77,22 @@ const ChangeEmail = ({
       setPrimaryEmailSuccess(false);
       removeAllToasts();
     }
-  }, [isChangeEmailActive]);
+  }, [isChangeEmailActive, resetPrimaryEmail, resetRecoveryEmail, removeAllToasts]);
 
   useEffect(() => {
     emailEditEnabledRef.current = {
       setRecoveryEmailEditEnabled: setRecoveryEmailEditEnabled,
       setPrimaryEmailEditEnabled: setEmailEditEnabled,
-      resetPrimaryEmail: resetPrimaryEmail,
-      resetRecoveryEmail: resetRecoveryEmail,
+      resetPrimaryEmail,
+      resetRecoveryEmail,
       setRecoveryEmailSuccess: setRecoveryEmailSuccess,
       setPrimaryEmailSuccess: setPrimaryEmailSuccess,
     };
-  }, []);
-
-  const resetPrimaryEmail = () => setEmail(profileRelatedData?.email || "");
-  const resetRecoveryEmail = () =>
-    setRecoveryEmail(profileRelatedData?.recoveryEmail || "");
+  }, [
+    resetPrimaryEmail,
+    resetRecoveryEmail,
+    emailEditEnabledRef,
+  ]);
 
   const submitChangeHandler = async (emailType) => {
     if (emailType === "Email") {

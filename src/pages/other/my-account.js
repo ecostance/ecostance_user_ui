@@ -6,12 +6,11 @@ import { LayoutTwo } from "../../components/Layout";
 import { BreadcrumbOne } from "../../components/Breadcrumb";
 import { me, sendResetPasswordLink } from "src/apiClient/auth";
 import { connect } from "react-redux";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useToasts } from "react-toast-notifications";
 import Sustainability from "../../components/MyAccount/Sustainability";
 import Orders from "src/components/MyAccount/orders";
 import Address from "../../components/MyAccount/Address";
-import { useEffect } from "react";
 import { verifyLoggedIn } from "src/apiClient/user";
 import router from "next/router";
 import Popup from "./popup";
@@ -233,7 +232,7 @@ const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
     }
   };
 
-  const getMeData = async () => {
+  const getMeData = useCallback(async () => {
     try {
       const res = await me();
       if (res?.success) {
@@ -245,7 +244,14 @@ const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, []);
+
+  // getServerSideProps can return { success: false } on refresh (SSR env, API
+  // errors, or cookie timing) while the browser session is still valid — refetch /me on the client.
+  useEffect(() => {
+    if (meData?.success) return;
+    getMeData();
+  }, [meData?.success, getMeData]);
 
   const handleForgotPasswordPopup = () => {
     setShowPrimaryEmailPopup(false);
