@@ -288,22 +288,27 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(mapStateToProps, mapDispatchToProps)(ProductBasic);
 
 export async function getStaticPaths() {
-  // get the paths we want to pre render based on products
-  const products = (await getProducts()).data;
-  const paths = products
-    ?.map((product) => {
-      if (product.slug) {
-        return {
-          params: { slug: product.slug },
-        };
-      }
-    })
-    .filter((path) => path !== undefined);
-  return { paths, fallback: false };
+  try {
+    const products = (await getProducts()).data;
+    const paths = products
+      ?.map((product) => {
+        if (product.slug) {
+          return { params: { slug: product.slug } };
+        }
+      })
+      .filter((path) => path !== undefined) || [];
+    return { paths, fallback: "blocking" };
+  } catch (err) {
+    return { paths: [], fallback: "blocking" };
+  }
 }
 
 export async function getStaticProps({ params }) {
-  // get product data based on slug
-  // const res = await getProductBySlug(params.slug);
-  return { props: { product: (await getProductBySlug(params.slug)).data } };
+  try {
+    const product = (await getProductBySlug(params.slug)).data;
+    if (!product) return { notFound: true };
+    return { props: { product } };
+  } catch (err) {
+    return { notFound: true };
+  }
 }

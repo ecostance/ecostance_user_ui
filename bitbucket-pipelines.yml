@@ -10,6 +10,9 @@ pipelines:
            caches:
              - node
            script:
+             - echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> .env
+             - echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" >> .env
+             - echo "API_BASE=$API_BASE" >> .env
              - npm install --force
              - CI=false npx next build
              - mkdir packaged
