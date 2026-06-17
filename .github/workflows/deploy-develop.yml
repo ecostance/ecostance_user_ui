@@ -13,6 +13,10 @@ concurrency:
   group: deploy-develop
   cancel-in-progress: true
 
+permissions:
+  # Allow the auto-provided GITHUB_TOKEN to read this repo (for the server-side fetch).
+  contents: read
+
 jobs:
   deploy:
     name: Build & deploy on server
@@ -40,12 +44,16 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
           APP_NAME: ${{ secrets.APP_NAME }}
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          # Ephemeral token (valid only for this job) + "owner/repo", used to
+          # fetch over HTTPS so the server needs no GitHub SSH key of its own.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          envs: DEPLOY_PATH,APP_NAME,DEPLOY_PORT
+          envs: DEPLOY_PATH,APP_NAME,DEPLOY_PORT,GH_TOKEN,REPO
           script: |
             set -euo pipefail
 
@@ -65,16 +73,21 @@ jobs:
             # --- The repo must already be cloned at DEPLOY_PATH (one-time setup) ---
             if [ ! -d "$DEPLOY_PATH/.git" ]; then
               echo "::error:: No git repo at $DEPLOY_PATH."
-              echo "One-time setup: git clone -b develop git@github.com:ecostance/ecostance_user_ui.git \"$DEPLOY_PATH\""
+              echo "One-time setup: git clone -b develop https://github.com/${REPO}.git \"$DEPLOY_PATH\""
               exit 1
             fi
 
             cd "$DEPLOY_PATH"
 
-            # --- Sync to latest develop ---
-            git fetch origin develop
-            git checkout develop
-            git reset --hard origin/develop
+            # Trust this checkout even if it's owned by another user (avoids
+            # git's "detected dubious ownership" refusal after a chown).
+            git config --global --add safe.directory "$DEPLOY_PATH"
+
+            # --- Sync to latest develop over HTTPS using the ephemeral token. ---
+            # Fetch via an explicit authenticated URL so the token is NOT written
+            # into .git/config; then point local develop at exactly what we fetched.
+            git fetch "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" develop
+            git checkout -B develop FETCH_HEAD
 
             # --- Put the uploaded .env in place ---
             mv -f ~/deploy.env "$DEPLOY_PATH/.env"
