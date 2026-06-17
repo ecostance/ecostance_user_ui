@@ -28,4 +28,5 @@ pipelines:
              - tar -xf packaged/package-${BITBUCKET_BUILD_NUMBER}.tar.gz -C upload
              - apk update && apk add openssh rsync
              - rsync -zrSlh --stats upload/ $USERNAME@$SERVER:ecostance.com
+             - printf 'STRIPE_SECRET_KEY=%s\nNEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=%s\nAPI_BASE=%s\n' "$STRIPE_SECRET_KEY" "$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" "$API_BASE" | ssh $USERNAME@$SERVER "cat > ecostance.com/.env"
              - ssh  $USERNAME@$SERVER "./ecostance.com.sh"
