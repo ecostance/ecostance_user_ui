@@ -520,18 +520,28 @@ const returnFormattedData = (data) => {
 };
 
 export async function getStaticProps() {
-  const paginateFields = "page=1&size=8&shouldPaginate=1";
-  const popularProducts = await getProducts(paginateFields);
-  const featuredProduct = await getFeaturedProduct();
-  const offeredProduct = await getOfferedProduct();
-  const featuredProductData = returnFormattedData(featuredProduct);
-  const offeredProductData = returnFormattedData(offeredProduct);
-  return {
-    props: {
-      featuredProductData,
-      offeredProductData,
-      popularProducts: popularProducts?.data || [],
-    },
-  };
+  try {
+    const paginateFields = "page=1&size=8&shouldPaginate=1";
+    const popularProducts = await getProducts(paginateFields);
+    const featuredProduct = await getFeaturedProduct();
+    const offeredProduct = await getOfferedProduct();
+    const featuredProductData = returnFormattedData(featuredProduct);
+    const offeredProductData = returnFormattedData(offeredProduct);
+    return {
+      props: {
+        featuredProductData,
+        offeredProductData,
+        popularProducts: popularProducts?.data || [],
+      },
+    };
+  } catch (err) {
+    return {
+      props: {
+        featuredProductData: { success: false },
+        offeredProductData: { success: false },
+        popularProducts: [],
+      },
+    };
+  }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Furniture);
