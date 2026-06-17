@@ -1,0 +1,104 @@
+name: Deploy (develop)
+
+# Auto-deploy the develop branch to the server over SSH.
+# The server pulls develop, installs, builds, and (re)starts the app under PM2.
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch: {} # allow manual runs from the Actions tab
+
+concurrency:
+  # Never run two deploys at once; cancel an in-flight one if a newer push lands.
+  group: deploy-develop
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build & deploy on server
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Write the .env file from the GitHub secret onto the runner.
+      - name: Create .env from secret
+        run: printf '%s' "${{ secrets.ENV_FILE }}" > deploy.env
+
+      # 2. Copy the .env up to the server (lands in the SSH user's home dir).
+      - name: Copy .env to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }} # optional, defaults to 22 if blank
+          source: deploy.env
+          target: ~/
+
+      # 3. Pull, build, and (re)start under PM2 on the server.
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          APP_NAME: ${{ secrets.APP_NAME }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          envs: DEPLOY_PATH,APP_NAME,DEPLOY_PORT
+          script: |
+            set -euo pipefail
+
+            # --- Config (with sensible fallbacks if a secret is unset) ---
+            APP_NAME="${APP_NAME:-ecostance-user-ui}"
+            DEPLOY_PORT="${DEPLOY_PORT:-3000}"
+            if [ -z "${DEPLOY_PATH:-}" ]; then
+              echo "::error:: DEPLOY_PATH secret is not set"; exit 1
+            fi
+
+            # Load nvm if PM2/node live under it (common on managed servers).
+            export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+            echo ">>> Deploying $APP_NAME to $DEPLOY_PATH (port $DEPLOY_PORT)"
+
+            # --- The repo must already be cloned at DEPLOY_PATH (one-time setup) ---
+            if [ ! -d "$DEPLOY_PATH/.git" ]; then
+              echo "::error:: No git repo at $DEPLOY_PATH."
+              echo "One-time setup: git clone -b develop git@github.com:ecostance/ecostance_user_ui.git \"$DEPLOY_PATH\""
+              exit 1
+            fi
+
+            cd "$DEPLOY_PATH"
+
+            # --- Sync to latest develop ---
+            git fetch origin develop
+            git checkout develop
+            git reset --hard origin/develop
+
+            # --- Put the uploaded .env in place ---
+            mv -f ~/deploy.env "$DEPLOY_PATH/.env"
+
+            # --- Install deps & build (CI=false so warnings don't fail the build) ---
+            npm install --force --legacy-peer-deps
+            CI=false npm run build
+
+            # --- PM2 log rotation (idempotent: install once, then configure) ---
+            pm2 install pm2-logrotate || true
+            pm2 set pm2-logrotate:max_size 10M
+            pm2 set pm2-logrotate:retain 14
+            pm2 set pm2-logrotate:compress true
+            pm2 set pm2-logrotate:rotateInterval '0 0 * * *'
+
+            # --- Start if absent, otherwise restart only ---
+            if pm2 describe "$APP_NAME" > /dev/null 2>&1; then
+              echo ">>> $APP_NAME exists -> restarting"
+              pm2 restart "$APP_NAME" --update-env
+            else
+              echo ">>> $APP_NAME not found -> starting"
+              PORT="$DEPLOY_PORT" pm2 start npm --name "$APP_NAME" -- start
+            fi
+
+            # Persist the process list so it survives a server reboot.
+            pm2 save
+            echo ">>> Deploy complete"

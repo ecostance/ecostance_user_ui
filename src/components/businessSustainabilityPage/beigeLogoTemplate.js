@@ -976,8 +976,9 @@ header p {
                                                         "
                                                         width="100%"
                                                     >
-                                                        ${dynamic.logo ? 
-                                                        `<table
+                                                        ${
+                                                          dynamic.logo
+                                                            ? `<table
                                                             border="0"
                                                             cellpadding="0"
                                                             cellspacing="0"
@@ -1022,7 +1023,9 @@ header p {
                                                                     </div>
                                                                 </td>
                                                             </tr>
-                                                        </table>` : ""}
+                                                        </table>`
+                                                            : ""
+                                                        }
                                                         <table
                                                             border="0"
                                                             cellpadding="0"
@@ -1914,19 +1917,19 @@ header p {
                                                                         ${dynamic.certData.map(
                                                                           (
                                                                             each,
-                                                                            index
+                                                                            index,
                                                                           ) => {
                                                                             return `<li class="each-order">
                                                                                                                                                         <div class="timeline-ref ${
                                                                                                                                                           dynamic.evaluateCertSide(
-                                                                                                                                                            index
+                                                                                                                                                            index,
                                                                                                                                                           )
                                                                                                                                                             ? `direction-r`
                                                                                                                                                             : `direction-l`
                                                                                                                                                         }">
                                                                                                                                                           <div ${
                                                                                                                                                             !dynamic.evaluateCertSide(
-                                                                                                                                                              index
+                                                                                                                                                              index,
                                                                                                                                                             )
                                                                                                                                                               ? `style="justify-content: flex-end;"`
                                                                                                                                                               : ""
@@ -1968,7 +1971,7 @@ header p {
                                                                                                                                                          
                                                                                                                                                           <div class="timeline-ref desc ${
                                                                                                                                                             dynamic.evaluateCertSide(
-                                                                                                                                                              index
+                                                                                                                                                              index,
                                                                                                                                                             )
                                                                                                                                                               ? `direction-r`
                                                                                                                                                               : `direction-l`
@@ -1980,7 +1983,7 @@ header p {
                                                                             <div class="timeline-item-date">
                                                                             ${
                                                                               each.createdAt?.split(
-                                                                                "T"
+                                                                                "T",
                                                                               )[0]
                                                                             }
                                                                             </div>
@@ -2015,7 +2018,7 @@ header p {
                                                                                                                                                           ${dynamic.returnShortenParagraph(
                                                                                                                                                             each
                                                                                                                                                               ?.product
-                                                                                                                                                              ?.shortDescription
+                                                                                                                                                              ?.shortDescription,
                                                                                                                                                           )}
                                                                                                                                                               </div>
                                                                                                                                                               </div>
@@ -2025,7 +2028,7 @@ header p {
 
                                                                                                                                                                                                                                                                                                                     <div class="timeline--product-image-holder-${
                                                                                                                                                                                                                                                                                                                       dynamic.evaluateCertSide(
-                                                                                                                                                                                                                                                                                                                        index
+                                                                                                                                                                                                                                                                                                                        index,
                                                                                                                                                                                                                                                                                                                       )
                                                                                                                                                                                                                                                                                                                         ? `direction-r-image`
                                                                                                                                                                                                                                                                                                                         : `direction-l-image`
@@ -2038,7 +2041,7 @@ header p {
                                                                                                                                                                                                                                                                                                                     </div>
                                                                                                                                                       </li>
                                                                                                                                                       `;
-                                                                          }
+                                                                          },
                                                                         )}
 </ul></div>
                                                                     </ul>
@@ -2377,7 +2380,7 @@ header p {
                                                                                 <span style="">
                                                                                 <div>
                                                                                 ${dynamic.newProjects(
-                                                                                  dynamic.allProjects
+                                                                                  dynamic.allProjects,
                                                                                 )}
                                                                                     </div>
                                                                                 </span>
@@ -3329,27 +3332,27 @@ header p {
                                                           "../images/email.png",
                                                           dynamic.email,
                                                           dynamic.showEmail,
-                                                          true
+                                                          true,
                                                         )}
                                                       ${dynamic.showSocial(
                                                         "../images/linkedin.png",
                                                         dynamic.linkedin,
-                                                        dynamic.showLinkedin
+                                                        dynamic.showLinkedin,
                                                       )}
                                                   ${dynamic.showSocial(
                                                     "../images/twitter.png",
                                                     dynamic.twitter,
-                                                    dynamic.showTwitter
+                                                    dynamic.showTwitter,
                                                   )}
                                               ${dynamic.showSocial(
                                                 "../images/facebook.png",
                                                 dynamic.facebook,
-                                                dynamic.showFacebook
+                                                dynamic.showFacebook,
                                               )}
                                                                                                                                                                 ${dynamic.showSocial(
                                                                                                                                                                   "../images/instagram.png",
                                                                                                                                                                   dynamic.instagram,
-                                                                                                                                                                  dynamic.showInstagram
+                                                                                                                                                                  dynamic.showInstagram,
                                                                                                                                                                 )}</div>
                                             
                                                     </td>
@@ -3520,7 +3523,7 @@ header p {
                                                                                                 "
                                                                                                 target="_blank"
                                                                                                 >Powered by ${dynamic.generateTextWithSpaces(
-                                                                                                  "ecostance"
+                                                                                                  "ecostance",
                                                                                                 )}
                                                                                                 </a
                                                                                             >
