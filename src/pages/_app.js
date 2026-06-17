@@ -57,7 +57,7 @@ class MyApp extends App {
     super(props);
     this.persistor = persistStore(props.reduxStore);
     const ISSERVER = typeof window === "undefined";
-    let theData
+    let theData;
     if (!ISSERVER) {
       if (!localStorage.getItem("email")) {
         deleteCookie("JWTToken");
@@ -67,9 +67,12 @@ class MyApp extends App {
           domain: `${process.env.COOKIE_URL}`,
         });
       }
-      theData = localStorage.getItem("verifyPass")
+      theData = localStorage.getItem("verifyPass");
       if (window.location.href.includes("refId")) {
-        localStorage.setItem("ReferralID", window.location.href.split("refId=")[1])
+        localStorage.setItem(
+          "ReferralID",
+          window.location.href.split("refId=")[1],
+        );
         this.deeplinkapi().catch((err) => console.log(err));
       }
       nextInterceptorWrapper(
@@ -79,15 +82,20 @@ class MyApp extends App {
         () =>
           props.reduxStore?.dispatch(removeAllItemsFromSustainabilityPage()),
         () =>
-          props.reduxStore?.dispatch(removeAllItemsFromBusinessSustainabilityPage()),
-        () => props.reduxStore?.dispatch(removeCurrentUser())
+          props.reduxStore?.dispatch(
+            removeAllItemsFromBusinessSustainabilityPage(),
+          ),
+        () => props.reduxStore?.dispatch(removeCurrentUser()),
       );
       props.reduxStore.dispatch(removeRegistationSuccess());
       Router.events.on("routeChangeStart", () => {
         const currentPath = window.location.pathname;
-        const isCheckoutPage = currentPath.includes('/checkout') || currentPath.includes('/other/checkout');
-        const isInCheckoutProcess = localStorage.getItem("modulepurchase") === "true" ||
-                                   localStorage.getItem("checkoutCartBackup");
+        const isCheckoutPage =
+          currentPath.includes("/checkout") ||
+          currentPath.includes("/other/checkout");
+        const isInCheckoutProcess =
+          localStorage.getItem("modulepurchase") === "true" ||
+          localStorage.getItem("checkoutCartBackup");
 
         if (!isCheckoutPage && !isInCheckoutProcess) {
           this.syncLocalCart(props).catch((err) => console.log(err));
@@ -100,7 +108,7 @@ class MyApp extends App {
         setUniqueVisitInformation({
           userCurrencyPreference: (currencyType, currency) =>
             props.reduxStore.dispatch(
-              setUserCurrencyPreference(currencyType, currency)
+              setUserCurrencyPreference(currencyType, currency),
             ),
           setCartCurrency: (currency) =>
             props.reduxStore.dispatch(setCartCurrency(currency)),
@@ -110,24 +118,21 @@ class MyApp extends App {
       this.loadProducts(props).catch((err) => console.log(err));
       this.syncLocalCart(props).catch((err) => console.log(err));
       setTimeout(() => {
-        const isInCheckoutProcess = localStorage.getItem("modulepurchase") === "true" ||
-                                   localStorage.getItem("checkoutCartBackup");
+        const isInCheckoutProcess =
+          localStorage.getItem("modulepurchase") === "true" ||
+          localStorage.getItem("checkoutCartBackup");
         if (!isInCheckoutProcess) {
           this.validateUserRouteChange(props);
         }
       }, 1);
     }
 
-
-
-
-
     this.state = {
       pass1: "",
       pass2: "",
       isDevMode: true,
       enterPass: "",
-      verifyPass: theData || false
+      verifyPass: theData || false,
       // ... other state properties
     };
 
@@ -145,11 +150,15 @@ class MyApp extends App {
 
   validateUserRouteChange = (props) => {
     const currentPath = window.location.pathname;
-    const isCheckoutPage = currentPath.includes('/checkout') || currentPath.includes('/other/checkout');
-    const hasModuleProducts = props.reduxStore.getState()?.cartData?.moduleProducts &&
-                             props.reduxStore.getState()?.cartData?.moduleProducts.length > 0;
-    const isInCheckoutProcess = localStorage.getItem("modulepurchase") === "true" ||
-                               localStorage.getItem("checkoutCartBackup");
+    const isCheckoutPage =
+      currentPath.includes("/checkout") ||
+      currentPath.includes("/other/checkout");
+    const hasModuleProducts =
+      props.reduxStore.getState()?.cartData?.moduleProducts &&
+      props.reduxStore.getState()?.cartData?.moduleProducts.length > 0;
+    const isInCheckoutProcess =
+      localStorage.getItem("modulepurchase") === "true" ||
+      localStorage.getItem("checkoutCartBackup");
 
     if (
       typeof window !== "undefined" &&
@@ -184,7 +193,7 @@ class MyApp extends App {
       const products = (await getProducts()).data;
 
       props.reduxStore.dispatch(
-        fetchProducts(products?.map((d) => ({ ...d, id: d._id })) || [])
+        fetchProducts(products?.map((d) => ({ ...d, id: d._id })) || []),
       );
     } catch (e) {
       console.log(e);
@@ -196,12 +205,12 @@ class MyApp extends App {
     // console.log("deeplink",deeplinkdata)
     try {
       const deeplinkdata = (await getdeeplink()).data;
-      console.log(deeplinkdata, "deeplink")
-      window.location.href = deeplinkdata.url
+      console.log(deeplinkdata, "deeplink");
+      window.location.href = deeplinkdata.url;
     } catch (e) {
       console.log(e);
     }
-  }
+  };
 
   // loadCart = async (props) => {
   //   try {
@@ -217,8 +226,9 @@ class MyApp extends App {
   syncLocalCart = async (props) => {
     try {
       // Skip cart sync if we're in a checkout process
-      const isInCheckoutProcess = localStorage.getItem("modulepurchase") === "true" ||
-                                 localStorage.getItem("checkoutCartBackup");
+      const isInCheckoutProcess =
+        localStorage.getItem("modulepurchase") === "true" ||
+        localStorage.getItem("checkoutCartBackup");
       if (isInCheckoutProcess) return;
 
       if (
@@ -229,9 +239,13 @@ class MyApp extends App {
       ) {
         console.log("here is window", window);
         const cartData = await getCart();
-        if (cartData?.data?.data &&
-            ((cartData.data.data.products && cartData.data.data.products.length > 0) ||
-             (cartData.data.data.moduleProducts && cartData.data.data.moduleProducts.length > 0))) {
+        if (
+          cartData?.data?.data &&
+          ((cartData.data.data.products &&
+            cartData.data.data.products.length > 0) ||
+            (cartData.data.data.moduleProducts &&
+              cartData.data.data.moduleProducts.length > 0))
+        ) {
           props.reduxStore.dispatch(addAPIDataToCart(cartData?.data?.data));
         }
         if (
@@ -239,7 +253,7 @@ class MyApp extends App {
           cartData?.data?.data?.temporaryCheckoutCurrency
         )
           props.reduxStore.dispatch(
-            setCartCurrency(cartData?.data?.data?.temporaryCheckoutCurrency)
+            setCartCurrency(cartData?.data?.data?.temporaryCheckoutCurrency),
           );
       }
     } catch (err) {
@@ -313,91 +327,91 @@ class MyApp extends App {
 
     const ActionSubmit = (value) => {
       if (this.state.enterPass === "SkyMetroBox@246") {
-        this.setState({ verifyPass: true })
-        if (typeof window !== 'undefined') {
+        this.setState({ verifyPass: true });
+        if (typeof window !== "undefined") {
           // Perform sessionStorage action
-          localStorage.setItem('verifyPass', true)
+          localStorage.setItem("verifyPass", true);
         }
       }
-    }
+    };
 
     return (
-        <Fragment>
-          {true ? (
-            <>
-              <Head>
-                <title>ECOSTANCE</title>
-                <link rel="icon" href={process.env.PUBLIC_URL + "/favicon.ico"} />
-                <link
-                  rel="stylesheet"
-                  href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/css/flag-icons.min.css"
-                />
-                <script src="https://unpkg.com/@ungap/custom-elements-builtin"></script>
-                {/* <script type="module" src="https://unpkg.com/x-frame-bypass"></script> */}
-                <link
-                  rel="stylesheet"
-                  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-                />
-                <link
-                  href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700;800&display=swap"
-                  rel="stylesheet"
-                ></link>
-                <script
-                  type="text/javascript"
-                  src="https://cdn.ywxi.net/js/1.js"
-                  async
-                ></script>
-              </Head>
-              <ToastProvider
-                components={{ toast: dummyToast }}
-                placement="bottom-left"
-              >
-                <Provider store={reduxStore}>
-                  <PersistGate loading={<Preloader />} persistor={this.persistor}>
-                    {/* <RegistrationSuccessPopup> */}
-                    <Component {...pageProps} />
-                    {/* </RegistrationSuccessPopup> */}
-                  </PersistGate>
-                </Provider>
-              </ToastProvider>
-            </>
-          ) : (
-            <div
-              style={{
-                height: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: "white",
-              }}
+      <Fragment>
+        {true ? (
+          <>
+            <Head>
+              <title>ECOSTANCE</title>
+              <link rel="icon" href={process.env.PUBLIC_URL + "/favicon.ico"} />
+              <link
+                rel="stylesheet"
+                href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/css/flag-icons.min.css"
+              />
+              <script src="https://unpkg.com/@ungap/custom-elements-builtin"></script>
+              {/* <script type="module" src="https://unpkg.com/x-frame-bypass"></script> */}
+              <link
+                rel="stylesheet"
+                href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+              />
+              <link
+                href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@400;500;600;700;800&display=swap"
+                rel="stylesheet"
+              ></link>
+              <script
+                type="text/javascript"
+                src="https://cdn.ywxi.net/js/1.js"
+                async
+              ></script>
+            </Head>
+            <ToastProvider
+              components={{ toast: dummyToast }}
+              placement="bottom-left"
             >
-              <div style={{ paddingBottom: "20px" }}>
-                The site is not available
-              </div>
-              <form>
-                <div style={{ paddingBottom: "10px" }}>
-                  <input
-                    type="text"
-                    value={pass1}
-                    onChange={(e) => this.setState({ pass1: e.target.value })}
-                  // onChange={(e) => setPass1(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <input
-                    onKeyDown={handleKeyDown}
-                    type="text"
-                    value={pass2}
-                    onChange={(e) => this.setState({ pass2: e.target.value })}
-                  // onChange={(e) => setPass2(e.target.value)}
-                  />
-                </div>
-              </form>
+              <Provider store={reduxStore}>
+                <PersistGate loading={<Preloader />} persistor={this.persistor}>
+                  {/* <RegistrationSuccessPopup> */}
+                  <Component {...pageProps} />
+                  {/* </RegistrationSuccessPopup> */}
+                </PersistGate>
+              </Provider>
+            </ToastProvider>
+          </>
+        ) : (
+          <div
+            style={{
+              height: "100vh",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "white",
+            }}
+          >
+            <div style={{ paddingBottom: "20px" }}>
+              The site is not available
             </div>
-          )}
-        </Fragment>
-      )
+            <form>
+              <div style={{ paddingBottom: "10px" }}>
+                <input
+                  type="text"
+                  value={pass1}
+                  onChange={(e) => this.setState({ pass1: e.target.value })}
+                  // onChange={(e) => setPass1(e.target.value)}
+                />
+              </div>
+              <div>
+                <input
+                  onKeyDown={handleKeyDown}
+                  type="text"
+                  value={pass2}
+                  onChange={(e) => this.setState({ pass2: e.target.value })}
+                  // onChange={(e) => setPass2(e.target.value)}
+                />
+              </div>
+            </form>
+          </div>
+        )}
+      </Fragment>
+    );
   }
 }
 
