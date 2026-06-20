@@ -1,363 +1,373 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { IoIosClose } from 'react-icons/io'
-import { IoMdRefresh } from 'react-icons/io'
-import { countryNameToISO3 } from 'src/data/countryNameToISO3'
-import { returnReverseCode } from 'src/data/countryCodeToISO3'
-import flagUrlByIso3 from 'src/helpers/getFlag'
+import React, { useEffect, useState, useMemo } from "react";
+import { IoIosClose } from "react-icons/io";
+import { IoMdRefresh } from "react-icons/io";
+import { countryNameToISO3 } from "src/data/countryNameToISO3";
+import { returnReverseCode } from "src/data/countryCodeToISO3";
+import flagUrlByIso3 from "src/helpers/getFlag";
 // import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Helper function to get country flag URL from country name
 const getCountryFlagUrl = (countryName) => {
   if (!countryName) return null;
-  
+
   // Handle comma-separated countries - take the first one
-  const firstCountry = countryName.split(',')[0].trim();
-  
+  const firstCountry = countryName.split(",")[0].trim();
+
   // Convert country name to ISO2 code
   const iso2Code = countryNameToISO3(firstCountry);
   if (!iso2Code) return null;
-  
+
   // Convert ISO2 to ISO3 code
   const iso3Code = returnReverseCode(iso2Code);
   if (!iso3Code) return null;
-  
+
   // Get flag URL from ISO3 code
   return flagUrlByIso3[iso3Code] || null;
 };
 
 // Sample data structure with text for nodes and connection lines
 const initialTreeData = {
-  "businessName": "ABCD TEXTILES",
-  "primaryName": 0,
-  "children": [
+  businessName: "ABCD TEXTILES",
+  primaryName: 0,
+  children: [
     {
-      "_id": "6800d435f4695469c4c5eeb1",
-      "userId": "6800d35df4695469c4c5eca8",
-      "chainBusinessId": "6800d3a4f4695469c4c5ed37",
-      "chainUserId": "6800d35df4695469c4c5eca8",
-      "chainBusinessName": "JKL TEXTILES",
-      "businessName": "ABCD TEXTILES",
-      "relationship": "distributor",
-      "primaryName": "fgh",
-      "primaryEmail": "fgh@gmail.com",
-      "alternateName": "ghi",
-      "alternateEmail": "ghi@gmail.com",
-      "status": "active",
-      "createdAt": "2025-04-17T10:13:09.790Z",
-      "updatedAt": "2025-04-17T10:13:09.790Z",
-      "__v": 0,
-      "chain": [],
-      "position": "left"
+      _id: "6800d435f4695469c4c5eeb1",
+      userId: "6800d35df4695469c4c5eca8",
+      chainBusinessId: "6800d3a4f4695469c4c5ed37",
+      chainUserId: "6800d35df4695469c4c5eca8",
+      chainBusinessName: "JKL TEXTILES",
+      businessName: "ABCD TEXTILES",
+      relationship: "distributor",
+      primaryName: "fgh",
+      primaryEmail: "fgh@gmail.com",
+      alternateName: "ghi",
+      alternateEmail: "ghi@gmail.com",
+      status: "active",
+      createdAt: "2025-04-17T10:13:09.790Z",
+      updatedAt: "2025-04-17T10:13:09.790Z",
+      __v: 0,
+      chain: [],
+      position: "left",
     },
     {
-      "_id": "6800d40bf4695469c4c5ee90",
-      "userId": "6800d35df4695469c4c5eca8",
-      "chainBusinessId": "6800d3a4f4695469c4c5ed37",
-      "chainUserId": "6800d35df4695469c4c5eca8",
-      "chainBusinessName": "DEF TEXTILES",
-      "businessName": "ABCD TEXTILES",
-      "relationship": "supplier",
-      "primaryName": "abcd",
-      "primaryEmail": "abcd@gmail.com",
-      "alternateName": "def",
-      "alternateEmail": "def@gmail.com",
-      "status": "active",
-      "createdAt": "2025-04-17T10:12:27.420Z",
-      "updatedAt": "2025-04-17T10:12:27.420Z",
-      "__v": 0,
-      "children": [
+      _id: "6800d40bf4695469c4c5ee90",
+      userId: "6800d35df4695469c4c5eca8",
+      chainBusinessId: "6800d3a4f4695469c4c5ed37",
+      chainUserId: "6800d35df4695469c4c5eca8",
+      chainBusinessName: "DEF TEXTILES",
+      businessName: "ABCD TEXTILES",
+      relationship: "supplier",
+      primaryName: "abcd",
+      primaryEmail: "abcd@gmail.com",
+      alternateName: "def",
+      alternateEmail: "def@gmail.com",
+      status: "active",
+      createdAt: "2025-04-17T10:12:27.420Z",
+      updatedAt: "2025-04-17T10:12:27.420Z",
+      __v: 0,
+      children: [
         {
-          "_id": "67ebbf87c0d6bea24e32cecb",
-          "userId": "67d04c9607b99193a04f06fd",
-          "chainBusinessId": "67ce89f4bb53d88985d458ca",
-          "chainUserId": "67c941e9d86b4cdd714afdb9",
-          "chainBusinessName": "xyz textiles",
-          "businessName": "ABCD TEXTILES",
-          "relationship": "supplier",
-          "primaryName": "jake john",
-          "primaryEmail": "1234567890",
-          "alternateName": "brian lara",
-          "alternateEmail": "0987654321",
-          "status": "active",
-          "createdAt": "2025-04-01T10:27:19.367Z",
-          "updatedAt": "2025-04-01T10:27:19.367Z",
-          "__v": 0,
-          "businessId": "67d04cca07b99193a04f082d",
-          "depthLevel": 1,
-          "position": "left",
-          "children": [
+          _id: "67ebbf87c0d6bea24e32cecb",
+          userId: "67d04c9607b99193a04f06fd",
+          chainBusinessId: "67ce89f4bb53d88985d458ca",
+          chainUserId: "67c941e9d86b4cdd714afdb9",
+          chainBusinessName: "xyz textiles",
+          businessName: "ABCD TEXTILES",
+          relationship: "supplier",
+          primaryName: "jake john",
+          primaryEmail: "1234567890",
+          alternateName: "brian lara",
+          alternateEmail: "0987654321",
+          status: "active",
+          createdAt: "2025-04-01T10:27:19.367Z",
+          updatedAt: "2025-04-01T10:27:19.367Z",
+          __v: 0,
+          businessId: "67d04cca07b99193a04f082d",
+          depthLevel: 1,
+          position: "left",
+          children: [
             {
-              "_id": "67ebce02c0d6bea24e32d47e",
-              "userId": "67c941e9d86b4cdd714afdb9",
-              "chainBusinessId": "67b7186a128eb1fa642366a3",
-              "chainUserId": "67b7182e128eb1fa64236620",
-              "chainBusinessName": "new textile business",
-              "businessName": "ABCD TEXTILES",
-              "relationship": "supplier",
-              "primaryName": "brian",
-              "primaryEmail": "abcd@gmail.com",
-              "alternateName": "lara",
-              "alternateEmail": "def@gmail.com",
-              "status": "active",
-              "createdAt": "2025-04-01T11:29:06.224Z",
-              "updatedAt": "2025-04-01T11:29:06.224Z",
-              "__v": 0,
-              "businessId": "67ce89f4bb53d88985d458ca",
-              "depthLevel": 2,
-              "position": "left",
-              "children": [
+              _id: "67ebce02c0d6bea24e32d47e",
+              userId: "67c941e9d86b4cdd714afdb9",
+              chainBusinessId: "67b7186a128eb1fa642366a3",
+              chainUserId: "67b7182e128eb1fa64236620",
+              chainBusinessName: "new textile business",
+              businessName: "ABCD TEXTILES",
+              relationship: "supplier",
+              primaryName: "brian",
+              primaryEmail: "abcd@gmail.com",
+              alternateName: "lara",
+              alternateEmail: "def@gmail.com",
+              status: "active",
+              createdAt: "2025-04-01T11:29:06.224Z",
+              updatedAt: "2025-04-01T11:29:06.224Z",
+              __v: 0,
+              businessId: "67ce89f4bb53d88985d458ca",
+              depthLevel: 2,
+              position: "left",
+              children: [
                 {
-                  "_id": "67ebce02c0d6bea24e32d47e",
-                  "userId": "67c941e9d86b4cdd714afdb9",
-                  "chainBusinessId": "67b7186a128eb1fa642366a3",
-                  "chainUserId": "67b7182e128eb1fa64236620",
-                  "chainBusinessName": "new own business",
-                  "businessName": "ABCD TEXTILES",
-                  "relationship": "supplier",
-                  "primaryName": "brian",
-                  "primaryEmail": "abcd@gmail.com",
-                  "alternateName": "lara",
-                  "alternateEmail": "def@gmail.com",
-                  "status": "active",
-                  "createdAt": "2025-04-01T11:29:06.224Z",
-                  "updatedAt": "2025-04-01T11:29:06.224Z",
-                  "__v": 0,
-                  "businessId": "67ce89f4bb53d88985d458ca",
-                  "depthLevel": 2,
-                  "position": "left",
-                  "children": [
+                  _id: "67ebce02c0d6bea24e32d47e",
+                  userId: "67c941e9d86b4cdd714afdb9",
+                  chainBusinessId: "67b7186a128eb1fa642366a3",
+                  chainUserId: "67b7182e128eb1fa64236620",
+                  chainBusinessName: "new own business",
+                  businessName: "ABCD TEXTILES",
+                  relationship: "supplier",
+                  primaryName: "brian",
+                  primaryEmail: "abcd@gmail.com",
+                  alternateName: "lara",
+                  alternateEmail: "def@gmail.com",
+                  status: "active",
+                  createdAt: "2025-04-01T11:29:06.224Z",
+                  updatedAt: "2025-04-01T11:29:06.224Z",
+                  __v: 0,
+                  businessId: "67ce89f4bb53d88985d458ca",
+                  depthLevel: 2,
+                  position: "left",
+                  children: [
                     {
-                      "_id": "67ebce02c0d6bea24e32d47e",
-                      "userId": "67c941e9d86b4cdd714afdb9",
-                      "chainBusinessId": "67b7186a128eb1fa642366a3",
-                      "chainUserId": "67b7182e128eb1fa64236620",
-                      "chainBusinessName": "MY TEXTILES",
-                      "businessName": "ABCD TEXTILES",
-                      "relationship": "supplier",
-                      "primaryName": "brian",
-                      "primaryEmail": "abcd@gmail.com",
-                      "alternateName": "lara",
-                      "alternateEmail": "def@gmail.com",
-                      "status": "active",
-                      "createdAt": "2025-04-01T11:29:06.224Z",
-                      "updatedAt": "2025-04-01T11:29:06.224Z",
-                      "__v": 0,
-                      "businessId": "67ce89f4bb53d88985d458ca",
-                      "depthLevel": 2,
-                      "position": "left",
-                      "children": [
+                      _id: "67ebce02c0d6bea24e32d47e",
+                      userId: "67c941e9d86b4cdd714afdb9",
+                      chainBusinessId: "67b7186a128eb1fa642366a3",
+                      chainUserId: "67b7182e128eb1fa64236620",
+                      chainBusinessName: "MY TEXTILES",
+                      businessName: "ABCD TEXTILES",
+                      relationship: "supplier",
+                      primaryName: "brian",
+                      primaryEmail: "abcd@gmail.com",
+                      alternateName: "lara",
+                      alternateEmail: "def@gmail.com",
+                      status: "active",
+                      createdAt: "2025-04-01T11:29:06.224Z",
+                      updatedAt: "2025-04-01T11:29:06.224Z",
+                      __v: 0,
+                      businessId: "67ce89f4bb53d88985d458ca",
+                      depthLevel: 2,
+                      position: "left",
+                      children: [
                         {
-                          "_id": "67ebce02c0d6bea24e32d47e",
-                          "userId": "67c941e9d86b4cdd714afdb9",
-                          "chainBusinessId": "67b7186a128eb1fa642366a3",
-                          "chainUserId": "67b7182e128eb1fa64236620",
-                          "chainBusinessName": "S1",
-                          "businessName": "ABCD TEXTILES",
-                          "relationship": "supplier",
-                          "primaryName": "brian",
-                          "primaryEmail": "abcd@gmail.com",
-                          "alternateName": "lara",
-                          "alternateEmail": "def@gmail.com",
-                          "status": "active",
-                          "createdAt": "2025-04-01T11:29:06.224Z",
-                          "updatedAt": "2025-04-01T11:29:06.224Z",
-                          "__v": 0,
-                          "businessId": "67ce89f4bb53d88985d458ca",
-                          "depthLevel": 2,
-                          "position": "left",
-                          "children": []
+                          _id: "67ebce02c0d6bea24e32d47e",
+                          userId: "67c941e9d86b4cdd714afdb9",
+                          chainBusinessId: "67b7186a128eb1fa642366a3",
+                          chainUserId: "67b7182e128eb1fa64236620",
+                          chainBusinessName: "S1",
+                          businessName: "ABCD TEXTILES",
+                          relationship: "supplier",
+                          primaryName: "brian",
+                          primaryEmail: "abcd@gmail.com",
+                          alternateName: "lara",
+                          alternateEmail: "def@gmail.com",
+                          status: "active",
+                          createdAt: "2025-04-01T11:29:06.224Z",
+                          updatedAt: "2025-04-01T11:29:06.224Z",
+                          __v: 0,
+                          businessId: "67ce89f4bb53d88985d458ca",
+                          depthLevel: 2,
+                          position: "left",
+                          children: [],
                         },
                         {
-                          "_id": "67ebce02c0d6bea24e32d47e",
-                          "userId": "67c941e9d86b4cdd714afdb9",
-                          "chainBusinessId": "67b7186a128eb1fa642366a3",
-                          "chainUserId": "67b7182e128eb1fa64236620",
-                          "chainBusinessName": "S2",
-                          "businessName": "ABCD TEXTILES",
-                          "relationship": "supplier",
-                          "primaryName": "brian",
-                          "primaryEmail": "abcd@gmail.com",
-                          "alternateName": "lara",
-                          "alternateEmail": "def@gmail.com",
-                          "status": "active",
-                          "createdAt": "2025-04-01T11:29:06.224Z",
-                          "updatedAt": "2025-04-01T11:29:06.224Z",
-                          "__v": 0,
-                          "businessId": "67ce89f4bb53d88985d458ca",
-                          "depthLevel": 2,
-                          "position": "left",
-                          "children": []
-                        }
-                      ]
+                          _id: "67ebce02c0d6bea24e32d47e",
+                          userId: "67c941e9d86b4cdd714afdb9",
+                          chainBusinessId: "67b7186a128eb1fa642366a3",
+                          chainUserId: "67b7182e128eb1fa64236620",
+                          chainBusinessName: "S2",
+                          businessName: "ABCD TEXTILES",
+                          relationship: "supplier",
+                          primaryName: "brian",
+                          primaryEmail: "abcd@gmail.com",
+                          alternateName: "lara",
+                          alternateEmail: "def@gmail.com",
+                          status: "active",
+                          createdAt: "2025-04-01T11:29:06.224Z",
+                          updatedAt: "2025-04-01T11:29:06.224Z",
+                          __v: 0,
+                          businessId: "67ce89f4bb53d88985d458ca",
+                          depthLevel: 2,
+                          position: "left",
+                          children: [],
+                        },
+                      ],
                     },
                     {
-                      "_id": "67ebce02c0d6bea24e32d47e",
-                      "userId": "67c941e9d86b4cdd714afdb9",
-                      "chainBusinessId": "67b7186a128eb1fa642366a3",
-                      "chainUserId": "67b7182e128eb1fa64236620",
-                      "chainBusinessName": "MY TEXTILES 2",
-                      "businessName": "ABCD TEXTILES",
-                      "relationship": "supplier",
-                      "primaryName": "brian",
-                      "primaryEmail": "abcd@gmail.com",
-                      "alternateName": "lara",
-                      "alternateEmail": "def@gmail.com",
-                      "status": "active",
-                      "createdAt": "2025-04-01T11:29:06.224Z",
-                      "updatedAt": "2025-04-01T11:29:06.224Z",
-                      "__v": 0,
-                      "businessId": "67ce89f4bb53d88985d458ca",
-                      "depthLevel": 2,
-                      "position": "left",
-                      "children": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+                      _id: "67ebce02c0d6bea24e32d47e",
+                      userId: "67c941e9d86b4cdd714afdb9",
+                      chainBusinessId: "67b7186a128eb1fa642366a3",
+                      chainUserId: "67b7182e128eb1fa64236620",
+                      chainBusinessName: "MY TEXTILES 2",
+                      businessName: "ABCD TEXTILES",
+                      relationship: "supplier",
+                      primaryName: "brian",
+                      primaryEmail: "abcd@gmail.com",
+                      alternateName: "lara",
+                      alternateEmail: "def@gmail.com",
+                      status: "active",
+                      createdAt: "2025-04-01T11:29:06.224Z",
+                      updatedAt: "2025-04-01T11:29:06.224Z",
+                      __v: 0,
+                      businessId: "67ce89f4bb53d88985d458ca",
+                      depthLevel: 2,
+                      position: "left",
+                      children: [],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
         {
-          "_id": "6800d435f4695469c4c5eeb1",
-          "userId": "6800d35df4695469c4c5eca8",
-          "chainBusinessId": "6800d3a4f4695469c4c5ed37",
-          "chainUserId": "6800d35df4695469c4c5eca8",
-          "chainBusinessName": "PLK TEXTILES",
-          "businessName": "ABCD TEXTILES",
-          "relationship": "distributor",
-          "primaryName": "fgh",
-          "primaryEmail": "fgh@gmail.com",
-          "alternateName": "ghi",
-          "alternateEmail": "ghi@gmail.com",
-          "status": "active",
-          "createdAt": "2025-04-17T10:13:09.790Z",
-          "updatedAt": "2025-04-17T10:13:09.790Z",
-          "__v": 0,
-          "chain": [],
-          "position": "left"
+          _id: "6800d435f4695469c4c5eeb1",
+          userId: "6800d35df4695469c4c5eca8",
+          chainBusinessId: "6800d3a4f4695469c4c5ed37",
+          chainUserId: "6800d35df4695469c4c5eca8",
+          chainBusinessName: "PLK TEXTILES",
+          businessName: "ABCD TEXTILES",
+          relationship: "distributor",
+          primaryName: "fgh",
+          primaryEmail: "fgh@gmail.com",
+          alternateName: "ghi",
+          alternateEmail: "ghi@gmail.com",
+          status: "active",
+          createdAt: "2025-04-17T10:13:09.790Z",
+          updatedAt: "2025-04-17T10:13:09.790Z",
+          __v: 0,
+          chain: [],
+          position: "left",
         },
       ],
-      "position": "left"
+      position: "left",
     },
     {
-      "_id": "6800d435f4695469c4c5eeb1",
-      "userId": "6800d35df4695469c4c5eca8",
-      "chainBusinessId": "6800d3a4f4695469c4c5ed37",
-      "chainUserId": "6800d35df4695469c4c5eca8",
-      "chainBusinessName": "FGHF TEXTILES",
-      "businessName": "ABCD TEXTILES",
-      "relationship": "distributor",
-      "primaryName": "fgh",
-      "primaryEmail": "fgh@gmail.com",
-      "alternateName": "ghi",
-      "alternateEmail": "ghi@gmail.com",
-      "status": "active",
-      "createdAt": "2025-04-17T10:13:09.790Z",
-      "updatedAt": "2025-04-17T10:13:09.790Z",
-      "__v": 0,
-      "chain": [],
-      "position": "left"
+      _id: "6800d435f4695469c4c5eeb1",
+      userId: "6800d35df4695469c4c5eca8",
+      chainBusinessId: "6800d3a4f4695469c4c5ed37",
+      chainUserId: "6800d35df4695469c4c5eca8",
+      chainBusinessName: "FGHF TEXTILES",
+      businessName: "ABCD TEXTILES",
+      relationship: "distributor",
+      primaryName: "fgh",
+      primaryEmail: "fgh@gmail.com",
+      alternateName: "ghi",
+      alternateEmail: "ghi@gmail.com",
+      status: "active",
+      createdAt: "2025-04-17T10:13:09.790Z",
+      updatedAt: "2025-04-17T10:13:09.790Z",
+      __v: 0,
+      chain: [],
+      position: "left",
     },
     {
-      "_id": "6800d435f4695469c4c5eeb1",
-      "userId": "6800d35df4695469c4c5eca8",
-      "chainBusinessId": "6800d3a4f4695469c4c5ed37",
-      "chainUserId": "6800d35df4695469c4c5eca8",
-      "chainBusinessName": "FGH TEXTILES",
-      "businessName": "ABCD TEXTILES",
-      "relationship": "distributor",
-      "primaryName": "fgh",
-      "primaryEmail": "fgh@gmail.com",
-      "alternateName": "ghi",
-      "alternateEmail": "ghi@gmail.com",
-      "status": "active",
-      "createdAt": "2025-04-17T10:13:09.790Z",
-      "updatedAt": "2025-04-17T10:13:09.790Z",
-      "__v": 0,
-      "chain": [],
-      "position": "right"
+      _id: "6800d435f4695469c4c5eeb1",
+      userId: "6800d35df4695469c4c5eca8",
+      chainBusinessId: "6800d3a4f4695469c4c5ed37",
+      chainUserId: "6800d35df4695469c4c5eca8",
+      chainBusinessName: "FGH TEXTILES",
+      businessName: "ABCD TEXTILES",
+      relationship: "distributor",
+      primaryName: "fgh",
+      primaryEmail: "fgh@gmail.com",
+      alternateName: "ghi",
+      alternateEmail: "ghi@gmail.com",
+      status: "active",
+      createdAt: "2025-04-17T10:13:09.790Z",
+      updatedAt: "2025-04-17T10:13:09.790Z",
+      __v: 0,
+      chain: [],
+      position: "right",
     },
     {
-      "_id": "6800d435f4695469c4c5eeb1",
-      "userId": "6800d35df4695469c4c5eca8",
-      "chainBusinessId": "6800d3a4f4695469c4c5ed37",
-      "chainUserId": "6800d35df4695469c4c5eca8",
-      "chainBusinessName": "RAM TEXTILES",
-      "businessName": "ABCD TEXTILES",
-      "relationship": "distributor",
-      "primaryName": "fgh",
-      "primaryEmail": "fgh@gmail.com",
-      "alternateName": "ghi",
-      "alternateEmail": "ghi@gmail.com",
-      "status": "active",
-      "createdAt": "2025-04-17T10:13:09.790Z",
-      "updatedAt": "2025-04-17T10:13:09.790Z",
-      "__v": 0,
-      "chain": [],
-      "position": "right"
-    }
-  ]
+      _id: "6800d435f4695469c4c5eeb1",
+      userId: "6800d35df4695469c4c5eca8",
+      chainBusinessId: "6800d3a4f4695469c4c5ed37",
+      chainUserId: "6800d35df4695469c4c5eca8",
+      chainBusinessName: "RAM TEXTILES",
+      businessName: "ABCD TEXTILES",
+      relationship: "distributor",
+      primaryName: "fgh",
+      primaryEmail: "fgh@gmail.com",
+      alternateName: "ghi",
+      alternateEmail: "ghi@gmail.com",
+      status: "active",
+      createdAt: "2025-04-17T10:13:09.790Z",
+      updatedAt: "2025-04-17T10:13:09.790Z",
+      __v: 0,
+      chain: [],
+      position: "right",
+    },
+  ],
 };
 
 const updateBusinessNames = (data) => {
   // Create a deep copy to avoid mutating the original data
   const updatedData = JSON.parse(JSON.stringify(data));
-  
+
   // Function to recursively process nodes and their children
   const processNode = (node) => {
     // Update businessName to match chainBusinessName for the current node
     if (node.chainBusinessName && node.businessName) {
       node.businessName = node.chainBusinessName;
     }
-    
+
     // Process children recursively if they exist
-    if (node.children && Array.isArray(node.children) && node.children.length > 0) {
-      node.children.forEach(child => processNode(child));
+    if (
+      node.children &&
+      Array.isArray(node.children) &&
+      node.children.length > 0
+    ) {
+      node.children.forEach((child) => processNode(child));
     }
   };
-  
+
   // Handle API response structure - use treeData array if available
   if (updatedData.treeData && Array.isArray(updatedData.treeData)) {
     // Use the treeData array which already contains both suppliers and distributors
     updatedData.children = updatedData.treeData;
-    
+
     // Process each child
-    updatedData.children.forEach(child => processNode(child));
+    updatedData.children.forEach((child) => processNode(child));
   }
   // Fallback: combine treeDataSupplier and treeDataDistributor into children
   else if (updatedData.treeDataSupplier || updatedData.treeDataDistributor) {
     const children = [];
-    
+
     // Add suppliers
-    if (updatedData.treeDataSupplier && Array.isArray(updatedData.treeDataSupplier)) {
+    if (
+      updatedData.treeDataSupplier &&
+      Array.isArray(updatedData.treeDataSupplier)
+    ) {
       children.push(...updatedData.treeDataSupplier);
     }
-    
+
     // Add distributors
-    if (updatedData.treeDataDistributor && Array.isArray(updatedData.treeDataDistributor)) {
+    if (
+      updatedData.treeDataDistributor &&
+      Array.isArray(updatedData.treeDataDistributor)
+    ) {
       children.push(...updatedData.treeDataDistributor);
     }
-    
+
     updatedData.children = children;
-    
+
     // Process each child
-    updatedData.children.forEach(child => processNode(child));
+    updatedData.children.forEach((child) => processNode(child));
   }
   // Handle existing children structure
   else if (updatedData.children && Array.isArray(updatedData.children)) {
-    updatedData.children.forEach(child => processNode(child));
+    updatedData.children.forEach((child) => processNode(child));
   }
-  
+
   // Set the main business name from businessData if available
   if (updatedData.businessData && updatedData.businessData.name) {
     updatedData.businessName = updatedData.businessData.name;
   }
-  
+
   // Process the root node itself (in case it has chainBusinessName)
   if (updatedData.chainBusinessName && updatedData.businessName) {
     updatedData.businessName = updatedData.chainBusinessName;
   }
-  
+
   return updatedData;
 };
 
@@ -369,7 +379,7 @@ const calculateNodePositions = (rootNode, centerX, centerY, options = {}) => {
     endAngle = Math.PI * 2,
     radius = 220, // Increased base radius for better spacing
     radiusStep = 140, // Increased radius step for better node separation
-    parentAngle = null
+    parentAngle = null,
   } = options;
 
   const positions = {};
@@ -380,14 +390,18 @@ const calculateNodePositions = (rootNode, centerX, centerY, options = {}) => {
     y: centerY,
     level,
     angle: parentAngle || 0,
-    primaryName: rootNode.primaryName
+    primaryName: rootNode.primaryName,
   };
 
   // If this node has children, calculate their positions
   if (rootNode.children && rootNode.children.length > 0) {
     // Filter nodes by position for distribution
-    const leftNodes = rootNode.children.filter(node => node.position === 'left');
-    const rightNodes = rootNode.children.filter(node => node.position === 'right');
+    const leftNodes = rootNode.children.filter(
+      (node) => node.position === "left",
+    );
+    const rightNodes = rootNode.children.filter(
+      (node) => node.position === "right",
+    );
 
     // For first level, split left and right
     if (level === 0) {
@@ -405,24 +419,19 @@ const calculateNodePositions = (rootNode, centerX, centerY, options = {}) => {
             y,
             level: level + 1,
             angle,
-            primaryName: node.primaryName
+            primaryName: node.primaryName,
           };
 
           // Recursively calculate positions for this node's children
           if (node.children && node.children.length > 0) {
-            const childPositions = calculateNodePositions(
-              node,
-              x,
-              y,
-              {
-                level: level + 1,
-                startAngle: angle - Math.PI / 4,
-                endAngle: angle + Math.PI / 4,
-                radius: radiusStep,
-                radiusStep,
-                parentAngle: angle
-              }
-            );
+            const childPositions = calculateNodePositions(node, x, y, {
+              level: level + 1,
+              startAngle: angle - Math.PI / 4,
+              endAngle: angle + Math.PI / 4,
+              radius: radiusStep,
+              radiusStep,
+              parentAngle: angle,
+            });
 
             // Merge child positions into the result
             Object.assign(positions, childPositions);
@@ -444,24 +453,19 @@ const calculateNodePositions = (rootNode, centerX, centerY, options = {}) => {
             y,
             level: level + 1,
             angle,
-            primaryName: node.primaryName
+            primaryName: node.primaryName,
           };
 
           // Recursively calculate positions for this node's children
           if (node.children && node.children.length > 0) {
-            const childPositions = calculateNodePositions(
-              node,
-              x,
-              y,
-              {
-                level: level + 1,
-                startAngle: angle - Math.PI / 4,
-                endAngle: angle + Math.PI / 4,
-                radius: radiusStep,
-                radiusStep,
-                parentAngle: angle
-              }
-            );
+            const childPositions = calculateNodePositions(node, x, y, {
+              level: level + 1,
+              startAngle: angle - Math.PI / 4,
+              endAngle: angle + Math.PI / 4,
+              radius: radiusStep,
+              radiusStep,
+              parentAngle: angle,
+            });
 
             // Merge child positions into the result
             Object.assign(positions, childPositions);
@@ -487,24 +491,19 @@ const calculateNodePositions = (rootNode, centerX, centerY, options = {}) => {
             y,
             level: level + 1,
             angle,
-            primaryName: node.primaryName
+            primaryName: node.primaryName,
           };
 
           // Recursively calculate positions for this node's children
           if (node.children && node.children.length > 0) {
-            const childPositions = calculateNodePositions(
-              node,
-              x,
-              y,
-              {
-                level: level + 1,
-                startAngle: angle - Math.PI / 5,
-                endAngle: angle + Math.PI / 5,
-                radius: radiusStep, // Slightly reduced to maintain fan-out effect
-                radiusStep: radiusStep,
-                parentAngle: angle
-              }
-            );
+            const childPositions = calculateNodePositions(node, x, y, {
+              level: level + 1,
+              startAngle: angle - Math.PI / 5,
+              endAngle: angle + Math.PI / 5,
+              radius: radiusStep, // Slightly reduced to maintain fan-out effect
+              radiusStep: radiusStep,
+              parentAngle: angle,
+            });
 
             // Merge child positions into the result
             Object.assign(positions, childPositions);
@@ -524,15 +523,15 @@ const findAllConnections = (node, connections = [], parent = null) => {
       from: parent.businessName,
       to: node.businessName,
       level: parent.level,
-      text: node.alternateName || ''
+      text: node.alternateName || "",
     });
   }
 
   if (node.children && node.children.length > 0) {
-    node.children.forEach(child => {
+    node.children.forEach((child) => {
       findAllConnections(child, connections, {
         businessName: node.businessName,
-        level: parent ? parent.level + 1 : 0
+        level: parent ? parent.level + 1 : 0,
       });
     });
   }
@@ -544,14 +543,20 @@ const findAllConnections = (node, connections = [], parent = null) => {
 const getAllNodes = (node, result = []) => {
   result.push(node);
   if (node.children && node.children.length > 0) {
-    node.children.forEach(child => getAllNodes(child, result));
+    node.children.forEach((child) => getAllNodes(child, result));
   }
   return result;
 };
 
-export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visualData }) {
+export default function MultiLevelTreeDiagram({
+  viewVisual,
+  setViewVisual,
+  visualData,
+}) {
   let thevisual = updateBusinessNames(visualData);
-  thevisual.children = thevisual.children.filter(obj => Object.keys(obj).length !== 0);
+  thevisual.children = thevisual.children.filter(
+    (obj) => Object.keys(obj).length !== 0,
+  );
   const [treeData, setTreeData] = useState(thevisual);
   const [selectedNode, setSelectedNode] = useState(null);
   const [hoveredNode, setHoveredNode] = useState(null);
@@ -567,18 +572,25 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
         if (!userId) return;
 
         // Make API call to get fresh business data
-        const response = await fetch(`https://api.ecostance.com/v1/user-chains/tree/${userId}`);
-        
+        const response = await fetch(
+          `${process.env.API_BASE}/v1/user-chains/tree/${userId}`,
+        );
+
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.data) {
             const updatedVisual = updateBusinessNames(data.data);
-            
+
             // Safely filter children if they exist
-            if (updatedVisual.children && Array.isArray(updatedVisual.children)) {
-              updatedVisual.children = updatedVisual.children.filter(obj => Object.keys(obj).length !== 0);
+            if (
+              updatedVisual.children &&
+              Array.isArray(updatedVisual.children)
+            ) {
+              updatedVisual.children = updatedVisual.children.filter(
+                (obj) => Object.keys(obj).length !== 0,
+              );
             }
-            
+
             setTreeData(updatedVisual);
           }
         }
@@ -621,7 +633,7 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
     let maxX = centerX;
 
     // Find the minimum and maximum X coordinates
-    Object.values(allPositions).forEach(pos => {
+    Object.values(allPositions).forEach((pos) => {
       if (pos.x < minX) minX = pos.x;
       if (pos.x > maxX) maxX = pos.x;
     });
@@ -642,7 +654,7 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
   const handleScrollRight = () => {
     // Math.min(viewBoxOffset + 200, boundaries.max - centerX - visibleWidth);
     const newOffset = Math.min(viewBoxOffset + 200, boundaries.max - centerX);
-    console.log(newOffset, "offsett")
+    console.log(newOffset, "offsett");
     setViewBoxOffset(newOffset);
   };
 
@@ -663,7 +675,7 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
     try {
       // Get user ID from localStorage
       const userId = localStorage.getItem("userId");
-      
+
       if (!userId) {
         console.error("User ID not found in localStorage");
         alert("User ID not found. Please login again.");
@@ -673,24 +685,28 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
       console.log("Refreshing tree data for userId:", userId);
 
       // Make API call to refresh tree data
-      const response = await fetch(`https://api.ecostance.com/v1/user-chains/tree/${userId}`);
-      
+      const response = await fetch(
+        `${process.env.API_BASE}/v1/user-chains/tree/${userId}`,
+      );
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log("API Response:", data);
-      
+
       if (data.success && data.data) {
         // Update the tree data with fresh data
         const updatedVisual = updateBusinessNames(data.data);
-        
+
         // Safely filter children if they exist
         if (updatedVisual.children && Array.isArray(updatedVisual.children)) {
-          updatedVisual.children = updatedVisual.children.filter(obj => Object.keys(obj).length !== 0);
+          updatedVisual.children = updatedVisual.children.filter(
+            (obj) => Object.keys(obj).length !== 0,
+          );
         }
-        
+
         setTreeData(updatedVisual);
         console.log("Tree data updated successfully");
       } else {
@@ -733,7 +749,7 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
     const offsetY = midY + perpY * offset;
 
     // Calculate angle for text
-    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
 
     // Adjust text angle to prevent upside-down text
     let textAngle = angle;
@@ -744,29 +760,36 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
     return {
       x: offsetX,
       y: offsetY,
-      angle: textAngle
+      angle: textAngle,
     };
   };
 
   // Determine if navigation arrows should be shown
   const showLeftArrow = viewBoxOffset > boundaries.min - centerX;
-  const showRightArrow = viewBoxOffset < boundaries.max - centerX
+  const showRightArrow = viewBoxOffset < boundaries.max - centerX;
 
-  let theName = JSON.parse(localStorage.getItem("MyBusinessDetails"))?.name
+  let theName = JSON.parse(localStorage.getItem("MyBusinessDetails"))?.name;
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-lg">
-      <h2 className="text-xl font-bold mb-4 text-slate-800"><b>{theName}</b> Supply Chain</h2>
-      <p className="text-sm text-slate-600 mb-4">Hover over nodes to see carbon footprints. Click on a node to select it.</p>
+      <h2 className="text-xl font-bold mb-4 text-slate-800">
+        <b>{theName}</b> Supply Chain
+      </h2>
+      <p className="text-sm text-slate-600 mb-4">
+        Hover over nodes to see carbon footprints. Click on a node to select it.
+      </p>
 
-      <div className="relative border rounded p-2 bg-slate-50 overflow-hidden" style={{ position: "relative" }}>
+      <div
+        className="relative border rounded p-2 bg-slate-50 overflow-hidden"
+        style={{ position: "relative" }}
+      >
         <button
           className="cart-overlay__close-icon"
           onClick={() => setViewVisual(false)}
         >
           <IoIosClose />
         </button>
-        
+
         <button
           className="refresh-button"
           onClick={handleRefresh}
@@ -787,36 +810,31 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
             justifyContent: "center",
             cursor: isRefreshing ? "not-allowed" : "pointer",
             opacity: isRefreshing ? 0.6 : 1,
-            transition: "all 0.3s ease"
+            transition: "all 0.3s ease",
           }}
         >
-          <IoMdRefresh 
-            style={{ 
+          <IoMdRefresh
+            style={{
               fontSize: "20px",
               transform: isRefreshing ? "rotate(360deg)" : "rotate(0deg)",
-              transition: "transform 0.5s ease"
-            }} 
+              transition: "transform 0.5s ease",
+            }}
           />
         </button>
 
         {/* Navigation arrows */}
         {showLeftArrow && (
-          <button
-            className="left arrow"
-            onClick={handleScrollLeft}
-          >
-          </button>
+          <button className="left arrow" onClick={handleScrollLeft}></button>
         )}
 
         {showRightArrow && (
-          <button
-            className="right arrow"
-            onClick={handleScrollRight}
-          >
-          </button>
+          <button className="right arrow" onClick={handleScrollRight}></button>
         )}
 
-        <div className="overflow-hidden" style={{ width: '100%', height: height }}>
+        <div
+          className="overflow-hidden"
+          style={{ width: "100%", height: height }}
+        >
           <svg
             width={width}
             height={height}
@@ -827,7 +845,12 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
             {connections.map((connection, index) => {
               const sourcePos = allPositions[connection.from];
               const targetPos = allPositions[connection.to];
-              const textPos = calculateTextPosition(sourcePos.x, sourcePos.y, targetPos.x, targetPos.y);
+              const textPos = calculateTextPosition(
+                sourcePos.x,
+                sourcePos.y,
+                targetPos.x,
+                targetPos.y,
+              );
 
               return (
                 <g key={`line-${connection.from}-${connection.to}`}>
@@ -837,7 +860,12 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
                     y1={sourcePos.y}
                     x2={targetPos.x}
                     y2={targetPos.y}
-                    stroke={selectedNode === connection.to || selectedNode === connection.from ? "#2563eb" : "#94a3b8"}
+                    stroke={
+                      selectedNode === connection.to ||
+                      selectedNode === connection.from
+                        ? "#2563eb"
+                        : "#94a3b8"
+                    }
                     strokeWidth={2.5}
                     className="transition-all duration-300"
                   />
@@ -915,10 +943,15 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
                     cx={nodePos.x}
                     cy={nodePos.y}
                     r={12}
-                    fill={isSelected ? "#2563eb" : 
-                      node.businessName === treeData.businessName ? "#64748b" : // Main business unchanged
-                      node.acceptanceStatus === "pending" ? "#f97316" : // Orange for pending
-                      "#22c55e"} // Green for accepted/other status
+                    fill={
+                      isSelected
+                        ? "#2563eb"
+                        : node.businessName === treeData.businessName
+                          ? "#64748b" // Main business unchanged
+                          : node.acceptanceStatus === "pending"
+                            ? "#f97316" // Orange for pending
+                            : "#22c55e"
+                    } // Green for accepted/other status
                     stroke="none"
                     strokeWidth={2}
                     className="transition-all duration-300"
@@ -929,10 +962,15 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
                     x={nodePos.x}
                     y={textY}
                     textAnchor="middle"
-                    fill={isSelected ? "#2563eb" : 
-                      node.businessName === treeData.businessName ? "#1e293b" : // Main business - dark gray
-                      node.acceptanceStatus === "pending" ? "#f97316" : // Orange for pending
-                      "#22c55e"} // Green for accepted/other status
+                    fill={
+                      isSelected
+                        ? "#2563eb"
+                        : node.businessName === treeData.businessName
+                          ? "#1e293b" // Main business - dark gray
+                          : node.acceptanceStatus === "pending"
+                            ? "#f97316" // Orange for pending
+                            : "#22c55e"
+                    } // Green for accepted/other status
                     fontWeight={isSelected ? "bold" : "normal"}
                     fontSize={12}
                     className="transition-all duration-300"
@@ -945,14 +983,18 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
                     <g>
                       {/* Country flag behind everything */}
                       {(() => {
-                        const countries = node.businessName === treeData.businessName ? 
-                          (treeData.businessData?.countries || []) : 
-                          (node.businessDetails?.countries || []);
-                        
+                        const countries =
+                          node.businessName === treeData.businessName
+                            ? treeData.businessData?.countries || []
+                            : node.businessDetails?.countries || [];
+
                         // Use first country or default to USA
-                        const countryToUse = (countries && countries.length > 0) ? countries[0] : "United States";
+                        const countryToUse =
+                          countries && countries.length > 0
+                            ? countries[0]
+                            : "United States";
                         const flagUrl = getCountryFlagUrl(countryToUse);
-                        
+
                         if (flagUrl) {
                           return (
                             <g>
@@ -998,7 +1040,7 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
                         strokeWidth={0.5}
                         strokeOpacity={0.2}
                       />
-                      
+
                       {/* White background for text area */}
                       <rect
                         x={nodePos.x - 80}
@@ -1018,9 +1060,13 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
                         fontWeight="600"
                         textAnchor="middle"
                       >
-                        <tspan>CO2 Emission: {node.businessName === treeData.businessName ? 
-                          (treeData.businessData?.co2Emission || 0) : 
-                          (node.businessDetails?.co2Emission || 0)} Kgs</tspan>
+                        <tspan>
+                          CO2 Emission:{" "}
+                          {node.businessName === treeData.businessName
+                            ? treeData.businessData?.co2Emission || 0
+                            : node.businessDetails?.co2Emission || 0}{" "}
+                          Kgs
+                        </tspan>
                       </text>
                       <text
                         x={nodePos.x}
@@ -1030,9 +1076,13 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
                         fontWeight="600"
                         textAnchor="middle"
                       >
-                        <tspan>Energy Consumption: {node.businessName === treeData.businessName ? 
-                          (treeData.businessData?.powerConsuption || 0) : 
-                          (node.businessDetails?.powerConsuption || 0)} Kwh</tspan>
+                        <tspan>
+                          Energy Consumption:{" "}
+                          {node.businessName === treeData.businessName
+                            ? treeData.businessData?.powerConsuption || 0
+                            : node.businessDetails?.powerConsuption || 0}{" "}
+                          Kwh
+                        </tspan>
                       </text>
                       <text
                         x={nodePos.x}
@@ -1042,9 +1092,13 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
                         fontWeight="600"
                         textAnchor="middle"
                       >
-                        <tspan>Water Usage: {node.businessName === treeData.businessName ? 
-                          (treeData.businessData?.waterConsuption || 0) : 
-                          (node.businessDetails?.waterConsuption || 0)} L</tspan>
+                        <tspan>
+                          Water Usage:{" "}
+                          {node.businessName === treeData.businessName
+                            ? treeData.businessData?.waterConsuption || 0
+                            : node.businessDetails?.waterConsuption || 0}{" "}
+                          L
+                        </tspan>
                       </text>
                       <text
                         x={nodePos.x}
@@ -1054,9 +1108,13 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
                         fontWeight="600"
                         textAnchor="middle"
                       >
-                        <tspan>Recycled Material: {node.businessName === treeData.businessName ? 
-                          (treeData.businessData?.recycleMaterial || 0) : 
-                          (node.businessDetails?.recycleMaterial || 0)}%</tspan>
+                        <tspan>
+                          Recycled Material:{" "}
+                          {node.businessName === treeData.businessName
+                            ? treeData.businessData?.recycleMaterial || 0
+                            : node.businessDetails?.recycleMaterial || 0}
+                          %
+                        </tspan>
                       </text>
                       <text
                         x={nodePos.x}
@@ -1066,9 +1124,13 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
                         fontWeight="600"
                         textAnchor="middle"
                       >
-                        <tspan>Upcycled Material: {node.businessName === treeData.businessName ? 
-                          (treeData.businessData?.upcycleMaterial || 0) : 
-                          (node.businessDetails?.upcycleMaterial || 0)}%</tspan>
+                        <tspan>
+                          Upcycled Material:{" "}
+                          {node.businessName === treeData.businessName
+                            ? treeData.businessData?.upcycleMaterial || 0
+                            : node.businessDetails?.upcycleMaterial || 0}
+                          %
+                        </tspan>
                       </text>
                     </g>
                   )}
@@ -1083,10 +1145,15 @@ export default function MultiLevelTreeDiagram({ viewVisual, setViewVisual, visua
         {selectedNode ? (
           <div>
             <p className="font-semibold text-slate-800">{selectedNode}</p>
-            <p className="mt-1">Carbon Footprint: {allPositions[selectedNode]?.primaryName} CO2 Tons</p>
+            <p className="mt-1">
+              Carbon Footprint: {allPositions[selectedNode]?.primaryName} CO2
+              Tons
+            </p>
           </div>
         ) : (
-          <p>No node selected. Hover over nodes to see carbon footprint details.</p>
+          <p>
+            No node selected. Hover over nodes to see carbon footprint details.
+          </p>
         )}
       </div>
     </div>

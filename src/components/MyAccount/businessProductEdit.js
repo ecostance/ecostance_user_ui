@@ -2345,7 +2345,8 @@ const BusinessProductEdit = ({
                             currentSlug?.length !== 0 &&
                             !validationErrors?.slug?.error &&
                             "This URL is Available"} */}
-                                                        {sustainabilityActionStates?.slugAvailable ===
+                                                        {inputSlugSelected &&
+                                                            sustainabilityActionStates?.slugAvailable ===
                                                             SLUG_UNAVAILABLE &&
                                                             initSlug?.length !== 0 &&
                                                             !validationErrors?.slug?.error &&
@@ -2353,7 +2354,8 @@ const BusinessProductEdit = ({
                                                         {/* {initSlug?.length === 0 &&
                                                                     !validationErrors?.slug?.error &&
                                                                     "Please provide a link name"} */}
-                                                        {validationErrors?.slug?.error &&
+                                                        {inputSlugSelected &&
+                                                            validationErrors?.slug?.error &&
                                                             generateInvalidMessage({
                                                                 name: validationErrors?.slug?.name,
                                                                 type: validationErrors?.slug?.type,

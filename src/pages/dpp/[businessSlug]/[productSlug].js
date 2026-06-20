@@ -1,5 +1,31 @@
 import NotFound from '../../404'
 
+// The product passport is a complete, standalone HTML document (its own <head>,
+// <style> and <script>). Injecting it via dangerouslySetInnerHTML does NOT run
+// its scripts, so interactive bits (openTab/showImage/changeImage) break with
+// "openTab is not defined". Rendering it in an iframe via srcDoc executes those
+// scripts natively and isolates its CSS from the app.
+const handleIframeLoad = (e) => {
+  const iframe = e.currentTarget
+  try {
+    const win = iframe.contentWindow
+    const doc = win.document
+    const resize = () => {
+      iframe.style.height = doc.documentElement.scrollHeight + 'px'
+    }
+    resize()
+    // Keep height in sync when content height changes (e.g. switching tabs).
+    if (win.ResizeObserver) {
+      const observer = new win.ResizeObserver(resize)
+      observer.observe(doc.documentElement)
+    }
+    win.addEventListener('resize', resize)
+  } catch (err) {
+    // Same-origin srcDoc access should not throw, but never break rendering.
+    console.error('DPP iframe resize error:', err)
+  }
+}
+
 const DppPage = ({ htmlContent, notFound, notPublished }) => {
   if (notFound) return <NotFound />
 
@@ -23,7 +49,12 @@ const DppPage = ({ htmlContent, notFound, notPublished }) => {
   }
 
   return (
-    <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+    <iframe
+      title="Digital Product Passport"
+      srcDoc={htmlContent}
+      onLoad={handleIframeLoad}
+      style={{ width: '100%', border: 'none', display: 'block', minHeight: '100vh' }}
+    />
   )
 }
 

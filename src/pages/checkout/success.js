@@ -143,8 +143,11 @@ const NewSuccess = ({
 
   const getCompanyAddressHandler = async () => {
     try {
+      // Wait for the auth cookie before calling, otherwise the request 401s
+      // and the seller/company info block renders empty.
+      await waitForJWTToken(5000);
       const res = await getCompanyAddress();
-      setCompanyAddress(res?.data?.data);
+      setCompanyAddress(res?.data?.data || {});
     } catch (err) {
       console.log(err);
     }
@@ -828,11 +831,21 @@ const NewSuccess = ({
               <div className="order__success__main-container_row">
                 <div className="order__success-info-container">
                   <div className="order__success__company-info-container">
-                    <p className="text-bold">{companyAddress?.companyName}</p>
-                    <p>{companyAddress?.departmentName}</p>
-                    <p>{getFormattedAddress1(companyAddress?.addressLine1)},</p>
-                    <p>{getFormattedBillingAddress(companyAddress)}</p>
-                    <p>Contact: {companyAddress?.email}</p>
+                    {companyAddress?.companyName && (
+                      <p className="text-bold">{companyAddress?.companyName}</p>
+                    )}
+                    {companyAddress?.departmentName && (
+                      <p>{companyAddress?.departmentName}</p>
+                    )}
+                    {companyAddress?.addressLine1 && (
+                      <p>{getFormattedAddress1(companyAddress?.addressLine1)},</p>
+                    )}
+                    {getFormattedBillingAddress(companyAddress) && (
+                      <p>{getFormattedBillingAddress(companyAddress)}</p>
+                    )}
+                    {companyAddress?.email && (
+                      <p>Contact: {companyAddress?.email}</p>
+                    )}
                   </div>
                   <div className="order__success__buyer-info-container">
                     <p className="text-bold">Sold To</p>

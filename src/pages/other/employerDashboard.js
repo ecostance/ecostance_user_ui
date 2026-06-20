@@ -42,7 +42,7 @@ ChartJS.register(
   ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
 // export const options = {
@@ -126,9 +126,8 @@ const EmployerDashboard = () => {
 
   let b;
   const currentDate = new Date(
-    JSON.parse(
-      localStorage.getItem("JoinedBusinessDetails")
-    )?.businessId?.createdAt
+    JSON.parse(localStorage.getItem("JoinedBusinessDetails"))?.businessId
+      ?.createdAt,
   );
   const lastEightMonthsArray = [];
   const lastEightMonthsArrayNums = [];
@@ -146,7 +145,6 @@ const EmployerDashboard = () => {
     getAllFootPrint();
     getAnnualBusinessData();
   }, []);
-  
 
   const fetchMetrics = async () => {
     let res = await getAllJoinedBusinessCarbonCalculations();
@@ -163,10 +161,12 @@ const EmployerDashboard = () => {
   }, []);
 
   const getOrdersData = async () => {
-    let BusinessDetails = JSON.parse(localStorage.getItem("JoinedBusinessDetails"));
+    let BusinessDetails = JSON.parse(
+      localStorage.getItem("JoinedBusinessDetails"),
+    );
     let businessCode = BusinessDetails?.businessCode;
-    const res= await axios.get(
-      `https://api.ecostance.com/v1/business-profiles/me/${businessCode}`
+    const res = await axios.get(
+      `${process.env.API_BASE}/v1/business-profiles/me/${businessCode}`,
     );
     if (res.data.success) {
       console.log("new-employer-business-data", res.data);
@@ -176,10 +176,12 @@ const EmployerDashboard = () => {
   };
 
   const fetchData = async () => {
-    let BusinessDetails = JSON.parse(localStorage.getItem("JoinedBusinessDetails"));
+    let BusinessDetails = JSON.parse(
+      localStorage.getItem("JoinedBusinessDetails"),
+    );
     let businessCode = BusinessDetails?.businessCode;
     const response = await axios.get(
-      `https://api.ecostance.com/v1/business-events/stats/${businessCode}`
+      `${process.env.API_BASE}/v1/business-events/stats/${businessCode}`,
     );
     const { data } = response.data;
     console.log(data, "yearlydataa1");
@@ -201,7 +203,7 @@ const EmployerDashboard = () => {
       "ghgcounttotalJoinedBusiness",
       totalEvents,
       "totalEvents",
-      totalgrossCarbonEmissions
+      totalgrossCarbonEmissions,
     );
 
     setTotalGHGDataCount(ghgCount);
@@ -256,15 +258,15 @@ const EmployerDashboard = () => {
         (accumulator, currentValue) => {
           return accumulator + currentValue.UserCarbonFootPrint.treesPlanted;
         },
-        0
+        0,
       );
-      console.log(footprintData,"footprintsData of employeeCarbonFootPrint")
+      console.log(footprintData, "footprintsData of employeeCarbonFootPrint");
       // const allProjects = footprintData?.data?.businessAggregate.flatMap(obj => obj.UserCarbonFootPrint.projectsSupported);
       ghcReduced = footprintData?.data?.businessAggregate.reduce(
         (accumulator, currentValue) => {
           return accumulator + currentValue.UserCarbonFootPrint.ghgReduced;
         },
-        0
+        0,
       );
       setTotalGHCreduced(ghcReduced);
       // Remove duplicates using Set
@@ -299,7 +301,7 @@ const EmployerDashboard = () => {
         lastMonth
           .toLocaleString("default", { month: "short", year: "numeric" })
           .split(" ")[1]
-          .slice(-2)
+          .slice(-2),
     );
     let monthIndex = lastMonth.getMonth();
 
@@ -309,9 +311,8 @@ const EmployerDashboard = () => {
   if (metricsData?.data?.length > 0) {
     transformedData = metricsData.data.map((item) => {
       const transformedItem = { ...item };
-      transformedItem[
-        "Total Purchased"
-      ] = `${transformedItem.ghgReduced} CO2 tons`;
+      transformedItem["Total Purchased"] =
+        `${transformedItem.ghgReduced} CO2 tons`;
       transformedItem.OrderValue.forEach((value) => {
         if (
           value.currency === "USD" ||
@@ -341,7 +342,7 @@ const EmployerDashboard = () => {
       monthlyPurchaseData.push(
         found
           ? found
-          : { _id: 0, ghgReduced: 0, treesPlanted: 0, orderCount: 0 }
+          : { _id: 0, ghgReduced: 0, treesPlanted: 0, orderCount: 0 },
       );
       // emittedData.push(foundEmitted ? foundEmitted.totalCarbonEmissions : 0)
       // setCalculatedUsers(metricsData?.businessUserCalculatedCount)
@@ -361,7 +362,7 @@ const EmployerDashboard = () => {
   if (metricsData?.dataEmitCalc?.length > 0) {
     lastEightMonthsArrayNums.forEach((monthNum) => {
       var foundEmitted = metricsData.dataEmitCalc.find(
-        (item) => item?._id?.month == monthNum
+        (item) => item?._id?.month == monthNum,
       );
       emittedData.push(foundEmitted ? foundEmitted.totalCarbonEmissions : 0);
     });
@@ -422,13 +423,13 @@ const EmployerDashboard = () => {
     if (annualData.data.length > 0) {
       var found = annualData.data.find((item) => item?._id?.year == yearLoop);
       var foundEmitted = annualData.dataEmitCalc.find(
-        (item) => item?._id?.year == yearLoop
+        (item) => item?._id?.year == yearLoop,
       );
       var currentYearData = annualData.data.find(
-        (item) => item?._id?.year == thisYear
+        (item) => item?._id?.year == thisYear,
       );
       var currentYearEmittedData = annualData.dataEmitCalc.find(
-        (item) => item?._id?.year == thisYear
+        (item) => item?._id?.year == thisYear,
       );
       yearReduced.push(found ? found.ghgReduced.toFixed(2) : 0);
       currentYearReduced = currentYearData ? currentYearData.ghgReduced : 0;
@@ -436,7 +437,7 @@ const EmployerDashboard = () => {
         ? currentYearEmittedData.totalCarbonEmissions
         : 0;
       yearEmitted.push(
-        foundEmitted ? foundEmitted.totalCarbonEmissions?.toFixed(2) : 0
+        foundEmitted ? foundEmitted.totalCarbonEmissions?.toFixed(2) : 0,
       );
     }
   }
@@ -542,7 +543,7 @@ const EmployerDashboard = () => {
         for (let i = 0; i < 7; i++) {
           const weekStartDate = getFirstDateOfWeek(
             currentDate.getFullYear(),
-            currentDate.getWeek() - i
+            currentDate.getWeek() - i,
           );
           const formattedDate = formatDate(weekStartDate);
           last7Weeks.push("Week of " + formattedDate);
@@ -595,7 +596,7 @@ const EmployerDashboard = () => {
             lastMonth.toLocaleString("default", {
               month: "short",
               year: "numeric",
-            })
+            }),
           );
           let monthIndex = (currentMonth - i + 12) % 12;
 
@@ -610,17 +611,17 @@ const EmployerDashboard = () => {
 
         lastSevenMonthsArrayNums.forEach((monthNum) => {
           var found = referralData.data.data.find(
-            (item) => item?.month == monthNum
+            (item) => item?.month == monthNum,
           );
           var foundEarning = EarningsData.data.data.find(
-            (item) => item?.month == monthNum
+            (item) => item?.month == monthNum,
           );
           monthsArray.push(found ? found.TotalUSDAmt : 0);
           monthEarnings.push(foundEarning ? foundEarning.TotalUSDAmt : 0);
           tooltipMonths.push(
             found
               ? { ...{ "Total USD": found.TotalUSDAmt }, ...found.totalAmt }
-              : { USD: 0 }
+              : { USD: 0 },
           );
           tooltipMonthEarnings.push(
             foundEarning
@@ -628,7 +629,7 @@ const EmployerDashboard = () => {
                   ...{ "Total USD": foundEarning.TotalUSDAmt },
                   ...foundEarning.totalAmt,
                 }
-              : { USD: 0 }
+              : { USD: 0 },
           );
         });
         tooltipMonths = tooltipMonths.reverse();
@@ -644,17 +645,17 @@ const EmployerDashboard = () => {
         console.log(lastSevenWeekArray, "weeks");
         lastSevenWeekArray.forEach((weekNum) => {
           var found = referralData.data.data.find(
-            (item) => item?.week + 1 == weekNum.split(" ")[1]
+            (item) => item?.week + 1 == weekNum.split(" ")[1],
           );
           var foundEarning = EarningsData.data.data.find(
-            (item) => item?.week + 1 == weekNum.split(" ")[1]
+            (item) => item?.week + 1 == weekNum.split(" ")[1],
           );
           weeksArray.push(found ? found.TotalUSDAmt : 0);
           weekEarnings.push(foundEarning ? foundEarning.TotalUSDAmt : 0);
           tooltipWeeks.push(
             found
               ? { ...{ "Total USD": found.TotalUSDAmt }, ...found.totalAmt }
-              : { USD: 0 }
+              : { USD: 0 },
           );
           tooltipWeeksEarnings.push(
             foundEarning
@@ -662,7 +663,7 @@ const EmployerDashboard = () => {
                   ...{ "Total USD": foundEarning.TotalUSDAmt },
                   ...foundEarning.totalAmt,
                 }
-              : { USD: 0 }
+              : { USD: 0 },
           );
         });
         tooltipWeeks = tooltipWeeks.reverse();
@@ -711,7 +712,7 @@ const EmployerDashboard = () => {
       : 0;
 
   let PercentageData = Math.ceil(
-    (currentYearReduced / currentYearEmitted) * 100
+    (currentYearReduced / currentYearEmitted) * 100,
   );
 
   let totalEmittedEstimate =
@@ -988,7 +989,7 @@ const EmployerDashboard = () => {
                     {Math.ceil(
                       (ordersData?.carbonCalculationCount /
                         ordersData?.totalMemberCount) *
-                        100
+                        100,
                     )}
                     %
                   </div>
@@ -1093,16 +1094,16 @@ const EmployerDashboard = () => {
                     {ordersData?.businessProfileAggregate?.ghgReduced === 0
                       ? "0%"
                       : ordersData?.totalCarbonEmissionsCount === 0
-                      ? "100%"
-                      : (
-                          ((ordersData?.businessProfileAggregate?.ghgReduced -
-                            ordersData?.businessProfileAggregate
-                              ?.ghgReducedEvent) /
-                            ((ordersData?.totalCarbonEmissionsCount /
-                              ordersData?.carbonCalculationCount) *
-                              ordersData?.totalMemberCount)) *
-                          100
-                        ).toFixed(2) + "%"}
+                        ? "100%"
+                        : (
+                            ((ordersData?.businessProfileAggregate?.ghgReduced -
+                              ordersData?.businessProfileAggregate
+                                ?.ghgReducedEvent) /
+                              ((ordersData?.totalCarbonEmissionsCount /
+                                ordersData?.carbonCalculationCount) *
+                                ordersData?.totalMemberCount)) *
+                            100
+                          ).toFixed(2) + "%"}
                   </div>
 
                   <div className="event--subtitle">

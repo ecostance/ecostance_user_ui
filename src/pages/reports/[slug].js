@@ -45,7 +45,7 @@ const PostRightSidebar = ({ post }) => {
   const verifyReportUser = () => {
     setLoading(true);
     axios
-      .get(`https://api.ecostance.com/v1/user-reports?email=${downloadEmail}`)
+      .get(`${process.env.API_BASE}/v1/user-reports?email=${downloadEmail}`)
       .then(({ data }) => {
         console.log(data, "lkwehklwjef");
         if (data.data.length > 0) {
@@ -67,7 +67,7 @@ const PostRightSidebar = ({ post }) => {
   const saveReportUserData = () => {
     setLoading(true);
     axios
-      .post(`https://api.ecostance.com/v1/user-reports`, {
+      .post(`${process.env.API_BASE}/v1/user-reports`, {
         firstName: downloadFname,
         lastName: downloadLname,
         email: downloadEmail,
@@ -119,7 +119,7 @@ const PostRightSidebar = ({ post }) => {
           author_url: authorWebsite,
           content: authorComment,
           post: postObj?.id,
-        }
+        },
       );
       setComments([...comments, response.data]);
       setLoading(false);

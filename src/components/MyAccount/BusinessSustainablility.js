@@ -1669,20 +1669,26 @@ const BusinessSustainability = ({
                                                         )}
                                                     </div>
                                                     <p className="error-msg position-absolute">
+                                                        {/* Slug feedback is only relevant while the user is
+                                                            editing the slug; don't surface it in the default
+                                                            read-only view. */}
                                                         {/* {sustainabilityActionStates?.slugAvailable ===
                             SLUG_AVAILABLE &&
                             currentSlug?.length !== 0 &&
                             !validationErrors?.slug?.error &&
                             "This URL is Available"} */}
-                                                        {sustainabilityActionStates?.slugAvailable ===
+                                                        {inputSlugSelected &&
+                                                            sustainabilityActionStates?.slugAvailable ===
                                                             SLUG_UNAVAILABLE &&
                                                             initSlug?.length !== 0 &&
                                                             !validationErrors?.slug?.error &&
                                                             "The link name has already been taken"}
-                                                        {initSlug?.length === 0 &&
+                                                        {inputSlugSelected &&
+                                                            initSlug?.length === 0 &&
                                                             !validationErrors?.slug?.error &&
                                                             "Please provide a link name"}
-                                                        {validationErrors?.slug?.error &&
+                                                        {inputSlugSelected &&
+                                                            validationErrors?.slug?.error &&
                                                             generateInvalidMessage({
                                                                 name: validationErrors?.slug?.name,
                                                                 type: validationErrors?.slug?.type,

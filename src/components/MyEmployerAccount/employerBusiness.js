@@ -255,7 +255,7 @@ const EmployerBusiness = ({
           return <>
             <div className="business--table--data">
               <div>{theNum + index + 1 + activePage * limit - limit}.</div>
-              <div>{e?.userId?.firstName ? e?.userId?.firstName : ""}&nbsp;{e?.userId?.lastName ? e?.userId?.lastName : ""}</div>
+              <div>{e?.userId?.firstName || e?.userId?.lastName ? <>{e?.userId?.firstName ? e?.userId?.firstName : ""}&nbsp;{e?.userId?.lastName ? e?.userId?.lastName : ""}</> : (BusinessDetails?.name || "")}</div>
               <div>{e.name}&nbsp;<span style={{ color: "black", fontWeight: 700, display: localStorage.getItem("email") === e?.name ? "" : "none" }}>(You)</span></div>
               <div>{getDisplayDate(e.createdAt)}</div>
               <div>{theRole}</div>

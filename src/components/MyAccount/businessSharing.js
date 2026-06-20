@@ -365,8 +365,16 @@ const BusinessSharing = ({
               <div className="business--table--data">
                 <div>{theNum + index + 1 + activePage * limit - limit}.</div>
                 <div>
-                  {e?.userId?.firstName ? e?.userId?.firstName : ""}&nbsp;
-                  {e?.userId?.lastName ? e?.userId?.lastName : ""}
+                  {e?.userId?.firstName || e?.userId?.lastName ? (
+                    <>
+                      {e?.userId?.firstName ? e?.userId?.firstName : ""}&nbsp;
+                      {e?.userId?.lastName ? e?.userId?.lastName : ""}
+                    </>
+                  ) : (
+                    // No personal name on the user account: fall back to the
+                    // business name so the column isn't blank.
+                    businessName || ""
+                  )}
                 </div>
                 <div>
                   {e.name}&nbsp;

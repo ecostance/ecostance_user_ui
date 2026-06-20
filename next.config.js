@@ -16,7 +16,12 @@ module.exports = {
     ],
   },
   env: {
-    PUBLIC_URL: process.env.NEXT_PUBLIC_UI_URL,
+    // PUBLIC_URL is used as a path prefix on internal routes/assets (CRA/Flone
+    // convention) and MUST stay relative. Aliasing it to the full origin
+    // (NEXT_PUBLIC_UI_URL) makes <Link as={...}> external while href stays
+    // relative, which Next.js rejects. Use NEXT_PUBLIC_UI_URL directly when a
+    // genuine absolute URL is needed.
+    PUBLIC_URL: "",
     PUBLIC_BLOG_URL: process.env.NEXT_PUBLIC_BLOG_URL,
   },
   webpack: (config) => {
