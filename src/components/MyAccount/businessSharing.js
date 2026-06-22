@@ -699,7 +699,7 @@ const BusinessSharing = ({
                         height: "18px",
                         // marginLeft: "15px",
                         borderWidth: "2px",
-                      }}/assets/images/ecostance-qr-logo.png
+                      }}
                     />
                   )}
                 </Tooltip>
