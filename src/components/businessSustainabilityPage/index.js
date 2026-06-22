@@ -430,6 +430,7 @@ width="125"
           currentUserSettings?.showFacebook === "true" ? true : false,
         newProjects: newProjects,
         showSocial: showSocial,
+        generateTextWithSpaces: generateTextWithSpaces,
         evaluateCertSide: evaluateCertSide,
         returnShortenParagraph: returnShortenParagraph,
       });
