@@ -62,7 +62,13 @@ const Cancel = ({
   console.log(allProductData, "allproducts")
   console.log(userData, sustainData, "themedata")
 
-  let BusinessDetails = JSON.parse(localStorage.getItem("MyBusinessDetails"))
+  // `localStorage` is undefined during SSR (this page is server-rendered via
+  // getServerSideProps), so guard it — otherwise the render throws on the server
+  // and the client shows "Application error: a client-side exception".
+  let BusinessDetails =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("MyBusinessDetails") || "null")
+      : null
   let businessCode = BusinessDetails?.businessCode
 
   // const setAllOrders = async () => {
