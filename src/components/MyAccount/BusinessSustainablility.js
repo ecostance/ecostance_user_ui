@@ -1529,7 +1529,7 @@ const BusinessSustainability = ({
                                                         <QRCode
                                                             value={`${process.env.NEXT_PUBLIC_UI_URL}/b/${initSlug}`} // here you should keep the link/value(string) for which you are generation promocode
                                                             size={250} // the dimension of the QR code (number)
-                                                            logoImage="/assets/images/netcarbon-qr-logo.png" // URL of the logo you want to use, make sure it is a dynamic url
+                                                            logoImage="/assets/images/ecostance-qr-logo.png" // URL of the logo you want to use, make sure it is a dynamic url
                                                             logoHeight={40}
                                                             logoWidth={40}
                                                             logoOpacity={1}
