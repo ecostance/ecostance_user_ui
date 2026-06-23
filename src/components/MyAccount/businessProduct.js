@@ -2034,36 +2034,71 @@ const BusinessProduct = ({
             const croppedWidth = maxX - minX + 1;
             const croppedHeight = maxY - minY + 1;
 
-            // Define margins around the cropped QR code (increased left/right padding for 5px text-to-QR gap)
-            const leftPadding = 40;
-            const rightPadding = 40;
-            const topPadding = 40; // Increased top padding to add space above Traceable
-            const bottomPadding = 35;
+            // Scale up the entire drawing canvas by a factor of 3 to produce a high-resolution crisp image (including the logo details)
+            const scaleFactor = 3;
+            const scaledWidth = croppedWidth * scaleFactor;
+            const scaledHeight = croppedHeight * scaleFactor;
 
-            combinedCanvas.width = croppedWidth + leftPadding + rightPadding;
-            combinedCanvas.height = croppedHeight + topPadding + bottomPadding;
+            // Define margins around the cropped QR code (increased left/right padding for 5px text-to-QR gap)
+            const leftPadding = 40 * scaleFactor;
+            const rightPadding = 40 * scaleFactor;
+            const topPadding = 40 * scaleFactor; // Increased top padding to add space above Traceable
+            const bottomPadding = 35 * scaleFactor;
+
+            combinedCanvas.width = scaledWidth + leftPadding + rightPadding;
+            combinedCanvas.height = scaledHeight + topPadding + bottomPadding;
 
             // Fill the entire canvas with a solid white background
             ctx.fillStyle = "#FFFFFF";
             ctx.fillRect(0, 0, combinedCanvas.width, combinedCanvas.height);
 
+            // Disable image smoothing temporarily to keep the scaled QR code modules pixel-perfect and sharp
+            ctx.imageSmoothingEnabled = false;
+
             // Draw the cropped QR code (bypassing the built-in white border)
-            ctx.drawImage(canvas, minX, minY, croppedWidth, croppedHeight, leftPadding, topPadding, croppedWidth, croppedHeight);
+            ctx.drawImage(canvas, minX, minY, croppedWidth, croppedHeight, leftPadding, topPadding, scaledWidth, scaledHeight);
+
+            // Re-enable image smoothing for drawing the logo and text elements smoothly
+            ctx.imageSmoothingEnabled = true;
+
+            // Draw the custom logo at the center of the QR code
+            const logoImg = new Image();
+            logoImg.src = "/assets/images/ecostance-qr-logo.png";
+            await new Promise((resolve) => {
+                logoImg.onload = () => {
+                    const centerX = leftPadding + scaledWidth / 2;
+                    const centerY = topPadding + scaledHeight / 2;
+                    const logoSize = Math.min(scaledWidth, scaledHeight) * 0.22;
+                    const logoX = centerX - logoSize / 2;
+                    const logoY = centerY - logoSize / 2;
+                    
+                    // Draw a white background square behind the logo (scaled margin of 6px)
+                    ctx.fillStyle = "#FFFFFF";
+                    ctx.fillRect(logoX - 6, logoY - 6, logoSize + 12, logoSize + 12);
+                    
+                    ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+                    resolve();
+                };
+                logoImg.onerror = () => {
+                    console.error("Failed to load center logo");
+                    resolve();
+                };
+            });
 
             const fontFamily = "Work Sans, Arial, sans-serif";
-            const fontSize = 25; // Optimized font size for better legibility on small product packages
+            const fontSize = 25 * scaleFactor; // Optimized font size for better legibility on small product packages
 
             // Draw a black border around the QR code, leaving a 3px margin so it does not touch the finder patterns
             ctx.strokeStyle = "#000000";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(leftPadding - 3, topPadding - 3, croppedWidth + 6, croppedHeight + 6);
+            ctx.lineWidth = 2 * scaleFactor;
+            ctx.strokeRect(leftPadding - (3 * scaleFactor), topPadding - (3 * scaleFactor), scaledWidth + (6 * scaleFactor), scaledHeight + (6 * scaleFactor));
 
             // 1. Draw "Traceable" at the top-left edge of the QR code (aligned with left border and 5px above top border)
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
             ctx.textAlign = "left";
             ctx.textBaseline = "bottom";
-            ctx.fillText("Traceable", leftPadding - 3, topPadding - 8);
+            ctx.fillText("Traceable", leftPadding - (3 * scaleFactor), topPadding - (8 * scaleFactor));
 
             // 2. Draw "100%" vertically on the left side of the border (with a 5px gap)
             ctx.save();
@@ -2071,7 +2106,7 @@ const BusinessProduct = ({
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.translate(leftPadding - 21, topPadding + (croppedHeight * 0.12));
+            ctx.translate(leftPadding - (21 * scaleFactor), topPadding + (scaledHeight * 0.12));
             ctx.rotate(-Math.PI / 2);
             ctx.fillText("100%", 0, 0);
             ctx.restore();
@@ -2081,7 +2116,7 @@ const BusinessProduct = ({
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "top";
-            ctx.fillText(productName, leftPadding + (croppedWidth / 2), topPadding + croppedHeight + 8);
+            ctx.fillText(productName, leftPadding + (scaledWidth / 2), topPadding + scaledHeight + (8 * scaleFactor));
 
             // 4. Draw the business name vertically on the right side of the border (with a 5px gap)
             const businessNameText = profileRelatedData?.name || (typeof window !== "undefined" && JSON.parse(localStorage.getItem("MyBusinessDetails") || "{}")?.name) || "EcoStance";
@@ -2090,7 +2125,7 @@ const BusinessProduct = ({
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.translate(leftPadding + croppedWidth + 21, topPadding + (croppedHeight / 2));
+            ctx.translate(leftPadding + scaledWidth + (21 * scaleFactor), topPadding + (scaledHeight / 2));
             ctx.rotate(-Math.PI / 2);
             ctx.fillText(businessNameText, 0, 0);
             ctx.restore();
