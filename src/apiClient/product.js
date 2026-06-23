@@ -32,9 +32,10 @@ export const getProducts = async (paginateFields) => {
   }
 };
 
-export const getdeeplink = async() => {
+export const getdeeplink = async () => {
   let deeplinkdata = await request.get("/auth/referral/deeplink")
   return deeplinkdata
+
 }
 export const getProductBySlug = async (slug) => {
   const productResult = await request.get(
@@ -100,7 +101,7 @@ export const getOrderProductReview = (orderId, productId, businessReview) => {
 export const updateOrderProductReview = (reviewId, payload) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const res = await request.patch(`v1/review/${reviewId}`, {comment:payload.comment , rating:payload.rating}, {
+      const res = await request.patch(`v1/review/${reviewId}`, { comment: payload.comment, rating: payload.rating }, {
         headers: {
           Authorization: `Bearer ${getCookie("JWTToken")}`,
         },
