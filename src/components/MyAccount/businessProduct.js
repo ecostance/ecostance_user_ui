@@ -1991,57 +1991,93 @@ const BusinessProduct = ({
 
             const qrCodeWidth = canvas.width;
             const qrCodeHeight = canvas.height;
-            const textHeight = 50;
-            const additionalWidth = 50;
+            
+            // Find the bounding box of the non-white pixels of the QR code to strip its built-in margins
+            const sourceCtx = canvas.getContext("2d");
+            let minX = qrCodeWidth;
+            let maxX = 0;
+            let minY = qrCodeHeight;
+            let maxY = 0;
 
-            combinedCanvas.width = qrCodeWidth + additionalWidth;
-            combinedCanvas.height = qrCodeHeight + textHeight + 20;
+            try {
+                const imgData = sourceCtx.getImageData(0, 0, qrCodeWidth, qrCodeHeight);
+                const data = imgData.data;
+                for (let y = 0; y < qrCodeHeight; y++) {
+                    for (let x = 0; x < qrCodeWidth; x++) {
+                        const idx = (y * qrCodeWidth + x) * 4;
+                        const r = data[idx];
+                        const g = data[idx + 1];
+                        const b = data[idx + 2];
+                        const a = data[idx + 3];
+                        
+                        // If pixel is not white (threshold: R, G, B less than 240) and has opacity
+                        if (a > 50 && (r < 240 || g < 240 || b < 240)) {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Error calculating QR bounds:", e);
+            }
 
+            // Fallback if no pixels found or error occurred
+            if (minX >= maxX || minY >= maxY) {
+                minX = 40;
+                maxX = qrCodeWidth - 40;
+                minY = 40;
+                maxY = qrCodeHeight - 40;
+            }
+
+            const croppedWidth = maxX - minX + 1;
+            const croppedHeight = maxY - minY + 1;
+
+            // Define margins around the cropped QR code
+            const leftPadding = 30;
+            const rightPadding = 8;
+            const topPadding = 35; // Increased top padding to add space above Traceable
+            const bottomPadding = 30;
+
+            combinedCanvas.width = croppedWidth + leftPadding + rightPadding;
+            combinedCanvas.height = croppedHeight + topPadding + bottomPadding;
+
+            // Fill the entire canvas with a solid white background
             ctx.fillStyle = "#FFFFFF";
-            ctx.fillRect(19.5, 0, qrCodeWidth + 34, 20);
-            console.log(qrCodeWidth + 25, "excesswidth")
+            ctx.fillRect(0, 0, combinedCanvas.width, combinedCanvas.height);
 
-            ctx.drawImage(canvas, additionalWidth, 20, qrCodeWidth, qrCodeHeight);
+            // Draw the cropped QR code (bypassing the built-in white border)
+            ctx.drawImage(canvas, minX, minY, croppedWidth, croppedHeight, leftPadding, topPadding, croppedWidth, croppedHeight);
 
             const fontFamily = "Work Sans, Arial, sans-serif";
-            const fontSize = 25;
+            const fontSize = 22; // Identical font size for all text elements
 
-            ctx.font = `${fontSize}px ${fontFamily}`;
-            const textTwo = "Traceable";
-            const textTwoWidth = ctx.measureText(textTwo).width;
-            console.log("Traceable text background width:", textTwoWidth);
-
-            // Commented out the line that draws the white background rectangle for "Traceable" text
-            // ctx.fillStyle = "#FFFFFF";
-            // ctx.fillRect(0, 0, textTwoWidth, textHeight);
-
+            // 1. Draw "Traceable" at the top-left edge of the QR code
+            ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
-            ctx.fillText(textTwo, additionalWidth + 5, fontSize);
+            ctx.textAlign = "left";
+            ctx.textBaseline = "bottom";
+            ctx.fillText("Traceable", leftPadding, topPadding - 3);
 
+            // 2. Draw "100%" vertically on the left side of the top-left finder pattern
             ctx.save();
-            ctx.font = `15px Work Sans, Arial, sans-serif`;
-            const textOne = "100%";
-            const textOneWidth = ctx.measureText(textOne).width;
-            console.log("100% text background width:", textOneWidth);
-
-            // Adjust the translation and rotation to move the text slightly outside the QR code
-            ctx.translate(32, textOneWidth / 2 + 20); // Adjust the y-coordinate to move the text outside
-            ctx.rotate(-Math.PI / 2);
-
-            ctx.fillStyle = "#FFFFFF"; // White background
-            ctx.fillRect(-textOneWidth / 2 - 5, -fontSize / 2, textOneWidth + 10, fontSize + 10); // Adjust padding as needed
-
-            ctx.fillStyle = "#000000"; // Set the text color
-            ctx.fillText(textOne, -textOneWidth / 2, fontSize / 2); // Adjust the x and y coordinates as needed
-            ctx.restore();
-
-            ctx.fillStyle = "#FFFFFF";
-            ctx.fillRect(additionalWidth, qrCodeHeight + 20, qrCodeWidth, textHeight);
-
-            ctx.font = "20px Work Sans, Arial, sans-serif";
+            ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
-            ctx.fillText(productName, qrCodeWidth / 2 + additionalWidth, qrCodeHeight + 55);
+            ctx.textBaseline = "middle";
+            // Align slightly lower next to the top-left finder block (moved from 0.09 to 0.12)
+            ctx.translate(leftPadding - 8, topPadding + (croppedHeight * 0.12));
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText("100%", 0, 0);
+            ctx.restore();
+
+            // 3. Draw the product name at the bottom of the QR code
+            ctx.font = `normal ${fontSize}px ${fontFamily}`;
+            ctx.fillStyle = "#000000";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "top";
+            ctx.fillText(productName, leftPadding + (croppedWidth / 2), topPadding + croppedHeight + 4);
 
             const pngUrl = combinedCanvas
                 .toDataURL("image/png")
@@ -2568,7 +2604,7 @@ const BusinessProduct = ({
                             <QRCode
                                 value={`${process.env.NEXT_PUBLIC_UI_URL}/dpp/${constSlug}/${initSlug}`} // here you should keep the link/value(string) for which you are generation promocode
                                 size={250} // the dimension of the QR code (number)
-                                logoImage="/assets/images/ecostance-qr-logo.png" // URL of the logo you want to use, make sure it is a dynamic url
+                                logoImage="/assets/images/logo-icon.png" // URL of the logo you want to use, make sure it is a dynamic url
                                 logoHeight={40}
                                 logoWidth={40}
                                 logoOpacity={1}
@@ -2588,7 +2624,7 @@ const BusinessProduct = ({
                     </div> */}
                     <QRCode
                         value={`${process.env.NEXT_PUBLIC_UI_URL}/dpp/${constSlug}/${initSlug}`}
-                        logoImage="/assets/images/ecostance-qr-logo.png"
+                        logoImage="/assets/images/logo-icon.png"
                         size={100}
 
                     />
@@ -2859,7 +2895,7 @@ const BusinessProduct = ({
                                             <QRCode
                                                 value={`${process.env.NEXT_PUBLIC_UI_URL}/dpp/${constSlug}/${initSlug}`} // here you should keep the link/value(string) for which you are generation promocode
                                                 size={250} // the dimension of the QR code (number)
-                                                logoImage="/assets/images/ecostance-qr-logo.png" // URL of the logo you want to use, make sure it is a dynamic url
+                                                logoImage="/assets/images/logo-icon.png" // URL of the logo you want to use, make sure it is a dynamic url
                                                 logoHeight={40}
                                                 logoWidth={40}
                                                 logoOpacity={1}
@@ -6109,7 +6145,7 @@ const BusinessProduct = ({
                                     <QRCode
                                         value={`${process.env.NEXT_PUBLIC_UI_URL}?conferenceCode=${singleEvent?.conferanceCode}`} // here you should keep the link/value(string) for which you are generation promocode
                                         size={250} // the dimension of the QR code (number)
-                                        logoImage="/assets/images/ecostance-qr-logo.png" // URL of the logo you want to use, make sure it is a dynamic url
+                                        logoImage="/assets/images/logo-icon.png" // URL of the logo you want to use, make sure it is a dynamic url
                                         logoHeight={40}
                                         logoWidth={40}
                                         logoOpacity={1}
@@ -6124,7 +6160,7 @@ const BusinessProduct = ({
                         <div style={{ marginLeft: "10px" }}>
                             <QRCode
                                 value={`${process.env.NEXT_PUBLIC_UI_URL}?conferenceCode=${singleEvent?.conferanceCode}`}
-                                logoImage="/assets/images/ecostance-qr-logo.png"
+                                logoImage="/assets/images/logo-icon.png"
                                 size={100}
 
                             />
