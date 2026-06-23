@@ -2034,9 +2034,9 @@ const BusinessProduct = ({
             const croppedWidth = maxX - minX + 1;
             const croppedHeight = maxY - minY + 1;
 
-            // Define margins around the cropped QR code
-            const leftPadding = 30;
-            const rightPadding = 8;
+            // Define margins around the cropped QR code (increased left/right padding for 5px text-to-QR gap)
+            const leftPadding = 35;
+            const rightPadding = 35;
             const topPadding = 35; // Increased top padding to add space above Traceable
             const bottomPadding = 30;
 
@@ -2066,8 +2066,8 @@ const BusinessProduct = ({
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            // Align slightly lower next to the top-left finder block (moved from 0.09 to 0.12)
-            ctx.translate(leftPadding - 8, topPadding + (croppedHeight * 0.12));
+            // Align slightly lower next to the top-left finder block with a 5px gap
+            ctx.translate(leftPadding - 16, topPadding + (croppedHeight * 0.12));
             ctx.rotate(-Math.PI / 2);
             ctx.fillText("100%", 0, 0);
             ctx.restore();
@@ -2078,6 +2078,19 @@ const BusinessProduct = ({
             ctx.textAlign = "center";
             ctx.textBaseline = "top";
             ctx.fillText(productName, leftPadding + (croppedWidth / 2), topPadding + croppedHeight + 4);
+
+            // 4. Draw the business name vertically on the right side of the QR code
+            const businessNameText = profileRelatedData?.name || (typeof window !== "undefined" && JSON.parse(localStorage.getItem("MyBusinessDetails") || "{}")?.name) || "EcoStance";
+            ctx.save();
+            ctx.font = `normal ${fontSize}px ${fontFamily}`;
+            ctx.fillStyle = "#000000";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            // Translate to the middle-right next to the QR code with a 5px gap
+            ctx.translate(leftPadding + croppedWidth + 16, topPadding + (croppedHeight / 2));
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(businessNameText, 0, 0);
+            ctx.restore();
 
             const pngUrl = combinedCanvas
                 .toDataURL("image/png")
@@ -2578,7 +2591,7 @@ const BusinessProduct = ({
                         >
                             {!downloading ? (
                                 <BsCloudDownload
-                                    onClick={(e) => downloadCode("qrID")}
+                                    onClick={(e) => downloadCode("productQrID")}
                                     style={{
                                         pointerEvents: "all",
                                         width: "18px",
@@ -2604,14 +2617,14 @@ const BusinessProduct = ({
                             <QRCode
                                 value={`${process.env.NEXT_PUBLIC_UI_URL}/dpp/${constSlug}/${initSlug}`} // here you should keep the link/value(string) for which you are generation promocode
                                 size={250} // the dimension of the QR code (number)
-                                logoImage="/assets/images/logo-icon.png" // URL of the logo you want to use, make sure it is a dynamic url
+                                logoImage="/assets/images/logo.png" // URL of the logo you want to use, make sure it is a dynamic url
                                 logoHeight={40}
                                 logoWidth={40}
                                 logoOpacity={1}
                                 enableCORS={true} // enabling CORS, this is the thing that will bypass that DOM check
                                 qrStyle="dots" // type of qr code, wether you want dotted ones or the square ones
                                 eyeRadius={10} // radius of the promocode eye
-                                id={"qrID"}
+                                id={"productQrID"}
                             />
                         </div>
                     </div>
@@ -2624,7 +2637,7 @@ const BusinessProduct = ({
                     </div> */}
                     <QRCode
                         value={`${process.env.NEXT_PUBLIC_UI_URL}/dpp/${constSlug}/${initSlug}`}
-                        logoImage="/assets/images/logo-icon.png"
+                        logoImage="/assets/images/logo.png"
                         size={100}
 
                     />
@@ -2869,7 +2882,7 @@ const BusinessProduct = ({
                                         >
                                             {!downloading ? (
                                                 <BsCloudDownload
-                                                    onClick={(e) => downloadCode("qrID")}
+                                                    onClick={(e) => downloadCode("productQrID")}
                                                     style={{
                                                         pointerEvents: "all",
                                                         width: "18px",
@@ -2895,14 +2908,14 @@ const BusinessProduct = ({
                                             <QRCode
                                                 value={`${process.env.NEXT_PUBLIC_UI_URL}/dpp/${constSlug}/${initSlug}`} // here you should keep the link/value(string) for which you are generation promocode
                                                 size={250} // the dimension of the QR code (number)
-                                                logoImage="/assets/images/logo-icon.png" // URL of the logo you want to use, make sure it is a dynamic url
+                                                logoImage="/assets/images/logo.png" // URL of the logo you want to use, make sure it is a dynamic url
                                                 logoHeight={40}
                                                 logoWidth={40}
                                                 logoOpacity={1}
                                                 enableCORS={true} // enabling CORS, this is the thing that will bypass that DOM check
                                                 qrStyle="dots" // type of qr code, wether you want dotted ones or the square ones
                                                 eyeRadius={10} // radius of the promocode eye
-                                                id={"qrID"}
+                                                id={"productQrID"}
                                             />
                                         </div>
                                     </div>
@@ -6145,7 +6158,7 @@ const BusinessProduct = ({
                                     <QRCode
                                         value={`${process.env.NEXT_PUBLIC_UI_URL}?conferenceCode=${singleEvent?.conferanceCode}`} // here you should keep the link/value(string) for which you are generation promocode
                                         size={250} // the dimension of the QR code (number)
-                                        logoImage="/assets/images/logo-icon.png" // URL of the logo you want to use, make sure it is a dynamic url
+                                        logoImage="/assets/images/logo.png" // URL of the logo you want to use, make sure it is a dynamic url
                                         logoHeight={40}
                                         logoWidth={40}
                                         logoOpacity={1}
@@ -6160,7 +6173,7 @@ const BusinessProduct = ({
                         <div style={{ marginLeft: "10px" }}>
                             <QRCode
                                 value={`${process.env.NEXT_PUBLIC_UI_URL}?conferenceCode=${singleEvent?.conferanceCode}`}
-                                logoImage="/assets/images/logo-icon.png"
+                                logoImage="/assets/images/logo.png"
                                 size={100}
 
                             />

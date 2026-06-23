@@ -442,8 +442,7 @@
 
 .sustainability-publish:hover svg,
 .sustainability-save:hover svg {
-  filter: invert(100%) sepia(3%) saturate(7487%) hue-rotate(55deg)
-    brightness(123%) contrast(103%);
+  filter: invert(100%) sepia(3%) saturate(7487%) hue-rotate(55deg) brightness(123%) contrast(103%);
 }
 
 .sustainability--page-input-slug-holder {
@@ -512,8 +511,7 @@
   top: 0;
 }
 
-.sustainability--switch-button-holder--primary--slug:hover
-  .sustainability--slug-information-box {
+.sustainability--switch-button-holder--primary--slug:hover .sustainability--slug-information-box {
   display: block;
 }
 
@@ -681,9 +679,7 @@
   width: 100%;
 }
 
-.sustainability--page-heading-input-holder--heading
-  .heading--input--holder
-  input {
+.sustainability--page-heading-input-holder--heading .heading--input--holder input {
   width: 100%;
 }
 
@@ -839,11 +835,11 @@
 }
 
 .sustainability--switch-unchecked .react-switch-bg {
-  background-color: #dddce1 ;
+  background-color: #dddce1;
 }
 
 .sustainability--switch-checked .react-switch-bg {
-  background-color: #7ba986 ;
+  background-color: #7ba986;
 }
 
 
@@ -858,6 +854,7 @@
 .sustainability--page-input-holder--country .country--dropdown--arrow {
   position: absolute;
   right: 0;
+  pointer-events: none;
 }
 
 .sustainability-slug-user-input {
@@ -920,36 +917,26 @@
 
 .sustainability--edit-main-holder.edit--disabled input,
 .sustainability--edit-main-holder.edit--disabled textarea,
-.sustainability--edit-main-holder.edit--disabled
-  .sustainability--page-input-holder--country,
-.sustainability--edit-main-holder.edit--disabled
-  .sustainability--page-profilePicture-input-holder,
-.sustainability--edit-main-holder.edit--disabled
-  .sustainability--page-input-holder {
+.sustainability--edit-main-holder.edit--disabled .sustainability--page-input-holder--country,
+.sustainability--edit-main-holder.edit--disabled .sustainability--page-profilePicture-input-holder,
+.sustainability--edit-main-holder.edit--disabled .sustainability--page-input-holder {
   border: none !important;
 }
 
 .sustainability--edit-main-holder.edit--disabled .country--dropdown--arrow,
-.sustainability--edit-main-holder.edit--disabled
-  .sustainability--edit-photo-text-holder,
-.sustainability--edit-main-holder.edit--disabled
-  .sustainability--invalid-message-holder,
+.sustainability--edit-main-holder.edit--disabled .sustainability--edit-photo-text-holder,
+.sustainability--edit-main-holder.edit--disabled .sustainability--invalid-message-holder,
 .sustainability--edit-main-holder.edit--disabled .counter-text--sustainability,
-.sustainability--edit-main-holder.sustainability--edit-main-holder.edit--disabled
-  .sustainability-slug-preURL-user-holder
-  svg {
+.sustainability--edit-main-holder.sustainability--edit-main-holder.edit--disabled .sustainability-slug-preURL-user-holder svg {
   display: none !important;
 }
 
-.sustainability--edit-main-holder.edit--disabled
-  .sustainability--page-input-holder--description,
-.sustainability--edit-main-holder.edit--disabled
-  .sustainability--page-input-holder--aboutUs {
+.sustainability--edit-main-holder.edit--disabled .sustainability--page-input-holder--description,
+.sustainability--edit-main-holder.edit--disabled .sustainability--page-input-holder--aboutUs {
   margin-bottom: 16px;
 }
 
-.sustainability--edit-main-holder.edit--disabled
-  .sustainability--page-input-holder--country {
+.sustainability--edit-main-holder.edit--disabled .sustainability--page-input-holder--country {
   padding-bottom: 0px !important;
 }
 
@@ -1085,8 +1072,7 @@
   position: relative;
 }
 
-.sustainability--page-slug-text-input-holder--contact
-  .sustainability--switch-button-holder {
+.sustainability--page-slug-text-input-holder--contact .sustainability--switch-button-holder {
   position: absolute;
   top: 0%;
   right: -15%;
@@ -1125,8 +1111,9 @@
 
 @media only screen and (max-width: 1560px) {
   .sustainability--edit-button.sustainability-save {
-    padding: 0px !important;
+    padding: 12px 30px !important;
   }
+
   /* .sustainability--page-box-holder {
     padding-left: 100px;
   }
@@ -1146,6 +1133,7 @@
     padding-left: 303px;
   } */
 }
+
 /* 
 @media only screen and (max-width: 1440px) {
   .sustainability--template--selection-holder {
@@ -1381,6 +1369,7 @@
   .sustainability--template-section-holder .contact-info-holder input {
     /* width: unset !important; */
   }
+
   /* 
   .sustainability--page-slug-toggleText-holder.contact--holder--sustainability {
     width: 100%;
@@ -1568,6 +1557,7 @@
     /* font-size: 12px; */
     /* font-weight: 400; */
   }
+
   /* 
   .sustainability--page-slug-toggleText-holder
     .sustainability--switch-button-holder
@@ -1877,14 +1867,14 @@
     bottom: -8px;
   }
 
-  .sustainability--page-slug-text-input-holder--contact
-    .sustainability--switch-button-holder {
+  .sustainability--page-slug-text-input-holder--contact .sustainability--switch-button-holder {
     bottom: 0;
   }
 
   .sustainability--slug--edit--slug--holder {
     top: 1.5% !important;
   }
+
   /* 
   .sustainability-slug-user {
     word-wrap: break-word;
@@ -1917,10 +1907,12 @@
   .sustainability--svg-big {
     display: none;
   }
+
   .sustainability--switch-button-holder,
   .sustainability--switch-button-holder--primary--slug {
     margin-bottom: 0px;
   }
+
   .sustainability--page-input-holder,
   .sustainability--page-input-holder--description,
   .sustainability--page-input-holder--aboutUs,
@@ -1938,6 +1930,7 @@
   .sustainability--page-heading-input-holder--aboutUs {
     gap: 0px;
   }
+
   .sustainability--page--error--textarea--wrapper {
     margin-top: -2px;
   }
@@ -1956,6 +1949,7 @@
   .sustainability--page-text-holder--contact {
     min-width: 63px;
   }
+
   .sustainability--page-heading-input-holder--heading input,
   .sustainability--page-input-wrapper textarea,
   .sustainability--page-slug-text-input-holder--contact input {
@@ -1971,9 +1965,11 @@
   .sustainability--page-slug-toggleText-holder.contact--holder--sustainability {
     padding-right: 74px;
   }
+
   .sustainability--contact--error-input-wrapper input {
     padding-right: 11px;
   }
+
   .sustainability--edit-photo-text-holder {
     gap: 0px;
   }
@@ -1983,8 +1979,7 @@
     padding-right: 11.28px;
   }
 
-  .sustainability--page-slug-text-input-holder--contact
-    .sustainability--switch-button-holder {
+  .sustainability--page-slug-text-input-holder--contact .sustainability--switch-button-holder {
     right: -78px !important;
   }
 
@@ -2022,6 +2017,7 @@
   margin-top: 15.5px;
   margin-bottom: 0px;
 }
+
 .iconHover {
   width: 30px;
   height: 30px;
@@ -2032,6 +2028,7 @@
   margin-left: 15px;
   color: gray;
 }
+
 .iconHover:hover {
   cursor: pointer;
   color: white;
@@ -2046,7 +2043,7 @@
   align-items: center; */
 }
 
-.colorpalette{
+.colorpalette {
   width: 75px !important;
   height: 38px;
   border-color: #7e7e7e;
