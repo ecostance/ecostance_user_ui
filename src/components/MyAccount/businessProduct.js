@@ -2035,10 +2035,10 @@ const BusinessProduct = ({
             const croppedHeight = maxY - minY + 1;
 
             // Define margins around the cropped QR code (increased left/right padding for 5px text-to-QR gap)
-            const leftPadding = 35;
-            const rightPadding = 35;
-            const topPadding = 35; // Increased top padding to add space above Traceable
-            const bottomPadding = 30;
+            const leftPadding = 40;
+            const rightPadding = 40;
+            const topPadding = 40; // Increased top padding to add space above Traceable
+            const bottomPadding = 35;
 
             combinedCanvas.width = croppedWidth + leftPadding + rightPadding;
             combinedCanvas.height = croppedHeight + topPadding + bottomPadding;
@@ -2051,43 +2051,46 @@ const BusinessProduct = ({
             ctx.drawImage(canvas, minX, minY, croppedWidth, croppedHeight, leftPadding, topPadding, croppedWidth, croppedHeight);
 
             const fontFamily = "Work Sans, Arial, sans-serif";
-            const fontSize = 22; // Identical font size for all text elements
+            const fontSize = 25; // Optimized font size for better legibility on small product packages
 
-            // 1. Draw "Traceable" at the top-left edge of the QR code
+            // Draw a black border around the QR code, leaving a 3px margin so it does not touch the finder patterns
+            ctx.strokeStyle = "#000000";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(leftPadding - 3, topPadding - 3, croppedWidth + 6, croppedHeight + 6);
+
+            // 1. Draw "Traceable" at the top-left edge of the QR code (aligned with left border and 5px above top border)
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
             ctx.textAlign = "left";
             ctx.textBaseline = "bottom";
-            ctx.fillText("Traceable", leftPadding, topPadding - 3);
+            ctx.fillText("Traceable", leftPadding - 3, topPadding - 8);
 
-            // 2. Draw "100%" vertically on the left side of the top-left finder pattern
+            // 2. Draw "100%" vertically on the left side of the border (with a 5px gap)
             ctx.save();
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            // Align slightly lower next to the top-left finder block with a 5px gap
-            ctx.translate(leftPadding - 16, topPadding + (croppedHeight * 0.12));
+            ctx.translate(leftPadding - 21, topPadding + (croppedHeight * 0.12));
             ctx.rotate(-Math.PI / 2);
             ctx.fillText("100%", 0, 0);
             ctx.restore();
 
-            // 3. Draw the product name at the bottom of the QR code
+            // 3. Draw the product name at the bottom of the QR code (centered, 5px below bottom border)
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "top";
-            ctx.fillText(productName, leftPadding + (croppedWidth / 2), topPadding + croppedHeight + 4);
+            ctx.fillText(productName, leftPadding + (croppedWidth / 2), topPadding + croppedHeight + 8);
 
-            // 4. Draw the business name vertically on the right side of the QR code
+            // 4. Draw the business name vertically on the right side of the border (with a 5px gap)
             const businessNameText = profileRelatedData?.name || (typeof window !== "undefined" && JSON.parse(localStorage.getItem("MyBusinessDetails") || "{}")?.name) || "EcoStance";
             ctx.save();
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            // Translate to the middle-right next to the QR code with a 5px gap
-            ctx.translate(leftPadding + croppedWidth + 16, topPadding + (croppedHeight / 2));
+            ctx.translate(leftPadding + croppedWidth + 21, topPadding + (croppedHeight / 2));
             ctx.rotate(-Math.PI / 2);
             ctx.fillText(businessNameText, 0, 0);
             ctx.restore();
