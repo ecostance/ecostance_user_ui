@@ -1,14 +1,11 @@
 import request from "./request";
-import { setCookies, getCookie,deleteCookie } from "cookies-next";
+import { setCookies, getCookie, deleteCookie } from "cookies-next";
 import { getAllOrders } from "src/apiClient/orders";
 import { getBusinessProfile } from "src/apiClient/business";
 import { getJoinedBusiness } from "src/apiClient/employer";
 import { removeAllItemsFromSustainabilityPage } from "src/redux/actions/sustainabilityActions";
 import { removeAllItemsFromBusinessSustainabilityPage } from "src/redux/actions/businessSustainabilityActions";
-import {
-  logoutCheckoutCurrencyAction,
-  runValidateUserProcessSync,
-} from "src/helpers/currencyActionHelper";
+import { logoutCheckoutCurrencyAction } from "src/helpers/currencyActionHelper";
 import {
   validateUser,
   setIsVerifyPopupShown,
@@ -16,8 +13,6 @@ import {
 } from "src/redux/actions/userAction";
 import { addOrder } from "src/redux/actions/orderActions";
 import { deleteAllFromWishlist } from "src/redux/actions/wishlistActions";
-
-
 
 export const login = async ({
   userName: userId,
@@ -31,17 +26,17 @@ export const login = async ({
     strategy: "password",
     temporaryCheckoutCurrency,
   });
-  console.log(loginResult, "loginn")
-  const keyToKeep = 'JoinBusinessCode';
+  console.log(loginResult, "loginn");
+  const keyToKeep = "JoinBusinessCode";
   const valueToKeep = localStorage.getItem("JoinBusinessCode");
 
-  const keepSupplyKey = 'JoinSupplierCode';
+  const keepSupplyKey = "JoinSupplierCode";
   const valueSupplyKey = localStorage.getItem("JoinSupplierCode");
 
-  const keepRIDKey = 'RID';
+  const keepRIDKey = "RID";
   const valueRIDKey = localStorage.getItem("RID");
 
-  const keepDistKey = 'JoinDistributorCode';
+  const keepDistKey = "JoinDistributorCode";
   const valueDistKey = localStorage.getItem("JoinDistributorCode");
 
   const keepRefKey = "ReferralID";
@@ -49,7 +44,7 @@ export const login = async ({
 
   const keepConfKey = "conferenceCode";
   const valueConfKey = localStorage.getItem("conferenceCode");
-  
+
   if (loginResult?.data?.success) {
     deleteCookie("JWTToken");
     deleteCookie("checkout");
@@ -83,31 +78,44 @@ export const login = async ({
     if (valueRIDKey !== null) {
       localStorage.setItem(keepRIDKey, valueRIDKey);
     }
-    localStorage.setItem("userId", loginResult?.data?.user?._id)
-    localStorage.setItem("email", loginResult?.data?.user?.email)
-    localStorage.setItem("name", loginResult?.data?.user?.firstName + " " + loginResult?.data?.user?.lastName)
-    localStorage.setItem("userCreated", loginResult?.data?.user?.createdAt)
-    await getJoinedBusiness(`Bearer ${loginResult?.data?.token}`)
-      .then((response) => {
-        console.log("join", response)
+    localStorage.setItem("userId", loginResult?.data?.user?._id);
+    localStorage.setItem("email", loginResult?.data?.user?.email);
+    localStorage.setItem(
+      "name",
+      loginResult?.data?.user?.firstName +
+        " " +
+        loginResult?.data?.user?.lastName,
+    );
+    localStorage.setItem("userCreated", loginResult?.data?.user?.createdAt);
+    await getJoinedBusiness(`Bearer ${loginResult?.data?.token}`).then(
+      (response) => {
+        console.log("join", response);
         if (response.status == 200) {
           if (response?.data?.success) {
-            localStorage.setItem("JoinedBusinessDetails", JSON.stringify(response?.data?.data?.[0]))
+            localStorage.setItem(
+              "JoinedBusinessDetails",
+              JSON.stringify(response?.data?.data?.[0]),
+            );
           }
         }
-      })
-    let MyBusinessDetails = await getBusinessProfile(`Bearer ${loginResult?.data?.token}`)
-    console.log("business", MyBusinessDetails)
+      },
+    );
+    let MyBusinessDetails = await getBusinessProfile(
+      `Bearer ${loginResult?.data?.token}`,
+    );
+    console.log("business", MyBusinessDetails);
     if (MyBusinessDetails?.data?.success) {
-      localStorage.setItem("MyBusinessDetails", JSON.stringify(MyBusinessDetails.data.data?.[0]))
+      localStorage.setItem(
+        "MyBusinessDetails",
+        JSON.stringify(MyBusinessDetails.data.data?.[0]),
+      );
     }
 
-    await getAllOrders(1, loginResult?.data?.token)
-      .then((response) => {
-        if (response.status == 200) {
-          localStorage.setItem("TotalOrders", response.data?.data?.length)
-        }
-      })
+    await getAllOrders(1, loginResult?.data?.token).then((response) => {
+      if (response.status == 200) {
+        localStorage.setItem("TotalOrders", response.data?.data?.length);
+      }
+    });
   }
   return loginResult;
 };
@@ -126,13 +134,13 @@ export const me = async (token = "") => {
 };
 
 export const userRegistration = async (user) => {
-  const keyToKeep = 'JoinBusinessCode';
+  const keyToKeep = "JoinBusinessCode";
   const valueToKeep = localStorage.getItem("JoinBusinessCode");
 
-  const keepSupplyKey = 'JoinSupplierCode';
+  const keepSupplyKey = "JoinSupplierCode";
   const valueSupplyKey = localStorage.getItem("JoinSupplierCode");
 
-  const keepDistKey = 'JoinDistributorCode';
+  const keepDistKey = "JoinDistributorCode";
   const valueDistKey = localStorage.getItem("JoinDistributorCode");
 
   const keepRefKey = "ReferralID";
@@ -141,7 +149,7 @@ export const userRegistration = async (user) => {
   const keepConfKey = "conferenceCode";
   const valueConfKey = localStorage.getItem("conferenceCode");
 
-  const keepRIDKey = 'RID';
+  const keepRIDKey = "RID";
   const valueRIDKey = localStorage.getItem("RID");
 
   deleteCookie("JWTToken");
@@ -221,7 +229,7 @@ export const setCurrency = async (currency) => {
         headers: {
           Authorization: `Bearer ${getCookie("JWTToken")}`,
         },
-      }
+      },
     );
 
     // temp
@@ -321,7 +329,7 @@ export const verifyRecoveryEmail = (payload) => {
           headers: {
             Authorization: `Bearer ${getCookie("JWTToken")}`,
           },
-        }
+        },
       );
       resolve(res);
     } catch (error) {
@@ -355,7 +363,7 @@ export const verifyPrimaryEmail = (payload) => {
           headers: {
             Authorization: `Bearer ${getCookie("JWTToken")}`,
           },
-        }
+        },
       );
       resolve(res);
     } catch (error) {
@@ -368,7 +376,7 @@ export const sendForgotPasswordOTP = (email) => {
   return new Promise(async (resolve, reject) => {
     try {
       return resolve(
-        await request.patch("/auth/otp-reset-password", { email })
+        await request.patch("/auth/otp-reset-password", { email }),
       );
     } catch (err) {
       return reject(err);
@@ -393,7 +401,7 @@ export const resetPasswordUsingToken = (token, password, confirmPassword) => {
         await request.post(`/auth/reset-password?tk=${token}`, {
           password,
           confirmPassword,
-        })
+        }),
       );
     } catch (err) {
       return reject(err);
@@ -411,7 +419,7 @@ export const verifyPasswordForPrimaryEmail = (payload, token) => {
           headers: {
             Authorization: `Bearer ${getCookie("JWTToken")}`,
           },
-        }
+        },
       );
       resolve(res);
     } catch (error) {
