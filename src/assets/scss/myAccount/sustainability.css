@@ -153,6 +153,7 @@
 
 .sustainability--country-holder--main {
   position: relative;
+  width: 100%;
 }
 
 .sustainability--country-holder--main select {
@@ -281,7 +282,8 @@
 }
 
 .sustainability--page-input-holder--country {
-  /* width: 260.92px; */
+  width: 100%;
+  max-width: 260.92px;
   position: relative;
 }
 

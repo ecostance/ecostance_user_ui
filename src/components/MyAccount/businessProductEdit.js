@@ -2870,11 +2870,12 @@ const BusinessProductEdit = ({
                                             <div className="sustainability--page-text-holder--country">
                                                 <p>Country:</p>
                                             </div>
-                                            <div>
-                                                <div className="sustainability--page-input-holder--country">
+                                            <div style={{ width: "100%" }}>
+                                                <div className="sustainability--page-input-holder--country" style={{ maxWidth: "100%" }}>
                                                     <CountrySelector
                                                         selectedCountry={selectedCountry}
                                                         setSelectedCountry={setSelectedCountry}
+                                                        hideCarbon={true}
                                                     />
                                                     <div className="country--dropdown--arrow">
                                                         <svg
