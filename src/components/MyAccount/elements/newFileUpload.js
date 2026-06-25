@@ -12,7 +12,6 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
   const handleRemoveImage = () => {
     setPreviews("");
 
-    // Reset the file input so the same file can be selected again
     if (fileInputRef?.current) {
       fileInputRef.current.value = "";
     }
@@ -23,7 +22,7 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
 
     const uploadedImg = event.target.files[0];
 
-    // Validate image type
+    // Validate type
     if (
       !(
         uploadedImg.type.includes("jpeg") ||
@@ -33,13 +32,13 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
     ) {
       if (fileInputRef?.current) fileInputRef.current.value = "";
 
-      return addToast("Image must be of type PNG | JPG | JPEG", {
+      return addToast("Image must be PNG | JPG | JPEG", {
         appearance: "error",
         autoDismiss: true,
       });
     }
 
-    // Validate image size (10MB)
+    // Validate size (10MB)
     if (uploadedImg.size > 10 * 1024 * 1024) {
       if (fileInputRef?.current) fileInputRef.current.value = "";
 
@@ -49,7 +48,7 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
       });
     }
 
-    // Validate image resolution (180x180 minimum)
+    // Validate resolution
     const image = new Image();
     const imageURL = URL.createObjectURL(uploadedImg);
 
@@ -59,13 +58,10 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
 
         if (fileInputRef?.current) fileInputRef.current.value = "";
 
-        return addToast(
-          "Image must have a minimum resolution of 180px × 180px",
-          {
-            appearance: "error",
-            autoDismiss: true,
-          }
-        );
+        return addToast("Minimum resolution 180px × 180px required", {
+          appearance: "error",
+          autoDismiss: true,
+        });
       }
 
       URL.revokeObjectURL(imageURL);
@@ -79,7 +75,7 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
         if (response?.data?.success) {
           setPreviews(response.data.data.urlLink);
         } else {
-          addToast("Image upload failed.", {
+          addToast("Upload failed", {
             appearance: "error",
             autoDismiss: true,
           });
@@ -87,7 +83,7 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
       } catch (err) {
         console.error(err);
 
-        addToast("Failed to upload image.", {
+        addToast("Something went wrong", {
           appearance: "error",
           autoDismiss: true,
         });
@@ -99,6 +95,7 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
 
   return (
     <>
+      {/* INPUT */}
       <input
         ref={fileInputRef}
         type="file"
@@ -114,6 +111,7 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
         }}
       />
 
+      {/* UPLOAD UI */}
       {!previews ? (
         <div className="sustainability--file-upload-info-holder">
           <svg
@@ -137,7 +135,6 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
               <span>Upload a file</span>
               <p>or drag and drop</p>
             </div>
-
             <p>PNG, JPG, JPEG up to 10MB</p>
           </div>
         </div>
@@ -147,50 +144,26 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            height: "150px",
           }}
         >
-          <div
-            style={{
-              position: "relative",
-              display: "inline-block",
-            }}
-          >
+          <div style={{ position: "relative" }}>
             <img
               src={previews}
               alt="Preview"
               style={{
-                maxWidth: "400px",
-                maxHeight: "150px",
-                border: "1px solid #ddd",
-                borderRadius: "6px",
+                height: "140px",
+                width: "140px",
+                border: "1px solid lightgray",
                 objectFit: "contain",
+                borderRadius: "4px",
               }}
             />
 
-            <button
-              type="button"
-              onClick={handleRemoveImage}
-              style={{
-                position: "absolute",
-                top: "-10px",
-                right: "-10px",
-                width: "26px",
-                height: "26px",
-                borderRadius: "50%",
-                border: "none",
-                background: "#ff4d4f",
-                color: "#fff",
-                cursor: "pointer",
-                fontSize: "16px",
-                fontWeight: "bold",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-              }}
-            >
-              ×
-            </button>
+            {/* SAME STYLE AS MULTIPLE UPLOAD */}
+            <div className="delete-img" onClick={handleRemoveImage}>
+              &#x2715;
+            </div>
           </div>
         </div>
       )}
