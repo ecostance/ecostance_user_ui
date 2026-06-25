@@ -48,54 +48,32 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
       });
     }
 
-    // Validate resolution
-    const image = new Image();
-    const imageURL = URL.createObjectURL(uploadedImg);
+    try {
+      const formData = new FormData();
+      formData.append("galleryFile", uploadedImg);
 
-    image.onload = async function () {
-      if (this.width < 180 || this.height < 180) {
-        URL.revokeObjectURL(imageURL);
+      const response = await uploadImage(formData);
 
-        if (fileInputRef?.current) fileInputRef.current.value = "";
-
-        return addToast("Minimum resolution 180px × 180px required", {
+      if (response?.data?.success) {
+        setPreviews(response.data.data.urlLink);
+      } else {
+        addToast("Upload failed", {
           appearance: "error",
           autoDismiss: true,
         });
       }
+    } catch (err) {
+      console.error(err);
 
-      URL.revokeObjectURL(imageURL);
-
-      try {
-        const formData = new FormData();
-        formData.append("galleryFile", uploadedImg);
-
-        const response = await uploadImage(formData);
-
-        if (response?.data?.success) {
-          setPreviews(response.data.data.urlLink);
-        } else {
-          addToast("Upload failed", {
-            appearance: "error",
-            autoDismiss: true,
-          });
-        }
-      } catch (err) {
-        console.error(err);
-
-        addToast("Something went wrong", {
-          appearance: "error",
-          autoDismiss: true,
-        });
-      }
-    };
-
-    image.src = imageURL;
+      addToast("Something went wrong", {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    }
   };
 
   return (
     <>
-      {/* INPUT */}
       <input
         ref={fileInputRef}
         type="file"
@@ -111,7 +89,6 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
         }}
       />
 
-      {/* UPLOAD UI */}
       {!previews ? (
         <div className="sustainability--file-upload-info-holder">
           <svg
@@ -160,7 +137,6 @@ const NewFileUpload = ({ previews, setPreviews, fileInputRef }) => {
               }}
             />
 
-            {/* SAME STYLE AS MULTIPLE UPLOAD */}
             <div className="delete-img" onClick={handleRemoveImage}>
               &#x2715;
             </div>
