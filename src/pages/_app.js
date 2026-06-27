@@ -8,6 +8,19 @@ import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 import fetchProducts from "../redux/actions/productActions";
 import React from "react";
+
+var _origSymbolFor = Symbol.for;
+Symbol.for = function (key) {
+  if (key === "react.transitional.element") return _origSymbolFor("react.element");
+  return _origSymbolFor(key);
+};
+
+if (!React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE) {
+  React.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = {
+    A: null,
+    getCurrentStack: undefined,
+  };
+}
 // import products from "../data/products.json";
 import "../assets/scss/styles.scss";
 import Preloader from "../components/Preloader";
