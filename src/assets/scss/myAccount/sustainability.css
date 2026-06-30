@@ -332,6 +332,18 @@
 .sustainability--template--selection-holder {
   display: flex;
   gap: 25px;
+  overflow-x: auto;
+  max-width: 100%;
+  padding-bottom: 10px;
+}
+
+.sustainability--template--selection-holder::-webkit-scrollbar {
+  height: 6px;
+}
+
+.sustainability--template--selection-holder::-webkit-scrollbar-thumb {
+  background-color: #cfcfcf;
+  border-radius: 3px;
 }
 
 .sustainability--each-template-check-holder {
@@ -347,6 +359,7 @@
 
 .sustainability--each-template-text-select-holder p {
   margin-bottom: 0px;
+  white-space: nowrap;
 }
 
 .sustainability--each-template-text-select-holder {
@@ -361,6 +374,7 @@
   gap: 19px;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
 }
 
 .sustainability--page-input-holder--contact {
@@ -804,6 +818,7 @@
   font-weight: 400;
   font-size: 20px;
   color: #333;
+  white-space: nowrap;
 }
 
 .sustainability--template-section-holder h3 {

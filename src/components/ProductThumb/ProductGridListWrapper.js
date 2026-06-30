@@ -20,6 +20,7 @@ import ProductGrid from "./ProductGrid";
 
 const ProductGridWrapper = ({
   products,
+  layout,
   bottomSpace,
   addToCart,
   addToWishlist,
@@ -97,6 +98,7 @@ const ProductGridWrapper = ({
               oldPrice={oldPrice}
               discount={discount}
               key={product.id}
+              layout={layout}
               addItemToCart={addItemToCart}
               product={product}
               discountedPrice={discountedPrice}

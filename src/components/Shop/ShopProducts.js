@@ -13,6 +13,7 @@ const ShopProducts = ({
       <Row className={layout}>
         <ProductGridListWrapper
           products={products}
+          layout={layout}
           setDebounce={setDebounce}
           removeDebounce={removeDebounce}
           bottomSpace="space-mb--50"

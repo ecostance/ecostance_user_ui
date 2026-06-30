@@ -144,7 +144,7 @@ const ShopSidebar = ({
             </div>
           </ul>
         ) : (
-          "No colors found"
+          "No SDGs found"
         )}
       </div>
 

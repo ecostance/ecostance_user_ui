@@ -215,7 +215,7 @@ export const getIndividualSDGS = (products) => {
     products.map((product) => {
       product?.details?.sdgs &&
         product?.details?.sdgs?.map((single) => {
-          if (!checkSDGS[single?.sdg?._id]) {
+          if (single?.sdg && single?.sdg?._id && !checkSDGS[single?.sdg?._id]) {
             productCategories.push(single);
             checkSDGS[single?.sdg?._id] = true;
           }

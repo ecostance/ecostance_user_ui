@@ -701,6 +701,7 @@ const ProductGridList = ({
   compareItem,
   bottomSpace,
   addToCart,
+  layout,
   addToWishlist,
   deleteFromWishlist,
   addToCompare,
@@ -762,18 +763,18 @@ const ProductGridList = ({
     }
   };
 
+  const isListLayout = layout === "list";
+
   return (
     <Fragment>
       <Col
-        lg={3}
+        lg={isListLayout ? 12 : 3}
         md={6}
-        // lg={column && column === 4 ? 3 : 4}
-        // md={6}
         className={bottomSpace ? bottomSpace : ""}
       >
-        <div className="product-grid">
+        <div className={isListLayout ? "product-list" : "product-grid"}>
           {/*=======  single product image  =======*/}
-          <div className="product-grid__image">
+          <div className={isListLayout ? "product-list__image" : "product-grid__image"}>
             <Link
               href={`/shop/product-basic/[slug]?slug=${product.slug}`}
               as={
@@ -806,7 +807,7 @@ const ProductGridList = ({
             >
               <>
                 <div
-                  className="product-grid__floating-badges"
+                  className={isListLayout ? "product-list__floating-badges" : "product-grid__floating-badges"}
                   style={{
                     paddingBottom: "20px",
                     cursor: "pointer",
@@ -1018,7 +1019,7 @@ const ProductGridList = ({
                     </Tooltip> */}
                   </div>
                 </div>
-                <div className="product-grid__floating-icons">
+                <div className={isListLayout ? "product-list__floating-icons" : "product-grid__floating-icons"}>
                   {/* add to wishlist */}
                   <Tooltip
                     title={
@@ -1168,7 +1169,7 @@ const ProductGridList = ({
           </div>
 
           {/*=======  single product content  =======*/}
-          <div className="product-grid__content">
+          <div className={isListLayout ? "product-list__content" : "product-grid__content"}>
             <div className="title">
               <h3>
                 <Link
@@ -1216,6 +1217,21 @@ const ProductGridList = ({
                 <button disabled>Out of Stock</button>
               )}
             </div>
+            {isListLayout && product.shortDescription && (
+              <div className="short-description" style={{ marginBottom: "15px", color: "#666", lineHeight: "1.6" }}>
+                {product.shortDescription.length > 150
+                  ? product.shortDescription.substring(0, 150) + "..."
+                  : product.shortDescription}
+                {product.shortDescription.length > 150 && (
+                  <Link
+                    href={`/shop/product-basic/[slug]?slug=${product.slug}`}
+                    as={process.env.PUBLIC_URL + "/shop/product-basic/" + product.slug}
+                  >
+                    <a style={{ color: "#333", fontWeight: "600", marginLeft: "5px" }}>Read More</a>
+                  </Link>
+                )}
+              </div>
+            )}
             <div className="price">
               <span className="main-price">
                 {currencyCode}
