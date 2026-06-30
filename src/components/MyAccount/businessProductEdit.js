@@ -3608,7 +3608,7 @@ const BusinessProductEdit = ({
                                                 <img
                                                     src={
                                                         process.env.NEXT_PUBLIC_UI_URL +
-                                                        "/assets/images/sustainability/template4.png"
+                                                        "/assets/images/sustainability/template8.png"
                                                     }
                                                     className="img-responsive"
                                                 />

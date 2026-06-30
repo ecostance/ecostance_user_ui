@@ -552,8 +552,17 @@
 }
 
 .sustainability--each-template-image-holder {
-  max-width: 100%;
+  width: 147px;
+  height: 200px;
+  overflow: hidden;
   display: flex;
+}
+
+.sustainability--each-template-image-holder img {
+  height: 100% !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  object-position: top !important;
 }
 
 .sustainability-slug-preURL-user-holder {
@@ -654,6 +663,7 @@
 
 .sustainability--each-template-image-holder {
   min-width: 147px;
+  width: 147px;
 }
 
 .counter-text--sustainability {
