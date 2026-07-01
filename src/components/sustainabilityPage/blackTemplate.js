@@ -1,5 +1,16 @@
-export const blackTemplate = (dynamic) => `
-<!DOCTYPE html>
+export const blackTemplate = (dynamic) => {
+  const uniqueProducts = [];
+  const productNamesSeen = new Set();
+  if (dynamic?.certData) {
+    for (const cert of dynamic.certData) {
+      if (cert?.product?.name && !productNamesSeen.has(cert.product.name)) {
+        productNamesSeen.add(cert.product.name);
+        uniqueProducts.push(cert.product);
+      }
+    }
+  }
+
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -32,14 +43,12 @@ export const blackTemplate = (dynamic) => `
       margin: 0;
       padding: 0;
       overflow-x: hidden;
-    }
-
-    body {
-      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       background: var(--canvas);
       color: var(--ink);
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       font-feature-settings: "ss01", "cv11";
+      scroll-behavior: smooth;
     }
 
     /* Navbar */
@@ -50,10 +59,20 @@ export const blackTemplate = (dynamic) => `
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 32px;
+      padding: 0 24px;
       height: 64px;
       background: var(--ink);
       border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .bl-nav-brand-link {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
     }
 
     .bl-nav-logo {
@@ -83,46 +102,81 @@ export const blackTemplate = (dynamic) => `
 
     @media (max-width: 768px) {
       .bl-navbar { padding: 0 16px; }
-      .bl-nav-links { display: none; }
+      .bl-nav-links li:not(:first-child) { display: none; }
     }
 
     /* Hero Section */
     .bl-hero {
       position: relative;
       width: 100%;
-      min-height: 420px;
+    }
+
+    .bl-hero-img-container {
+      position: relative;
+      height: 78vh;
+      min-height: 520px;
+      width: 100%;
+      overflow: hidden;
       background: var(--ink);
+    }
+
+    .bl-hero-img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      opacity: 0.9;
+    }
+
+    .bl-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.5) 100%);
+    }
+
+    .bl-hero-content-wrapper {
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
     }
 
     .bl-hero-inner {
       width: 100%;
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 80px 24px;
+      padding: 0 24px;
       color: #fff;
     }
 
     .bl-hero-label {
       font-size: 11px;
       letter-spacing: 0.28em;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255,255,255,0.75);
       text-transform: uppercase;
     }
 
     .bl-hero-title {
       margin-top: 20px;
       max-width: 768px;
-      font-size: 52px;
+      font-size: 36px;
       font-weight: 300;
-      line-height: 1.05;
+      line-height: 1.02;
       letter-spacing: -0.02em;
     }
 
-    @media (max-width: 768px) {
-      .bl-hero-title { font-size: 32px; }
-      .bl-hero-inner { padding: 48px 16px; }
+    @media (min-width: 768px) {
+      .bl-hero-title {
+        font-size: 64px;
+      }
+      .hidden-mobile {
+        display: inline;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .hidden-mobile {
+        display: none;
+      }
     }
 
     .bl-hero-desc {
@@ -130,7 +184,46 @@ export const blackTemplate = (dynamic) => `
       max-width: 576px;
       font-size: 15px;
       line-height: 1.7;
-      color: rgba(255,255,255,0.75);
+      color: rgba(255,255,255,0.85);
+    }
+
+    .bl-hero-buttons {
+      margin-top: 40px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .bl-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      transition: opacity 0.2s, background-color 0.2s;
+    }
+
+    .bl-btn-primary {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid #fff;
+    }
+
+    .bl-btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .bl-btn-secondary {
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .bl-btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
     }
 
     /* Stats Band */
@@ -142,7 +235,7 @@ export const blackTemplate = (dynamic) => `
     .bl-stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
@@ -189,7 +282,7 @@ export const blackTemplate = (dynamic) => `
     }
 
     .bl-section-inner {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
@@ -213,8 +306,8 @@ export const blackTemplate = (dynamic) => `
       color: var(--ink);
     }
 
-    @media (max-width: 768px) {
-      .bl-section-title { font-size: 28px; }
+    @media (min-width: 768px) {
+      .bl-section-title { font-size: 48px; }
     }
 
     .bl-section-text {
@@ -228,27 +321,101 @@ export const blackTemplate = (dynamic) => `
     /* Projects Grid */
     .bl-projects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 16px;
       margin-top: 40px;
     }
 
-    .bl-project-card {
-      padding: 24px;
-      border: 1px solid var(--hairline);
-      background: var(--canvas-alt);
-      transition: box-shadow 0.2s, transform 0.2s;
+    @media (min-width: 640px) {
+      .bl-projects-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
 
-    .bl-project-card:hover {
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-      transform: translateY(-2px);
+    @media (min-width: 768px) {
+      .bl-projects-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .bl-projects-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+
+    .bl-project-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .bl-project-img-wrapper {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      overflow: hidden;
+      background: var(--canvas-alt);
+    }
+
+    .bl-project-img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .bl-project-card:hover .bl-project-img {
+      transform: scale(1.04);
+    }
+
+    .bl-project-info {
+      margin-top: 8px;
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .bl-project-meta {
+      min-width: 0;
+    }
+
+    .bl-project-category {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.20em;
+      color: var(--muted);
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .bl-project-name {
-      font-size: 14px;
-      font-weight: 600;
+      margin-top: 2px;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.25;
       color: var(--ink);
+    }
+
+    .bl-project-card:hover .bl-project-name {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .bl-project-arrow {
+      margin-top: 2px;
+      height: 14px;
+      width: 14px;
+      flex-shrink: 0;
+      color: var(--muted);
+      transition: transform 0.2s;
+    }
+
+    .bl-project-card:hover .bl-project-arrow {
+      transform: translate(2px, -2px);
     }
 
     /* Certificate Timeline */
@@ -269,71 +436,198 @@ export const blackTemplate = (dynamic) => `
 
     .bl-timeline-item {
       position: relative;
-      margin-bottom: 32px;
+      margin-bottom: 56px;
     }
 
     .bl-timeline-dot {
       position: absolute;
       left: -32px;
-      top: 4px;
-      width: 12px;
-      height: 12px;
-      border: 2px solid var(--ink);
-      background: var(--canvas);
+      top: 12px;
+      width: 10px;
+      height: 10px;
+      border: 1px solid var(--ink);
+      background: var(--canvas-alt);
       transform: rotate(45deg);
     }
 
-    .bl-timeline-header {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 8px;
-      margin-bottom: 6px;
+    .bl-timeline-item-inner {
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: 24px;
     }
 
-    .bl-timeline-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--ink);
+    @media (min-width: 768px) {
+      .bl-timeline-item-inner {
+        grid-template-columns: 1fr 240px;
+        gap: 40px;
+      }
+    }
+
+    .bl-timeline-cert-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--hairline);
+      background: #fff;
+      padding: 6px 12px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 16px;
     }
 
     .bl-timeline-date {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
+      font-size: 13px;
       color: var(--muted);
+      margin-bottom: 8px;
     }
 
     .bl-timeline-qty {
       font-size: 13px;
-      color: var(--ink-soft);
-      margin-bottom: 4px;
+      color: var(--muted);
+      margin-bottom: 16px;
     }
 
-    .bl-timeline-note {
+    .bl-timeline-qty strong {
+      color: var(--ink);
+    }
+
+    .bl-timeline-title {
+      font-size: 24px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+
+    @media (min-width: 768px) {
+      .bl-timeline-title {
+        font-size: 32px;
+      }
+    }
+
+    .bl-timeline-desc {
       font-size: 14px;
       line-height: 1.6;
       color: var(--ink-soft);
+      max-width: 576px;
+      margin-bottom: 16px;
     }
 
     .bl-timeline-cert-link {
       display: inline-block;
-      margin-top: 8px;
-      padding: 6px 14px;
+      padding: 8px 16px;
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 500;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--ink);
       border: 1px solid var(--hairline);
       text-decoration: none;
-      transition: background 0.2s;
+      transition: background 0.2s, color 0.2s;
     }
 
     .bl-timeline-cert-link:hover {
       background: var(--ink);
       color: #fff;
+    }
+
+    .bl-timeline-img-wrapper {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      overflow: hidden;
+      background: var(--canvas);
+    }
+
+    @media (min-width: 768px) {
+      .bl-timeline-img-wrapper {
+        width: 240px;
+      }
+    }
+
+    .bl-timeline-img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .bl-timeline-item-inner:hover .bl-timeline-img {
+      transform: scale(1.04);
+    }
+
+    /* Why Section */
+    .bl-why-section {
+      background: var(--canvas);
+      padding: 80px 24px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .bl-why-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+
+    @media (min-width: 768px) {
+      .bl-why-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: center;
+      }
+      .bl-why-text-col {
+        order: 1;
+      }
+      .bl-why-img-col {
+        order: 2;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .bl-why-text-col {
+        order: 2;
+      }
+      .bl-why-img-col {
+        order: 1;
+      }
+    }
+
+    .bl-why-img-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+    }
+
+    .bl-why-img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+
+    .bl-take-action-btn {
+      margin-top: 40px;
+      display: inline-flex;
+      align-items: center;
+      background: var(--ink);
+      color: #fff;
+      padding: 12px 24px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+    }
+
+    .bl-take-action-btn:hover {
+      opacity: 0.9;
     }
 
     /* Contact Cards */
@@ -409,184 +703,69 @@ export const blackTemplate = (dynamic) => `
     }
 
     .bl-footer-inner {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 64px 24px 40px;
-    }
-
-    @media (max-width: 768px) {
-      .bl-footer-inner { padding: 48px 16px 32px; }
-    }
-
-    .bl-brand {
-      max-width: 768px;
-      margin-bottom: 56px;
-    }
-
-    .bl-brand-label {
+      padding: 40px 24px;
       display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
+      flex-direction: column;
+      gap: 24px;
     }
 
-    .bl-brand-label i { color: rgba(255,255,255,0.5); }
-
-    .bl-brand-label span {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.25em;
-      color: rgba(255,255,255,0.5);
+    @media (min-width: 768px) {
+      .bl-footer-inner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
     }
 
-    .bl-brand-heading {
-      font-size: 28px;
-      font-weight: 600;
-      line-height: 1.3;
+    .bl-footer-left {
       color: #fff;
-      margin-bottom: 16px;
-    }
-
-    @media (max-width: 768px) {
-      .bl-brand-heading { font-size: 22px; }
-    }
-
-    .bl-brand-text {
-      font-size: 14px;
-      line-height: 1.8;
-      max-width: 640px;
-      color: rgba(255,255,255,0.45);
-    }
-
-    .bl-footer-bottom {
-      padding-top: 32px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .bl-footer-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .bl-footer-brand-icon {
-      width: 32px;
-      height: 32px;
-      background: rgba(255,255,255,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .bl-footer-brand-icon i {
-      color: #fff;
-      font-size: 14px;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
     }
 
     .bl-footer-copyright {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      font-weight: 500;
-      color: rgba(255,255,255,0.35);
-    }
-
-    .bl-footer-links-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 40px;
-      margin-bottom: 56px;
-    }
-
-    @media (max-width: 768px) {
-      .bl-footer-links-grid { grid-template-columns: 1fr; }
-    }
-
-    .bl-footer-links-title {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: rgba(255,255,255,0.35);
-      margin-bottom: 20px;
-    }
-
-    .bl-footer-links-list {
-      list-style: none;
-    }
-
-    .bl-footer-links-list li { margin-bottom: 12px; }
-
-    .bl-footer-links-list a {
-      font-size: 12px;
-      font-weight: 400;
-      color: rgba(255,255,255,0.55);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .bl-footer-links-list a:hover { color: #fff; }
-
-    .bl-footer-contact-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .bl-footer-contact-item i {
-      width: 12px;
-      height: 12px;
-      color: rgba(255,255,255,0.4);
-    }
-
-    .bl-footer-contact-item span {
-      font-size: 12px;
-      color: rgba(255,255,255,0.4);
-    }
-
-    .bl-powered-by {
-      margin-top: 24px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-    }
-
-    .bl-powered-by span {
-      font-size: 12px;
-      color: rgba(255,255,255,0.45);
-    }
-
-    .bl-powered-by img {
-      margin-left: 9px;
-      filter: brightness(0) invert(1);
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.5);
     }
   </style>
 </head>
 <body>
   <!-- Navbar -->
   <nav class="bl-navbar">
-    ${dynamic?.logo ? `<img src="${dynamic.logo}" alt="Logo" class="bl-nav-logo" />` : ''}
+    <a href="#" class="bl-nav-brand-link">
+      ${dynamic?.logo ? `<img src="${dynamic.logo}" alt="Logo" class="bl-nav-logo" />` : 'ecostance'}
+    </a>
     <ul class="bl-nav-links">
-      ${dynamic?.showHomePage && dynamic?.isValidHomePageURL ? `<li><a href="${dynamic.homePageURL}">Home</a></li>` : ''}
-      ${dynamic?.showAboutUs && dynamic?.isValidAboutUsURL ? `<li><a href="${dynamic.aboutUsURL}">About</a></li>` : ''}
-      ${dynamic?.showContactUs && dynamic?.isValidContactPageURL ? `<li><a href="${dynamic.contactPageURL}">Contact</a></li>` : ''}
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#certificates">Certificates</a></li>
+      <li><a href="#about">About</a></li>
     </ul>
   </nav>
 
   <!-- Hero Section -->
   <section class="bl-hero">
-    <div class="bl-hero-inner">
-      <div class="bl-hero-label">${dynamic?.companyName || 'EcoStance'}</div>
-      <h1 class="bl-hero-title">${dynamic?.title && dynamic.title !== '' ? dynamic.title : 'Our Stance on Climate Change'}</h1>
-      ${dynamic?.description && dynamic.description !== '' ? `<p class="bl-hero-desc">${dynamic.description}</p>` : ''}
+    <div class="bl-hero-img-container">
+      <img
+        src="${dynamic?.UI_URL || ''}/assets/images/sustainability/eco-hero.jpg"
+        alt="Forest at golden hour"
+        class="bl-hero-img"
+      />
+      <div class="bl-hero-overlay"></div>
+      <div class="bl-hero-content-wrapper">
+        <div class="bl-hero-inner">
+          <div class="bl-hero-label">${dynamic?.companyName || 'OUR ECOSTANCE'}</div>
+          <h1 class="bl-hero-title">${dynamic?.title && dynamic.title !== '' ? dynamic.title : 'Combating climate change,<br class="hidden-mobile" /> one verified tonne at a time.'}</h1>
+          ${dynamic?.description && dynamic.description !== '' ? `<p class="bl-hero-desc">${dynamic.description}</p>` : `<p class="bl-hero-desc">Every offset we retire is traceable to a specific project, on a specific date, with a specific certificate.</p>`}
+          <div class="bl-hero-buttons">
+            <a href="#projects" class="bl-btn bl-btn-primary">Explore projects</a>
+            <a href="#certificates" class="bl-btn bl-btn-secondary">Chain of custody</a>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -609,16 +788,30 @@ export const blackTemplate = (dynamic) => `
   </section>
 
   <!-- Projects Section -->
-  ${dynamic?.allProjects && dynamic.allProjects.length > 0 ? `
-  <section class="bl-section">
+  ${uniqueProducts.length > 0 ? `
+  <section id="projects" class="bl-section">
     <div class="bl-section-inner">
-      <div class="bl-section-label">Climate Projects</div>
-      <h2 class="bl-section-title">Every tonne accounted for.</h2>
+      <div class="bl-section-label">CLIMATE PROJECTS</div>
+      <h2 class="bl-section-title" style="font-weight: 300;">Every tonne accounted for.</h2>
       <div class="bl-projects-grid">
-        ${dynamic.allProjects.map(project => `
-          <div class="bl-project-card">
-            <div class="bl-project-name">${project}</div>
-          </div>
+        ${uniqueProducts.map(prod => `
+          <a href="#certificates" class="bl-project-card">
+            <div class="bl-project-img-wrapper">
+              <img
+                src="${prod?.thumbImage?.[0] || ''}"
+                alt="${prod?.name || 'Project'}"
+                class="bl-project-img"
+                loading="lazy"
+              />
+            </div>
+            <div class="bl-project-info">
+              <div class="bl-project-meta">
+                <div class="bl-project-category">CARBON OFFSET</div>
+                <div class="bl-project-name">${prod?.name || 'Project'}</div>
+              </div>
+              <i class="fa-solid fa-arrow-up-right-from-square bl-project-arrow" style="font-size: 11px;"></i>
+            </div>
+          </a>
         `).join('')}
       </div>
     </div>
@@ -626,35 +819,82 @@ export const blackTemplate = (dynamic) => `
 
   <!-- Certificates / Chain of Custody -->
   ${dynamic?.certData && dynamic.certData.length > 0 ? `
-  <section class="bl-section-alt">
+  <section id="certificates" class="bl-section-alt">
     <div class="bl-section-inner">
-      <div class="bl-section-label">Chain of Custody</div>
-      <h2 class="bl-section-title">Carbon Offset Certificates</h2>
+      <div class="bl-section-label">CHAIN OF CUSTODY</div>
+      <h2 class="bl-section-title" style="font-weight: 300;">Carbon Offset Chain of Custody Certificates</h2>
       <p class="bl-section-text">Every offset we retire is issued a unique certificate that eliminates double counting.</p>
       <div class="bl-timeline">
         <div class="bl-timeline-line"></div>
         ${dynamic.certData.map((cert, i) => `
           <div class="bl-timeline-item">
             <div class="bl-timeline-dot"></div>
-            <div class="bl-timeline-header">
-              <h3 class="bl-timeline-title">${cert?.product?.name || 'Certificate'}</h3>
-              <span class="bl-timeline-date">${cert?.originNumber || ''}</span>
+            <div class="bl-timeline-item-inner">
+              <div>
+                <div class="bl-timeline-cert-tag">
+                  <i class="fa-regular fa-file-lines"></i>
+                  CERTIFICATE &middot; ${cert?.originNumber || ''}
+                </div>
+                <div class="bl-timeline-date">
+                  ${cert?.createdAt ? new Date(cert.createdAt).toISOString().split('T')[0] : ''}
+                </div>
+                ${cert?.quantity ? `
+                <div class="bl-timeline-qty">
+                  Carbon Offset Quantity: <strong>${cert.quantity} Tons</strong>
+                </div>` : ''}
+                <h3 class="bl-timeline-title">${cert?.product?.name || 'Certificate'}</h3>
+                <p class="bl-timeline-desc">${cert?.product?.description || ''}</p>
+                ${cert?.certificate?.certificateURL ? `<a href="${cert.certificate.certificateURL}" target="_blank" class="bl-timeline-cert-link">View Certificate</a>` : ''}
+              </div>
+              ${cert?.product?.thumbImage?.[0] ? `
+              <div class="bl-timeline-img-wrapper">
+                <img src="${cert.product.thumbImage[0]}" alt="${cert?.product?.name || 'Certificate'}" class="bl-timeline-img" />
+              </div>
+              ` : ''}
             </div>
-            ${cert?.quantity ? `<p class="bl-timeline-qty">Offset Quantity: <strong>${cert.quantity} Tons</strong></p>` : ''}
-            <p class="bl-timeline-note">${dynamic.returnShortenParagraph(cert?.product?.description || '')}</p>
-            ${cert?.certificate?.certificateURL ? `<a href="${cert.certificate.certificateURL}" target="_blank" class="bl-timeline-cert-link">View Certificate</a>` : ''}
           </div>
         `).join('')}
       </div>
     </div>
   </section>` : ''}
 
+  <!-- Why Carbon Offsets Section -->
+  <section class="bl-why-section">
+    <div class="bl-why-grid">
+      <div class="bl-why-text-col">
+        <div class="bl-section-label">WHY CARBON OFFSETS</div>
+        <h2 class="bl-section-title" style="font-weight: 300;">To achieve NetZero &mdash; now.</h2>
+        <p class="bl-section-text" style="margin-top: 24px;">
+          Carbon offsets let individuals and businesses invest in environmental
+          projects to balance out their greenhouse gas footprints &mdash; replacing
+          fossil fuel with renewable energy, removing methane, cleaning oceans,
+          restoring forests.
+        </p>
+        <p class="bl-section-text" style="margin-top: 16px;">
+          We don't wait for 2030 or 2050. We act today, and we prove it.
+        </p>
+        <a href="#projects" class="bl-take-action-btn">
+          TAKE ACTION <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px; margin-left: 6px;"></i>
+        </a>
+      </div>
+      <div class="bl-why-img-col">
+        <div class="bl-why-img-wrapper">
+          <img
+            src="${dynamic?.UI_URL || ''}/assets/images/sustainability/eco-why.jpg"
+            alt="Industrial smokestacks at sunset"
+            class="bl-why-img"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- About Us -->
   ${dynamic?.aboutUs && dynamic.aboutUs !== '' ? `
-  <section class="bl-section">
+  <section id="about" class="bl-section">
     <div class="bl-section-inner">
-      <div class="bl-section-label">About Us</div>
-      <h2 class="bl-section-title">We are not waiting for 2030 or 2050 for NetZero.</h2>
+      <div class="bl-section-label">ABOUT US</div>
+      <h2 class="bl-section-title" style="font-weight: 300;">We are not waiting for 2030 or 2050 for NetZero.</h2>
       <div class="bl-section-text">
         <p>${dynamic.aboutUs}</p>
       </div>
@@ -664,8 +904,8 @@ export const blackTemplate = (dynamic) => `
   <!-- Contact & Social -->
   <section class="bl-section-alt">
     <div class="bl-section-inner">
-      <div class="bl-section-label">Get in Touch</div>
-      <h2 class="bl-section-title">Connect With Us</h2>
+      <div class="bl-section-label">GET IN TOUCH</div>
+      <h2 class="bl-section-title" style="font-weight: 300; margin-bottom: 24px;">Connect With Us</h2>
       <div class="bl-contact-grid">
         ${dynamic?.showName && dynamic?.name ? `
         <div class="bl-contact-card">
@@ -695,62 +935,11 @@ export const blackTemplate = (dynamic) => `
   <!-- Footer -->
   <footer class="bl-footer">
     <div class="bl-footer-inner">
-      <!-- Brand Statement -->
-      <div class="bl-brand">
-        <div class="bl-brand-label">
-          <i class="fa fa-leaf"></i>
-          <span>Our Promise</span>
-        </div>
-        <h3 class="bl-brand-heading">We are doing our part in combating climate change</h3>
-        <p class="bl-brand-text">Every product we create is a step toward a healthier planet. Traceable materials, verified emissions, and transparent supply chains — because the future deserves better.</p>
-      </div>
-
-      <!-- Footer Links -->
-      <div class="bl-footer-links-grid">
-        <div>
-          <h4 class="bl-footer-links-title">Navigation</h4>
-          <ul class="bl-footer-links-list">
-            ${dynamic?.showHomePage && dynamic?.isValidHomePageURL ? `<li><a href="${dynamic.homePageURL}">Home Page</a></li>` : ''}
-            ${dynamic?.showAboutUs && dynamic?.isValidAboutUsURL ? `<li><a href="${dynamic.aboutUsURL}">About Us</a></li>` : ''}
-            ${dynamic?.showContactUs && dynamic?.isValidContactPageURL ? `<li><a href="${dynamic.contactPageURL}">Contact</a></li>` : ''}
-          </ul>
-        </div>
-        <div>
-          <h4 class="bl-footer-links-title">Legal</h4>
-          <ul class="bl-footer-links-list">
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Access</a></li>
-            <li><a href="#">Cookie Policy</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="bl-footer-links-title">Connect</h4>
-          <ul class="bl-footer-links-list">
-            ${dynamic?.showLinkedin && dynamic?.linkedin ? `<li><a href="${dynamic.linkedin}" target="_blank"><i class="fa fa-linkedin"></i> LinkedIn</a></li>` : ''}
-            ${dynamic?.showInstagram && dynamic?.instagram ? `<li><a href="${dynamic.instagram}" target="_blank"><i class="fa fa-instagram"></i> Instagram</a></li>` : ''}
-            ${dynamic?.showTwitter && dynamic?.twitter ? `<li><a href="${dynamic.twitter}" target="_blank"><i class="fa fa-twitter"></i> Twitter</a></li>` : ''}
-            ${dynamic?.showFacebook && dynamic?.facebook ? `<li><a href="${dynamic.facebook}" target="_blank"><i class="fa fa-facebook"></i> Facebook</a></li>` : ''}
-          </ul>
-        </div>
-      </div>
-
-      <!-- Bottom Bar -->
-      <div class="bl-footer-bottom">
-        <div class="bl-footer-brand">
-          <div class="bl-footer-brand-icon">
-            <i class="fa fa-leaf"></i>
-          </div>
-          <p class="bl-footer-copyright">&copy; ${new Date().getFullYear()} ${dynamic?.companyName || 'EcoStance'}. All rights reserved.</p>
-        </div>
-      </div>
-
-      <!-- Powered By -->
-      <div class="bl-powered-by">
-        <span>Powered By</span>
-        <img src="https://ecostance.com/assets/images/logo_big2.png" alt="ecostanceLogo" width="100" height="18" />
-      </div>
+      <div class="bl-footer-left">ecostance</div>
+      <p class="bl-footer-copyright">&copy; ${new Date().getFullYear()} &mdash; Carbon chain of custody</p>
     </div>
   </footer>
 </body>
 </html>
 `;
+};
