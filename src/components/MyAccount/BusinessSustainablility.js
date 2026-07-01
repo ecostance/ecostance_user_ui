@@ -107,6 +107,7 @@ const BusinessSustainability = ({
     const [instagram, setInstagram] = useState(sustainData?.instagram);
     const [facebook, setFacebook] = useState(sustainData?.facebook);
     const [firstSlug, setFirstSlug] = useState("")
+    const [hasExistingSlug, setHasExistingSlug] = useState(false)
     const [image, setImage] = useState("");
     const [businessOrders, setBusinessOrders] = useState([])
 
@@ -343,9 +344,13 @@ const BusinessSustainability = ({
     const getInitalSlugData = async () => {
         let slugValues = await businessSlugData();
         // console.log(slugValues.data.data.slug, "slugData12")
-        setInitSlug(slugValues?.data?.data?.slug)
-        setFirstSlug(slugValues?.data?.data?.slug)
-        setFixedSlug(slugValues?.data?.data?.slug)
+        const slug = slugValues?.data?.data?.slug;
+        const hasSlug = !!slug;
+        const defaultSlug = slug || "business";
+        setInitSlug(defaultSlug)
+        setFirstSlug(defaultSlug)
+        setFixedSlug(defaultSlug)
+        setHasExistingSlug(hasSlug)
     };
 
     useEffect(() => {
@@ -1070,8 +1075,14 @@ const BusinessSustainability = ({
             (sustainabilityActionStates?.slugAvailable === SLUG_UNTOUCHED ||
                 sustainabilityActionStates?.slugAvailable === SLUG_AVAILABLE)
         ) {
-            dataForm.append("slug", fixedSlug);
-            dataForm.append("newSlug", initSlug);
+            if (!hasExistingSlug) {
+                // First time saving - only send slug
+                dataForm.append("slug", initSlug);
+            } else {
+                // Editing existing slug - send both current and new
+                dataForm.append("slug", fixedSlug);
+                dataForm.append("newSlug", initSlug);
+            }
         }
         if (phone && phone !== `+${phoneInfo?.numericCode}` && phone.length > 2) {
             const phoneDetails = returnPhoneDetails(phoneInfo);
