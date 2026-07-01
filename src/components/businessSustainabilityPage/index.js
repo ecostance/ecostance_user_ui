@@ -18,6 +18,7 @@ import { pinkTemplate } from "./pinkTemplate";
 import { beigeTemplate } from "./beigeTemplate";
 import { beigeLogoTemplate } from "./beigeLogoTemplate"
 import { whiteLogoTemplate } from "./whiteLogoTemplate";
+import { blackTemplate } from "./blackTemplate";
 import { useToasts } from "react-toast-notifications";
 import { Spinner } from "react-bootstrap";
 import { returnPhoneDetails } from "src/helpers/returnPhoneDetails";
@@ -316,7 +317,8 @@ width="125"
     pink: pinkTemplate,
     beige: beigeTemplate,
     beigelogo: beigeLogoTemplate,
-    whitelogo: whiteLogoTemplate
+    whitelogo: whiteLogoTemplate,
+    black: blackTemplate
   };
 
   const returnCorrectBackgroundColor = (template) => {
