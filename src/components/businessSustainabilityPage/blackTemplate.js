@@ -29,12 +29,12 @@ export const blackTemplate = (dynamic) => {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --ink: #1a1a1a;
-      --ink-soft: #3d3d3d;
+      --ink: #151618;
+      --ink-soft: #3c3e41;
       --canvas: #fafafa;
-      --canvas-alt: #f0f0f0;
-      --hairline: #d4d4d4;
-      --muted: #6b6b6b;
+      --canvas-alt: #f1f2f4;
+      --hairline: #dadbe0;
+      --muted: #737373;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -162,6 +162,7 @@ export const blackTemplate = (dynamic) => {
       font-weight: 300;
       line-height: 1.02;
       letter-spacing: -0.02em;
+      color: #ffffff !important;
     }
 
     @media (min-width: 768px) {
@@ -277,7 +278,7 @@ export const blackTemplate = (dynamic) => {
 
     .bl-section-alt {
       padding: 80px 24px;
-      background: #fff;
+      background: var(--canvas-alt);
       border-top: 1px solid var(--hairline);
     }
 
@@ -562,7 +563,7 @@ export const blackTemplate = (dynamic) => {
 
     /* Why Section */
     .bl-why-section {
-      background: var(--canvas);
+      background: #ffffff;
       padding: 80px 24px;
       border-top: 1px solid var(--hairline);
     }
@@ -628,71 +629,6 @@ export const blackTemplate = (dynamic) => {
 
     .bl-take-action-btn:hover {
       opacity: 0.9;
-    }
-
-    /* Contact Cards */
-    .bl-contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 32px;
-    }
-
-    .bl-contact-card {
-      padding: 20px;
-      border: 1px solid var(--hairline);
-      background: var(--canvas-alt);
-    }
-
-    .bl-contact-label {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .bl-contact-value {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--ink);
-      word-break: break-all;
-    }
-
-    .bl-contact-value a {
-      color: var(--ink);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
-    .bl-contact-value a:hover { opacity: 0.7; }
-
-    /* Social Links */
-    .bl-social-list {
-      list-style: none;
-      margin-top: 16px;
-    }
-
-    .bl-social-list li {
-      margin-bottom: 10px;
-    }
-
-    .bl-social-list a {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      color: var(--ink-soft);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .bl-social-list a:hover { color: var(--ink); }
-
-    .bl-social-list img {
-      max-height: 24px;
-      max-width: 24px;
     }
 
     /* Footer */
@@ -891,7 +827,7 @@ export const blackTemplate = (dynamic) => {
 
   <!-- About Us -->
   ${dynamic?.aboutUs && dynamic.aboutUs !== '' ? `
-  <section id="about" class="bl-section">
+  <section id="about" class="bl-section-alt">
     <div class="bl-section-inner">
       <div class="bl-section-label">ABOUT US</div>
       <h2 class="bl-section-title" style="font-weight: 300;">We are not waiting for 2030 or 2050 for NetZero.</h2>
@@ -900,37 +836,6 @@ export const blackTemplate = (dynamic) => {
       </div>
     </div>
   </section>` : ''}
-
-  <!-- Contact & Social -->
-  <section class="bl-section-alt">
-    <div class="bl-section-inner">
-      <div class="bl-section-label">GET IN TOUCH</div>
-      <h2 class="bl-section-title" style="font-weight: 300; margin-bottom: 24px;">Connect With Us</h2>
-      <div class="bl-contact-grid">
-        ${dynamic?.showName && dynamic?.name ? `
-        <div class="bl-contact-card">
-          <p class="bl-contact-label">Name</p>
-          <p class="bl-contact-value">${dynamic.name}</p>
-        </div>` : ''}
-        ${dynamic?.showEmail && dynamic?.email ? `
-        <div class="bl-contact-card">
-          <p class="bl-contact-label">Email</p>
-          <p class="bl-contact-value"><a href="mailto:${dynamic.email}">${dynamic.email}</a></p>
-        </div>` : ''}
-        ${dynamic?.showPhone && dynamic?.phone ? `
-        <div class="bl-contact-card">
-          <p class="bl-contact-label">Phone</p>
-          <p class="bl-contact-value">${dynamic.phone}</p>
-        </div>` : ''}
-      </div>
-      <ul class="bl-social-list">
-        ${dynamic?.showSocialt1 ? dynamic.showSocialt1('<i class="fa fa-linkedin"></i> LinkedIn', dynamic.linkedin, dynamic.showLinkedin) : ''}
-        ${dynamic?.showSocialt1 ? dynamic.showSocialt1('<i class="fa fa-instagram"></i> Instagram', dynamic.instagram, dynamic.showInstagram) : ''}
-        ${dynamic?.showSocialt1 ? dynamic.showSocialt1('<i class="fa fa-twitter"></i> Twitter', dynamic.twitter, dynamic.showTwitter) : ''}
-        ${dynamic?.showSocialt1 ? dynamic.showSocialt1('<i class="fa fa-facebook"></i> Facebook', dynamic.facebook, dynamic.showFacebook) : ''}
-      </ul>
-    </div>
-  </section>
 
   <!-- Footer -->
   <footer class="bl-footer">
