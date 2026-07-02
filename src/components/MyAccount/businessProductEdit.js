@@ -3819,21 +3819,21 @@ const BusinessProductEdit = ({
                                         </div> */}
                                         <div
                                             className="sustainability--each-template"
-                                            onClick={() => setThemeSelected("black")}
+                                            onClick={() => setThemeSelected("template9")}
                                         >
                                             <div className="sustainability--each-template-image-holder">
                                                 <img
                                                     src={
                                                         process.env.NEXT_PUBLIC_UI_URL +
-                                                        "/assets/images/sustainability/black.png"
+                                                        "/assets/images/sustainability/template9.png"
                                                     }
                                                     className="img-responsive"
                                                 />
                                             </div>
                                             <div className="sustainability--each-template-text-select-holder">
-                                                <p>Black</p>
+                                                <p>Template 9</p>
                                                 <div
-                                                    className={`sustainability--each-template-check-holder ${themeSelected === "black" ? "template-clicked" : ""
+                                                    className={`sustainability--each-template-check-holder ${themeSelected === "template9" ? "template-clicked" : ""
                                                         }`}
                                                 >
                                                     <div className="big-checkmark">

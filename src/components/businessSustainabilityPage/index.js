@@ -318,7 +318,8 @@ width="125"
     beige: beigeTemplate,
     beigelogo: beigeLogoTemplate,
     whitelogo: whiteLogoTemplate,
-    black: blackTemplate
+    black: blackTemplate,
+    template9: whiteTemplate
   };
 
   const returnCorrectBackgroundColor = (template) => {
