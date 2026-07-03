@@ -133,7 +133,7 @@ const Cancel = ({
     } else {
       getBusinessProduct().then((res) => {
         const products = res?.data?.data || []
-        setDppProducts(products.filter(p => p.isPublic === true))
+        setDppProducts(products.filter(p => p.isPublic === true && p.status !== 2))
       }).catch(() => {})
     }
   }, [])

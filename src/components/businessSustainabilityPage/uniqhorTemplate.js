@@ -611,518 +611,333 @@ export const uniqhorTemplate = (dynamic) => {
       opacity: 1;
     }
 
-    /* Chain of Custody */
-    .uq-chain {
-      background: oklch(0.96 0.004 80);
+    /* DPP Info Cards */
+    .uq-dpp {
+      background: var(--canvas);
       border-top: 1px solid var(--hairline);
       padding: 96px 24px;
     }
-
-    .uq-chain-inner {
-      max-width: 1600px;
+    .uq-dpp-inner {
+      max-width: 1200px;
       margin: 0 auto;
     }
-
-    @media (min-width: 768px) {
-      .uq-chain { padding: 144px 48px; }
-    }
-
-    .uq-chain-header {
+    .uq-dpp-grid {
       display: grid;
-      gap: 40px;
-      margin-bottom: 80px;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-top: 48px;
     }
-
-    .uq-chain-header h2 {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 36px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      margin-top: 16px;
-      color: var(--ink);
+    @media (min-width: 640px) {
+      .uq-dpp-grid { grid-template-columns: repeat(2, 1fr); }
     }
-
-    .uq-chain-header-text {
-      font-size: 15px;
-      line-height: 1.7;
-      color: var(--muted);
-      max-width: 520px;
+    @media (min-width: 1024px) {
+      .uq-dpp-grid { grid-template-columns: repeat(3, 1fr); }
     }
-
-    .uq-chain-header-text strong {
-      color: var(--ink);
-      font-weight: 500;
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-header {
-        grid-template-columns: 1fr 1.1fr;
-        gap: 80px;
-        align-items: end;
-      }
-      .uq-chain-header h2 { font-size: 64px; }
-    }
-
-    /* Process Timeline */
-    .uq-process {
-      position: relative;
-    }
-
-    .uq-process-line {
-      display: none;
-    }
-
-    @media (min-width: 768px) {
-      .uq-process-line {
-        display: block;
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 22px;
-        height: 1px;
-        background: rgba(0,0,0,0.2);
-      }
-    }
-
-    .uq-process-grid {
-      display: grid;
-      gap: 48px;
-      position: relative;
-      list-style: none;
-    }
-
-    @media (min-width: 768px) {
-      .uq-process-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 32px;
-      }
-    }
-
-    .uq-process-step {
-      position: relative;
-    }
-
-    .uq-process-step-head {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-process-step-head { display: block; }
-    }
-
-    .uq-process-num {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 44px;
-      width: 44px;
-      border-radius: 50%;
-      border: 1px solid var(--ink);
-      background: oklch(0.96 0.004 80);
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 14px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .uq-process-step-body {
-      margin-top: 0;
-    }
-
-    @media (min-width: 768px) {
-      .uq-process-step-body { margin-top: 32px; padding-right: 24px; }
-    }
-
-    .uq-process-step-body h3 {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 20px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      color: var(--ink);
-    }
-
-    .uq-process-step-body p {
-      margin-top: 8px;
-      font-size: 14px;
-      line-height: 1.6;
-      color: var(--muted);
-      max-width: 220px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-process-step-body h3 { font-size: 24px; }
-    }
-
-    .uq-process-connector {
-      margin-left: 22px;
-      margin-top: 24px;
-      height: 32px;
-      width: 1px;
-      background: rgba(0,0,0,0.2);
-    }
-
-    @media (min-width: 768px) {
-      .uq-process-connector { display: none; }
-    }
-
-    /* Public Ledger */
-    .uq-ledger {
-      margin-top: 96px;
-      background: oklch(0.97 0.002 80);
-      color: var(--ink);
-      padding: 56px 20px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-ledger { margin-top: 128px; padding: 80px 64px; }
-    }
-
-    .uq-ledger-header {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      margin-bottom: 56px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-ledger-header {
-        flex-direction: row;
-        align-items: flex-end;
-        justify-content: space-between;
-        margin-bottom: 80px;
-      }
-    }
-
-    .uq-ledger-header h3 {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 30px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      margin-top: 12px;
-      color: var(--ink);
-    }
-
-    @media (min-width: 768px) {
-      .uq-ledger-header h3 { font-size: 48px; }
-    }
-
-    .uq-ledger-live {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
-    .uq-ledger-dot {
-      height: 6px;
-      width: 6px;
-      border-radius: 50%;
-      background: var(--accent-green);
-      animation: uq-pulse 2s infinite;
-    }
-
-    @keyframes uq-pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    /* Vertical Chain */
-    .uq-chain-list {
-      position: relative;
-      max-width: 960px;
-      margin: 0 auto;
-      list-style: none;
-    }
-
-    .uq-chain-spine {
-      position: absolute;
-      left: 16px;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background: rgba(0,0,0,0.15);
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-spine {
-        left: 50%;
-        transform: translateX(-50%);
-      }
-    }
-
-    .uq-chain-item {
-      position: relative;
-      padding-left: 56px;
-      padding-bottom: 72px;
-    }
-
-    .uq-chain-item:last-child { padding-bottom: 0; }
-
-    @media (min-width: 768px) {
-      .uq-chain-item { padding-left: 0; }
-    }
-
-    .uq-chain-node {
-      position: absolute;
-      left: 16px;
-      top: 24px;
-      transform: translateX(-50%);
-      z-index: 10;
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-node {
-        left: 50%;
-      }
-    }
-
-    .uq-chain-node-inner {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 16px;
-      width: 16px;
-    }
-
-    .uq-chain-node-ping {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: rgba(16,185,129,0.3);
-      animation: uq-ping 1.5s infinite;
-    }
-
-    @keyframes uq-ping {
-      0% { transform: scale(1); opacity: 0.8; }
-      100% { transform: scale(2); opacity: 0; }
-    }
-
-    .uq-chain-node-dot {
-      position: relative;
-      height: 12px;
-      width: 12px;
-      border-radius: 50%;
-      background: var(--accent-green);
-      box-shadow: 0 0 0 4px oklch(0.97 0.002 80);
-    }
-
-    .uq-chain-connector {
-      display: none;
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-connector {
-        display: block;
-        position: absolute;
-        top: 32px;
-        height: 1px;
-        background: rgba(0,0,0,0.15);
-        width: 6%;
-      }
-
-      .uq-chain-connector-left {
-        right: 50%;
-        margin-right: 8px;
-      }
-
-      .uq-chain-connector-right {
-        left: 50%;
-        margin-left: 8px;
-      }
-    }
-
-    .uq-cert-card {
-      width: 100%;
-    }
-
-    @media (min-width: 768px) {
-      .uq-cert-card { width: 46%; }
-      .uq-cert-card-left { margin-right: auto; padding-right: 28px; }
-      .uq-cert-card-right { margin-left: auto; padding-left: 28px; }
-    }
-
-    .uq-cert-card-inner {
-      display: grid;
-      grid-template-columns: 1fr 110px;
+    .uq-dpp-card {
       background: #fff;
       border: 1px solid var(--hairline);
       border-radius: 8px;
+      padding: 20px;
       transition: border-color 0.2s, box-shadow 0.2s;
-      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
-
-    .uq-cert-card-inner:hover {
+    .uq-dpp-card:hover {
       border-color: rgba(0,0,0,0.2);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
-
-    @media (min-width: 768px) {
-      .uq-cert-card-inner { grid-template-columns: 1fr 140px; }
+    .uq-dpp-card-top {
+      display: flex;
+      gap: 16px;
     }
-
-    .uq-cert-body {
-      padding: 24px 20px;
+    .uq-dpp-card-img {
+      width: 72px;
+      height: 72px;
+      flex-shrink: 0;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--canvas-alt);
     }
-
-    @media (min-width: 768px) {
-      .uq-cert-body { padding: 28px 28px; }
+    .uq-dpp-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-
-    .uq-cert-tags {
+    .uq-dpp-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .uq-dpp-card-name {
+      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+    .uq-dpp-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    .uq-dpp-verified {
+      color: var(--accent-green);
+      font-weight: 500;
+    }
+    .uq-dpp-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .uq-dpp-metric {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--canvas-alt);
+      border-radius: 4px;
+      padding: 4px 8px;
+      min-width: 52px;
+    }
+    .uq-dpp-metric-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+    .uq-dpp-metric-value {
+      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-top: 1px;
+    }
+    .uq-dpp-card-desc {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+    .uq-dpp-card-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--hairline);
     }
-
-    .uq-cert-tag {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
+    .uq-dpp-qr {
+      width: 40px;
+      height: 40px;
+      border-radius: 3px;
+      background: #fff;
+      padding: 2px;
+      border: 1px solid var(--hairline);
     }
-
-    .uq-cert-tag-retired {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent-green);
-    }
-
-    .uq-cert-id {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 18px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      margin-top: 4px;
-      color: var(--ink);
-    }
-
-    .uq-cert-meta {
-      margin-top: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 16px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .uq-cert-meta-dot {
-      height: 4px;
-      width: 4px;
-      border-radius: 50%;
-      background: rgba(0,0,0,0.3);
-      flex-shrink: 0;
-    }
-
-    .uq-cert-meta strong {
-      color: var(--ink);
-      font-weight: 500;
-    }
-
-    .uq-cert-project {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 18px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      margin-top: 16px;
-      color: var(--ink);
-    }
-
-    .uq-cert-desc {
-      margin-top: 8px;
-      font-size: 13px;
-      line-height: 1.6;
-      color: var(--muted);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .uq-cert-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 20px;
+    .uq-dpp-link {
       font-size: 11px;
-      letter-spacing: 0.16em;
+      font-weight: 500;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: rgba(0,0,0,0.7);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(0,0,0,0.2);
-      padding-bottom: 2px;
-      transition: color 0.2s, border-color 0.2s;
-    }
-
-    .uq-cert-link:hover {
       color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--hairline);
+      padding-bottom: 2px;
+      transition: border-color 0.2s;
+    }
+    .uq-dpp-link:hover {
       border-color: var(--ink);
     }
 
-    .uq-cert-img-wrap {
-      position: relative;
-      overflow: hidden;
+    /* Chain of Custody */
+    .uq-chain {
       background: var(--canvas-alt);
+      border-top: 1px solid var(--hairline);
+      padding: 80px 24px;
     }
 
-    .uq-cert-img {
+    @media (max-width: 768px) {
+      .uq-chain { padding: 48px 16px; }
+    }
+
+    .uq-chain-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .uq-chain-label {
+      font-size: 11px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .uq-chain-title {
+      margin-top: 12px;
+      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+      font-size: 36px;
+      font-weight: 300;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    @media (min-width: 768px) {
+      .uq-chain-title { font-size: 48px; }
+    }
+
+    .uq-chain-subtitle {
+      margin-top: 20px;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--ink-soft);
+      max-width: 640px;
+    }
+
+    .uq-chain-list {
+      position: relative;
+      margin-top: 40px;
+      padding-left: 32px;
+      list-style: none;
+    }
+
+    .uq-chain-line {
       position: absolute;
-      inset: 0;
+      left: 5px;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: var(--hairline);
+    }
+
+    .uq-chain-item {
+      position: relative;
+      margin-bottom: 56px;
+    }
+
+    .uq-chain-item:last-child { margin-bottom: 0; }
+
+    .uq-chain-dot {
+      position: absolute;
+      left: -32px;
+      top: 12px;
+      width: 10px;
+      height: 10px;
+      border: 1px solid var(--ink);
+      background: var(--canvas-alt);
+      transform: rotate(45deg);
+    }
+
+    .uq-chain-card {
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .uq-chain-card {
+        grid-template-columns: 1fr 240px;
+        gap: 40px;
+      }
+    }
+
+    .uq-chain-cert-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--hairline);
+      background: #fff;
+      padding: 6px 12px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 16px;
+    }
+
+    .uq-chain-date {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .uq-chain-qty {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .uq-chain-qty strong {
+      color: var(--ink);
+    }
+
+    .uq-chain-project {
+      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+      font-size: 24px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+
+    @media (min-width: 768px) {
+      .uq-chain-project { font-size: 32px; }
+    }
+
+    .uq-chain-desc {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      max-width: 576px;
+      margin-bottom: 16px;
+    }
+
+    .uq-chain-view-link {
+      display: inline-block;
+      padding: 8px 16px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink);
+      border: 1px solid var(--hairline);
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .uq-chain-view-link:hover {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .uq-chain-img-wrap {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      overflow: hidden;
+      background: var(--canvas);
+    }
+
+    @media (min-width: 768px) {
+      .uq-chain-img-wrap { width: 240px; }
+    }
+
+    .uq-chain-img {
       height: 100%;
       width: 100%;
       object-fit: cover;
-      opacity: 0.9;
       transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .uq-cert-card:hover .uq-cert-img {
-      transform: scale(1.05);
-    }
-
-    /* Chain Terminal */
-    .uq-chain-terminal {
-      position: relative;
-      padding-left: 56px;
-      padding-top: 8px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-terminal { padding-left: 0; text-align: center; }
-    }
-
-    .uq-chain-terminal-dot {
-      position: absolute;
-      left: 16px;
-      top: 0;
-      transform: translateX(-50%);
-      height: 12px;
-      width: 12px;
-      border-radius: 50%;
-      border: 1px solid rgba(0,0,0,0.3);
-      background: oklch(0.97 0.002 80);
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-terminal-dot { left: 50%; }
-    }
-
-    .uq-chain-terminal-text {
-      padding-top: 8px;
-      font-size: 11px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--muted);
+    .uq-chain-card:hover .uq-chain-img {
+      transform: scale(1.04);
     }
 
     /* Ledger Footer */
@@ -1376,7 +1191,7 @@ export const uniqhorTemplate = (dynamic) => {
 
     @media (min-width: 768px) {
       .uq-footer-grid {
-        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        grid-template-columns: 1.5fr 1fr;
         gap: 40px;
       }
     }
@@ -1573,33 +1388,54 @@ export const uniqhorTemplate = (dynamic) => {
 
   <!-- Digital Product Passport -->
   ${dynamic?.dppProducts && dynamic.dppProducts.length > 0 ? `
-  <section class="uq-gallery">
-    <div class="uq-gallery-header">
+  <section class="uq-dpp">
+    <div class="uq-dpp-inner">
       <p class="eyebrow">Digital Product Passport</p>
-      <h2>Our Products</h2>
-      <p>Explore our product passports — transparent, traceable, and verified.</p>
-    </div>
-    <div class="uq-gallery-scroll">
-      <div class="uq-gallery-track">
+      <h2 style="font-family:'Inter Tight',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:500;letter-spacing:-0.03em;line-height:1.02;margin-top:16px;">Verified Product Passports</h2>
+      <p style="color:var(--muted);font-size:15px;margin-top:16px;max-width:640px;">Each product carries a Digital Product Passport — transparent, auditable, and independently verified.</p>
+      <div class="uq-dpp-grid">
         ${dynamic.dppProducts.map((dpp) => {
+          const pub = dpp?.published || {};
           const isPublished = dpp?.isPublic === true;
-          const dppImage = dpp?.published?.productImages?.[0] || dpp?.published?.thumbImage?.[0] || dpp?.published?.image?.[0] || '';
-          const dppName = dpp?.published?.name || dpp?.name || 'Product';
-          const dppCategory = dpp?.published?.Category || '';
+          const dppImage = pub.productImages?.[0] || pub.thumbImage?.[0] || pub.image?.[0] || '';
+          const dppName = pub.name || pub.formalName || dpp?.name || 'Product';
+          const dppCategory = pub.Category || '';
+          const dppDesc = pub.shortDescription || '';
           const dppUrl = isPublished ? '/dpp/' + (dpp?.businessSlugName || '') + '/' + (dpp?.slug || '') : '#';
+          const qrCodeUrl = isPublished && dppUrl !== '#' ? 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=' + encodeURIComponent(dppUrl) : '';
+          const metrics = [];
+          if (pub.showCo2Emission && pub.co2Emission > 0) metrics.push({ label: 'CO₂', value: pub.co2Emission + 'kg' });
+          if (pub.showWaterConsuption && pub.waterConsuption > 0) metrics.push({ label: 'H₂O', value: pub.waterConsuption + 'L' });
+          if (pub.showPowerConsuption && pub.powerConsuption > 0) metrics.push({ label: 'Energy', value: pub.powerConsuption + 'kWh' });
+          if (pub.showRecycleMaterial && pub.recycleMaterial > 0) metrics.push({ label: 'Recycled', value: pub.recycleMaterial + '%' });
+          if (pub.showUpcycleMaterial && pub.upcycleMaterial > 0) metrics.push({ label: 'Upcycled', value: pub.upcycleMaterial + '%' });
           return `
-          <a href="${dppUrl}" ${isPublished ? 'target="_blank" rel="noopener noreferrer"' : ''} class="uq-gallery-card" style="${!isPublished ? 'opacity:0.55;pointer-events:auto;cursor:default;' : ''}">
-            <div class="uq-gallery-img-wrap">
-              ${dppImage ? `<img src="${dppImage}" alt="${dppName}" loading="lazy" class="uq-gallery-img" />` : `<div style="width:100%;height:100%;background:var(--canvas-alt);display:flex;align-items:center;justify-content:center;"><span style="font-size:48px;opacity:0.15;font-family:'Inter Tight',sans-serif;font-weight:700;">DPP</span></div>`}
-              ${!isPublished ? '<div style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.5);color:#fff;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 8px;border-radius:3px;font-weight:500;">Draft</div>' : ''}
+        <div class="uq-dpp-card" style="${!isPublished ? 'opacity:0.55;' : ''}">
+          <div class="uq-dpp-card-top">
+            <div class="uq-dpp-card-img">
+              ${dppImage ? `<img src="${dppImage}" alt="${dppName}">` : '<div style="width:100%;height:100%;background:var(--canvas-alt);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);letter-spacing:0.1em;">DPP</div>'}
             </div>
-            <div class="uq-gallery-card-title">${dppName}</div>
-            ${dppCategory ? `<div class="uq-gallery-card-type">${dppCategory}${!isPublished ? ' &middot; Not published' : ''}</div>` : (!isPublished ? '<div class="uq-gallery-card-type">Not published</div>' : '')}
-          </a>`;
+            <div class="uq-dpp-card-info">
+              <h3 class="uq-dpp-card-name">${dppName}</h3>
+              <div class="uq-dpp-card-meta">
+                ${dppCategory ? '<span>' + dppCategory + '</span>' : ''}
+                ${isPublished ? '<span class="uq-dpp-verified">&#10003; Verified</span>' : '<span style="color:#999;">Draft</span>'}
+              </div>
+              ${metrics.length > 0 ? `
+              <div class="uq-dpp-metrics">
+                ${metrics.map(m => '<span class="uq-dpp-metric"><span class="uq-dpp-metric-label">' + m.label + '</span><span class="uq-dpp-metric-value">' + m.value + '</span></span>').join('')}
+              </div>` : ''}
+            </div>
+          </div>
+          ${dppDesc ? '<p class="uq-dpp-card-desc">' + (dppDesc.length > 140 ? dppDesc.substring(0, 140) + '...' : dppDesc) + '</p>' : ''}
+          <div class="uq-dpp-card-footer">
+            ${isPublished && qrCodeUrl ? '<img src="' + qrCodeUrl + '" alt="QR" class="uq-dpp-qr">' : ''}
+            ${isPublished ? '<a href="' + dppUrl + '" target="_blank" rel="noopener noreferrer" class="uq-dpp-link">View Passport &rarr;</a>' : '<span class="uq-dpp-link" style="opacity:0.4;cursor:default;">Not published</span>'}
+          </div>
+        </div>`;
         }).join('')}
       </div>
     </div>
-    <p class="uq-gallery-hint">&larr; Scroll &rarr;</p>
   </section>` : ''}
 
   <!-- Hover Story / Method Section -->
@@ -1654,123 +1490,39 @@ export const uniqhorTemplate = (dynamic) => {
   ${dynamic?.certData && dynamic.certData.length > 0 ? `
   <section class="uq-chain" id="chain">
     <div class="uq-chain-inner">
-      <div class="uq-chain-header">
-        <div>
-          <p class="eyebrow">Chain of Custody</p>
-          <h2>From source<br/>to certificate.</h2>
-        </div>
-        <div class="uq-chain-header-text">
-          <p>Every credit is issued from an accredited registry and supported by a fully traceable custody chain — timestamped, signed, and independently auditable at every stage.</p>
-          <p><strong>Verified, not claimed.</strong></p>
-        </div>
-      </div>
-
-      <!-- Process Timeline -->
-      <div class="uq-process">
-        <div class="uq-process-line"></div>
-        <ol class="uq-process-grid">
-          <li class="uq-process-step">
-            <div class="uq-process-step-head">
-              <div class="uq-process-num">01</div>
-              <div class="uq-process-step-body">
-                <h3>Origination</h3>
-                <p>Verified developer, third-party audited baseline at the project site.</p>
-              </div>
-            </div>
-            <div class="uq-process-connector"></div>
-          </li>
-          <li class="uq-process-step">
-            <div class="uq-process-step-head">
-              <div class="uq-process-num">02</div>
-              <div class="uq-process-step-body">
-                <h3>Issuance</h3>
-                <p>Accredited registry mints a unique serialised carbon credit.</p>
-              </div>
-            </div>
-            <div class="uq-process-connector"></div>
-          </li>
-          <li class="uq-process-step">
-            <div class="uq-process-step-head">
-              <div class="uq-process-num">03</div>
-              <div class="uq-process-step-body">
-                <h3>Transfer</h3>
-                <p>Custody moves on-ledger, timestamped and cryptographically signed.</p>
-              </div>
-            </div>
-            <div class="uq-process-connector"></div>
-          </li>
-          <li class="uq-process-step">
-            <div class="uq-process-step-head">
-              <div class="uq-process-num">04</div>
-              <div class="uq-process-step-body">
-                <h3>Retirement</h3>
-                <p>Credit retired against a single owner. Immutable, verifiable, final.</p>
-              </div>
-            </div>
-          </li>
-        </ol>
-      </div>
-
-      <!-- Public Ledger -->
-      <div class="uq-ledger">
-        <div class="uq-ledger-header">
-          <div>
-            <p class="eyebrow">Public Ledger</p>
-            <h3>The Chain, Unbroken.</h3>
-          </div>
-          <div class="uq-ledger-live">
-            <span class="uq-ledger-dot"></span>
-            Live &middot; ${dynamic.certData.length} retirements
-          </div>
-        </div>
-
-        <ol class="uq-chain-list">
-          <div class="uq-chain-spine" aria-hidden></div>
-
-          ${dynamic.certData.map((cert, i) => {
-            const isLeft = i % 2 === 0;
-            return `
-            <li class="uq-chain-item">
-              <div class="uq-chain-node">
-                <div class="uq-chain-node-inner">
-                  <span class="uq-chain-node-ping"></span>
-                  <span class="uq-chain-node-dot"></span>
+      <div class="uq-chain-label">CHAIN OF CUSTODY</div>
+      <h2 class="uq-chain-title" style="font-weight: 300;">Carbon Offset Chain of Custody Certificates</h2>
+      <p class="uq-chain-subtitle">Every offset we retire is issued a unique certificate that eliminates double counting.</p>
+      <div class="uq-chain-list">
+        <div class="uq-chain-line" aria-hidden></div>
+        ${dynamic.certData.map((cert) => `
+          <div class="uq-chain-item">
+            <div class="uq-chain-dot"></div>
+            <div class="uq-chain-card">
+              <div>
+                <div class="uq-chain-cert-tag">
+                  <i class="fa-regular fa-file-lines"></i>
+                  CERTIFICATE &middot; ${cert?.originNumber || ''}
                 </div>
-              </div>
-
-              <div class="uq-chain-connector ${isLeft ? 'uq-chain-connector-left' : 'uq-chain-connector-right'}" aria-hidden></div>
-
-              <div class="uq-cert-card ${isLeft ? 'uq-cert-card-left' : 'uq-cert-card-right'}">
-                <div class="uq-cert-card-inner">
-                  <div class="uq-cert-body">
-                    <div class="uq-cert-tags">
-                      <span class="uq-cert-tag">Certificate</span>
-                      <span class="uq-cert-tag-retired">Retired</span>
-                    </div>
-                    <p class="uq-cert-id">#${cert?.originNumber || ''}</p>
-                    <div class="uq-cert-meta">
-                      <span>${cert?.createdAt ? new Date(cert.createdAt).toISOString().split('T')[0] : ''}</span>
-                      <span class="uq-cert-meta-dot"></span>
-                      ${cert?.quantity ? `<strong>${cert.quantity} tCO\u2082e</strong>` : ''}
-                    </div>
-                    <h4 class="uq-cert-project">${cert?.product?.name || 'Certificate'}</h4>
-                    <p class="uq-cert-desc">${(function() {
-                      const desc = cert?.product?.shortDescription || cert?.product?.description || '';
-                      return desc.length > 120 ? desc.substring(0, 120) + '...' : desc;
-                    })()}</p>
-                    ${cert?.certificate?.certificateURL ? `<a href="${cert.certificate.certificateURL}" target="_blank" class="uq-cert-link">View Passport &rarr;</a>` : ''}
-                  </div>
-                  ${cert?.product?.thumbImage?.[0] ? `
-                  <div class="uq-cert-img-wrap">
-                    <img src="${cert.product.thumbImage[0]}" alt="${cert?.product?.name || 'Certificate'}" loading="lazy" class="uq-cert-img" />
-                  </div>
-                  ` : ''}
+                <div class="uq-chain-date">
+                  ${cert?.createdAt ? new Date(cert.createdAt).toISOString().split('T')[0] : ''}
                 </div>
+                ${cert?.quantity ? `
+                <div class="uq-chain-qty">
+                  Carbon Offset Quantity: <strong>${cert.quantity} Tons</strong>
+                </div>` : ''}
+                <h3 class="uq-chain-project">${cert?.product?.name || 'Certificate'}</h3>
+                <p class="uq-chain-desc">${cert?.product?.description || ''}</p>
+                ${cert?.certificate?.certificateURL ? `<a href="${cert.certificate.certificateURL}" target="_blank" class="uq-chain-view-link">View Certificate</a>` : ''}
               </div>
-            </li>`;
-          }).join('')}
-
-        </ol>
+              ${cert?.product?.thumbImage?.[0] ? `
+              <div class="uq-chain-img-wrap">
+                <img src="${cert.product.thumbImage[0]}" alt="${cert?.product?.name || 'Certificate'}" class="uq-chain-img" />
+              </div>
+              ` : ''}
+            </div>
+          </div>
+        `).join('')}
       </div>
     </div>
   </section>` : ''}
@@ -1841,8 +1593,25 @@ export const uniqhorTemplate = (dynamic) => {
 
   <!-- Footer -->
   <footer class="uq-footer">
-    <div class="uq-footer-inner" style="text-align: center;">
-      <p style="color: rgba(255,255,255,0.7); font-size: 14px;">Powered by Ecostance, all rights reserved copyright &copy; ${new Date().getFullYear()}</p>
+    <div class="uq-footer-inner">
+      <div class="uq-footer-grid">
+        <div>
+          <div class="uq-footer-brand">${dynamic?.companyName || 'ecostance'}</div>
+        </div>
+        <div class="uq-footer-col">
+          <h4>Connect</h4>
+          <ul>
+            ${dynamic?.showTwitter && dynamic?.twitter ? `<li><a href="${dynamic.twitter}" target="_blank">Twitter</a></li>` : ''}
+            ${dynamic?.showLinkedin && dynamic?.linkedin ? `<li><a href="${dynamic.linkedin}" target="_blank">LinkedIn</a></li>` : ''}
+            ${dynamic?.showInstagram && dynamic?.instagram ? `<li><a href="${dynamic.instagram}" target="_blank">Instagram</a></li>` : ''}
+            ${dynamic?.showFacebook && dynamic?.facebook ? `<li><a href="${dynamic.facebook}" target="_blank">Facebook</a></li>` : ''}
+          </ul>
+        </div>
+      </div>
+      <div class="uq-footer-bottom">
+        <p>&copy; ${new Date().getFullYear()} ${dynamic?.companyName || 'ecostance'}. All rights reserved.</p>
+        <p>Powered by Ecostance</p>
+      </div>
     </div>
   </footer>
 
