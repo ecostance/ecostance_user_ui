@@ -423,6 +423,7 @@ export const uniqhorTemplate = (dynamic) => {
       width: 100%;
       overflow: hidden;
       background: var(--canvas-alt);
+      position: relative;
     }
 
     .uq-gallery-img {
@@ -1589,6 +1590,37 @@ export const uniqhorTemplate = (dynamic) => {
             <div class="uq-gallery-card-type">Carbon Offset</div>
           </a>
         `).join('')}
+      </div>
+    </div>
+    <p class="uq-gallery-hint">&larr; Scroll &rarr;</p>
+  </section>` : ''}
+
+  <!-- Digital Product Passport -->
+  ${dynamic?.dppProducts && dynamic.dppProducts.length > 0 ? `
+  <section class="uq-gallery">
+    <div class="uq-gallery-header">
+      <p class="eyebrow">Digital Product Passport</p>
+      <h2>Our Products</h2>
+      <p>Explore our product passports — transparent, traceable, and verified.</p>
+    </div>
+    <div class="uq-gallery-scroll">
+      <div class="uq-gallery-track">
+        ${dynamic.dppProducts.map((dpp) => {
+          const isPublished = dpp?.isPublic === true;
+          const dppImage = dpp?.published?.productImages?.[0] || dpp?.published?.thumbImage?.[0] || dpp?.published?.image?.[0] || '';
+          const dppName = dpp?.published?.name || dpp?.name || 'Product';
+          const dppCategory = dpp?.published?.Category || '';
+          const dppUrl = isPublished ? '/dpp/' + (dpp?.businessSlugName || '') + '/' + (dpp?.slug || '') : '#';
+          return `
+          <a href="${dppUrl}" ${isPublished ? 'target="_blank" rel="noopener noreferrer"' : ''} class="uq-gallery-card" style="${!isPublished ? 'opacity:0.55;pointer-events:auto;cursor:default;' : ''}">
+            <div class="uq-gallery-img-wrap">
+              ${dppImage ? `<img src="${dppImage}" alt="${dppName}" loading="lazy" class="uq-gallery-img" />` : `<div style="width:100%;height:100%;background:var(--canvas-alt);display:flex;align-items:center;justify-content:center;"><span style="font-size:48px;opacity:0.15;font-family:'Inter Tight',sans-serif;font-weight:700;">DPP</span></div>`}
+              ${!isPublished ? '<div style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.5);color:#fff;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:3px 8px;border-radius:3px;font-weight:500;">Draft</div>' : ''}
+            </div>
+            <div class="uq-gallery-card-title">${dppName}</div>
+            ${dppCategory ? `<div class="uq-gallery-card-type">${dppCategory}${!isPublished ? ' &middot; Not published' : ''}</div>` : (!isPublished ? '<div class="uq-gallery-card-type">Not published</div>' : '')}
+          </a>`;
+        }).join('')}
       </div>
     </div>
     <p class="uq-gallery-hint">&larr; Scroll &rarr;</p>
