@@ -1896,7 +1896,7 @@ const BusinessProductEdit = ({
 
     return (
         <>
-            {localStorage.getItem("MyBusinessDetails") ?
+            {localStorage.getItem("MyBusinessDetails") ? (
                 <>
                     {/* {initSlug ? ( */}
                     <>
@@ -5649,10 +5649,8 @@ const BusinessProductEdit = ({
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
-                            </div>
                         </form>
 
                     </>
@@ -5678,9 +5676,11 @@ const BusinessProductEdit = ({
         <Spinner animation="border" size="sm" />
       )} */}
                 </>
-                : <p style={{ marginTop: "50px" }} className="text-center">
+            ) : (
+                <p style={{ marginTop: "50px" }} className="text-center">
                     Create a business to view business sustainability page
-                </p>}
+                </p>
+            )}
         </>
     );
 };
