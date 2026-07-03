@@ -1830,40 +1830,8 @@ export const uniqhorTemplate = (dynamic) => {
 
   <!-- Footer -->
   <footer class="uq-footer">
-    <div class="uq-footer-inner">
-      <div class="uq-footer-grid">
-        <div>
-          <p class="uq-footer-brand">ecostance</p>
-        </div>
-        <div class="uq-footer-col">
-          <h4>Our Story</h4>
-          <ul>
-            <li><a href="#about">About Us</a></li>
-            <li><a href="#technology">Technology</a></li>
-            <li><a href="#projects">Journal</a></li>
-          </ul>
-        </div>
-        <div class="uq-footer-col">
-          <h4>Support</h4>
-          <ul>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#chain">Custody</a></li>
-          </ul>
-        </div>
-        <div class="uq-footer-col">
-          <h4>Projects</h4>
-          <ul>
-            <li><a href="#projects">Renewables</a></li>
-            <li><a href="#projects">Nature Based</a></li>
-            <li><a href="#projects">Engineered Removal</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="uq-footer-bottom">
-        <p>&copy; ${new Date().getFullYear()} Ecostance</p>
-        <p>Terms and Policies</p>
-      </div>
+    <div class="uq-footer-inner" style="text-align: center;">
+      <p style="color: rgba(255,255,255,0.7); font-size: 14px;">Powered by Ecostance, all rights reserved copyright &copy; ${new Date().getFullYear()}</p>
     </div>
   </footer>
 
