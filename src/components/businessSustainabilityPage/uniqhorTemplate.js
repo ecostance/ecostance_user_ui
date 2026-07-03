@@ -212,7 +212,7 @@ export const uniqhorTemplate = (dynamic) => {
 
     .uq-hero-desc {
       margin-top: 24px;
-      max-width: 576px;
+      max-width: 100%;
       font-size: 16px;
       line-height: 1.7;
       color: rgba(255,255,255,0.9);
@@ -285,19 +285,27 @@ export const uniqhorTemplate = (dynamic) => {
 
     .uq-about-link:hover { opacity: 0.7; }
 
+    .uq-about-img-wrap {
+      order: 1;
+    }
+    .uq-about-text {
+      order: 2;
+    }
+
     @media (min-width: 768px) {
       .uq-about-inner {
         grid-template-columns: 1fr 1fr;
         gap: 80px;
         padding: 144px 48px;
       }
-      .uq-about-img { order: 2; }
+      .uq-about-img-wrap { order: 2; }
       .uq-about-text { order: 1; }
       .uq-about-text h2 { font-size: 48px; }
     }
 
     /* Stats Band */
     .uq-stats {
+      border-top: 1px solid var(--hairline);
       border-bottom: 1px solid var(--hairline);
       background: var(--canvas);
     }
@@ -931,15 +939,6 @@ export const uniqhorTemplate = (dynamic) => {
 
     .uq-cert-card {
       width: 100%;
-      background: #fff;
-      border: 1px solid var(--hairline);
-      transition: border-color 0.2s, box-shadow 0.2s;
-      overflow: hidden;
-    }
-
-    .uq-cert-card:hover {
-      border-color: rgba(0,0,0,0.2);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
 
     @media (min-width: 768px) {
@@ -951,6 +950,15 @@ export const uniqhorTemplate = (dynamic) => {
     .uq-cert-card-inner {
       display: grid;
       grid-template-columns: 1fr 96px;
+      background: #fff;
+      border: 1px solid var(--hairline);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      overflow: hidden;
+    }
+
+    .uq-cert-card-inner:hover {
+      border-color: rgba(0,0,0,0.2);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
 
     @media (min-width: 768px) {
@@ -1518,7 +1526,7 @@ export const uniqhorTemplate = (dynamic) => {
   <!-- About Founder -->
   <section class="uq-about" id="about-founder">
     <div class="uq-about-inner">
-      <div>
+      <div class="uq-about-img-wrap">
         <img
           src="${dynamic?.UI_URL || ''}/assets/images/sustainability/eco-founder.jpg"
           alt="Ecostance founder portrait"
@@ -1751,16 +1759,7 @@ export const uniqhorTemplate = (dynamic) => {
             </li>`;
           }).join('')}
 
-          <li class="uq-chain-terminal">
-            <div class="uq-chain-terminal-dot"></div>
-            <p class="uq-chain-terminal-text">Chain continues &rarr; ${dynamic.certData.length}+ retirements</p>
-          </li>
         </ol>
-
-        <div class="uq-ledger-footer">
-          <p class="uq-ledger-footer-text">Every link cryptographically signed and permanently anchored to the source registry.</p>
-          <a href="#chain" class="uq-ledger-cta">Explore full ledger &rarr;</a>
-        </div>
       </div>
     </div>
   </section>` : ''}

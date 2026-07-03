@@ -126,6 +126,48 @@ const Cancel = ({
     metricDetails();
   }, [])
 
+  useEffect(() => {
+    const handleMouseHover = (e) => {
+      const item = e.currentTarget;
+      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      const images = document.querySelectorAll('.uq-method-visual img');
+      if (!items.length || !images.length) return;
+
+      const idx = item.getAttribute('data-index');
+      items.forEach((el) => el.classList.remove('uq-active'));
+      item.classList.add('uq-active');
+      images.forEach((img) => {
+        if (img.getAttribute('data-img') === idx) {
+          img.classList.remove('uq-img-hidden');
+          img.classList.add('uq-img-visible');
+        } else {
+          img.classList.remove('uq-img-visible');
+          img.classList.add('uq-img-hidden');
+        }
+      });
+    };
+
+    const attachListeners = () => {
+      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      items.forEach((item) => {
+        item.addEventListener('mouseenter', handleMouseHover);
+        item.addEventListener('focus', handleMouseHover);
+      });
+    };
+
+    attachListeners();
+    const timer = setTimeout(attachListeners, 500);
+
+    return () => {
+      clearTimeout(timer);
+      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      items.forEach((item) => {
+        item.removeEventListener('mouseenter', handleMouseHover);
+        item.removeEventListener('focus', handleMouseHover);
+      });
+    };
+  });
+
   const filteredProductData = async () => {
     const response = await getAllBusinessOrders(1);
     const allOrders = response?.data?.data || [];
