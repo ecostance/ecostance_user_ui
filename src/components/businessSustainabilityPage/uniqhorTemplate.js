@@ -861,7 +861,7 @@ export const uniqhorTemplate = (dynamic) => {
     .uq-chain-item {
       position: relative;
       padding-left: 56px;
-      padding-bottom: 56px;
+      padding-bottom: 72px;
     }
 
     .uq-chain-item:last-child { padding-bottom: 0; }
@@ -946,34 +946,35 @@ export const uniqhorTemplate = (dynamic) => {
 
     @media (min-width: 768px) {
       .uq-cert-card { width: 46%; }
-      .uq-cert-card-left { margin-right: auto; padding-right: 24px; }
-      .uq-cert-card-right { margin-left: auto; padding-left: 24px; }
+      .uq-cert-card-left { margin-right: auto; padding-right: 28px; }
+      .uq-cert-card-right { margin-left: auto; padding-left: 28px; }
     }
 
     .uq-cert-card-inner {
       display: grid;
-      grid-template-columns: 1fr 96px;
+      grid-template-columns: 1fr 110px;
       background: #fff;
       border: 1px solid var(--hairline);
+      border-radius: 8px;
       transition: border-color 0.2s, box-shadow 0.2s;
       overflow: hidden;
     }
 
     .uq-cert-card-inner:hover {
       border-color: rgba(0,0,0,0.2);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     @media (min-width: 768px) {
-      .uq-cert-card-inner { grid-template-columns: 1fr 120px; }
+      .uq-cert-card-inner { grid-template-columns: 1fr 140px; }
     }
 
     .uq-cert-body {
-      padding: 20px;
+      padding: 24px 20px;
     }
 
     @media (min-width: 768px) {
-      .uq-cert-body { padding: 24px; }
+      .uq-cert-body { padding: 28px 28px; }
     }
 
     .uq-cert-tags {
@@ -1568,34 +1569,7 @@ export const uniqhorTemplate = (dynamic) => {
     </div>
   </section>
 
-  <!-- Product Gallery -->
-  ${uniqueProducts.length > 0 ? `
-  <section class="uq-gallery" id="projects">
-    <div class="uq-gallery-header">
-      <p class="eyebrow">Digital Product Passport</p>
-      <h2>Every project, documented.</h2>
-      <p>From source to certificate, each offset in our portfolio carries a Digital Product Passport — accessible, auditable, and independent.</p>
-    </div>
-    <div class="uq-gallery-scroll">
-      <div class="uq-gallery-track">
-        ${uniqueProducts.map(prod => `
-          <a href="#chain" class="uq-gallery-card">
-            <div class="uq-gallery-img-wrap">
-              <img
-                src="${prod?.thumbImage?.[0] || ''}"
-                alt="${prod?.name || 'Project'}"
-                loading="lazy"
-                class="uq-gallery-img"
-              />
-            </div>
-            <div class="uq-gallery-card-title">${prod?.name || 'Project'}</div>
-            <div class="uq-gallery-card-type">Carbon Offset</div>
-          </a>
-        `).join('')}
-      </div>
-    </div>
-    <p class="uq-gallery-hint">&larr; Scroll &rarr;</p>
-  </section>` : ''}
+
 
   <!-- Digital Product Passport -->
   ${dynamic?.dppProducts && dynamic.dppProducts.length > 0 ? `
@@ -1919,6 +1893,13 @@ export const uniqhorTemplate = (dynamic) => {
       // Drag to scroll for uq-gallery-scroll containers
       var sliders = document.querySelectorAll('.uq-gallery-scroll');
       sliders.forEach(function(slider) {
+        // Mouse wheel horizontal scroll
+        slider.addEventListener('wheel', function(e) {
+          if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+            e.preventDefault();
+            slider.scrollLeft += e.deltaY;
+          }
+        }, { passive: false });
         var isDown = false;
         var startX;
         var scrollLeft;
