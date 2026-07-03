@@ -391,6 +391,8 @@ export const uniqhorTemplate = (dynamic) => {
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       overscroll-behavior-x: contain;
+      cursor: grab;
+      user-select: none;
     }
 
     .uq-gallery-scroll::-webkit-scrollbar { display: none; }
@@ -1778,7 +1780,10 @@ export const uniqhorTemplate = (dynamic) => {
                       ${cert?.quantity ? `<strong>${cert.quantity} tCO\u2082e</strong>` : ''}
                     </div>
                     <h4 class="uq-cert-project">${cert?.product?.name || 'Certificate'}</h4>
-                    <p class="uq-cert-desc">${cert?.product?.description || ''}</p>
+                    <p class="uq-cert-desc">${(function() {
+                      const desc = cert?.product?.shortDescription || cert?.product?.description || '';
+                      return desc.length > 120 ? desc.substring(0, 120) + '...' : desc;
+                    })()}</p>
                     ${cert?.certificate?.certificateURL ? `<a href="${cert.certificate.certificateURL}" target="_blank" class="uq-cert-link">View Passport &rarr;</a>` : ''}
                   </div>
                   ${cert?.product?.thumbImage?.[0] ? `
@@ -1867,46 +1872,98 @@ export const uniqhorTemplate = (dynamic) => {
     </div>
   </footer>
 
-  <!-- Hover Interaction Script -->
+  <!-- Hover Interaction & Drag-to-Scroll Script -->
   <script>
     (function() {
+      // Hover/focus interaction for method items
       var items = document.querySelectorAll('#uq-method-list .uq-method-item');
       var images = document.querySelectorAll('.uq-method-visual img');
-      if (!items.length || !images.length) return;
-
-      items.forEach(function(item) {
-        item.addEventListener('mouseenter', function() {
-          var idx = this.getAttribute('data-index');
-          items.forEach(function(el) {
-            el.classList.remove('uq-active');
+      if (items.length && images.length) {
+        items.forEach(function(item) {
+          item.addEventListener('mouseenter', function() {
+            var idx = this.getAttribute('data-index');
+            items.forEach(function(el) {
+              el.classList.remove('uq-active');
+            });
+            this.classList.add('uq-active');
+            images.forEach(function(img) {
+              if (img.getAttribute('data-img') === idx) {
+                img.classList.remove('uq-img-hidden');
+                img.classList.add('uq-img-visible');
+              } else {
+                img.classList.remove('uq-img-visible');
+                img.classList.add('uq-img-hidden');
+              }
+            });
           });
-          this.classList.add('uq-active');
-          images.forEach(function(img) {
-            if (img.getAttribute('data-img') === idx) {
-              img.classList.remove('uq-img-hidden');
-              img.classList.add('uq-img-visible');
-            } else {
-              img.classList.remove('uq-img-visible');
-              img.classList.add('uq-img-hidden');
-            }
+
+          item.addEventListener('focus', function() {
+            var idx = this.getAttribute('data-index');
+            items.forEach(function(el) {
+              el.classList.remove('uq-active');
+            });
+            this.classList.add('uq-active');
+            images.forEach(function(img) {
+              if (img.getAttribute('data-img') === idx) {
+                img.classList.remove('uq-img-hidden');
+                img.classList.add('uq-img-visible');
+              } else {
+                img.classList.remove('uq-img-visible');
+                img.classList.add('uq-img-hidden');
+              }
+            });
           });
         });
+      }
 
-        item.addEventListener('focus', function() {
-          var idx = this.getAttribute('data-index');
-          items.forEach(function(el) {
-            el.classList.remove('uq-active');
-          });
-          this.classList.add('uq-active');
-          images.forEach(function(img) {
-            if (img.getAttribute('data-img') === idx) {
-              img.classList.remove('uq-img-hidden');
-              img.classList.add('uq-img-visible');
-            } else {
-              img.classList.remove('uq-img-visible');
-              img.classList.add('uq-img-hidden');
-            }
-          });
+      // Drag to scroll for uq-gallery-scroll containers
+      var sliders = document.querySelectorAll('.uq-gallery-scroll');
+      sliders.forEach(function(slider) {
+        var isDown = false;
+        var startX;
+        var scrollLeft;
+        var moved = false;
+
+        slider.addEventListener('mousedown', function(e) {
+          isDown = true;
+          slider.style.cursor = 'grabbing';
+          slider.style.scrollSnapType = 'none';
+          startX = e.pageX - slider.offsetLeft;
+          scrollLeft = slider.scrollLeft;
+          moved = false;
+        });
+
+        slider.addEventListener('mouseleave', function() {
+          isDown = false;
+          slider.style.cursor = 'grab';
+          slider.style.scrollSnapType = 'x mandatory';
+        });
+
+        slider.addEventListener('mouseup', function() {
+          isDown = false;
+          slider.style.cursor = 'grab';
+          slider.style.scrollSnapType = 'x mandatory';
+        });
+
+        slider.addEventListener('mousemove', function(e) {
+          if (!isDown) return;
+          e.preventDefault();
+          var x = e.pageX - slider.offsetLeft;
+          var walk = (x - startX) * 2;
+          if (Math.abs(walk) > 5) {
+            moved = true;
+          }
+          slider.scrollLeft = scrollLeft - walk;
+        });
+
+        slider.addEventListener('dragstart', function(e) {
+          e.preventDefault();
+        });
+
+        slider.addEventListener('click', function(e) {
+          if (moved) {
+            e.preventDefault();
+          }
         });
       });
     })();
