@@ -55,11 +55,18 @@ const Cancel = ({
   const [products, setProducts] = useState([]);
   const [projects, setProjects] = useState([]);
   const [metricData , setMetricData] = useState("")
+  const [dppProducts, setDppProducts] = useState([])
   const { addToast } = useToasts();
 
   useEffect(() => {
     filteredProductData();
     metricDetails();
+  }, [])
+
+  useEffect(() => {
+    if (userSettings?.dppProducts?.length) {
+      setDppProducts(userSettings.dppProducts)
+    }
   }, [])
 
   useEffect(() => {
@@ -396,7 +403,7 @@ width="125"
         description: sustainData?.description,
         title: sustainData?.title,
         certData: userCertificates,
-        dppProducts: userSettings?.dppProducts || [],
+        dppProducts: dppProducts,
         name: sustainData?.name,
         phone: sustainData?.phone,
         email: sustainData?.email,
@@ -434,7 +441,7 @@ width="125"
         description: currentUserSettings?.description,
         title: currentUserSettings?.title,
         certData: userSettings?.userCertificates,
-        dppProducts: userSettings?.dppProducts || [],
+        dppProducts: dppProducts,
         name: currentUserSettings?.name,
         phone: currentUserSettings?.phone,
         email: currentUserSettings?.email,

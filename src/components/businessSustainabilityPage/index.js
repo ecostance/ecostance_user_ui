@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { getAllOrders } from "src/apiClient/orders";
 import router, { useRouter } from "next/router";
-import { getAllBusinessOrders, getAllSupportedProducts } from "src/apiClient/business";
+import { getAllBusinessOrders, getAllSupportedProducts, getBusinessProduct } from "src/apiClient/business";
 import {
   publishBusinessPage,
   updateUserBusinessSettingInfo,
@@ -60,6 +60,7 @@ const Cancel = ({
   const [ghgValues, setGHGvalues] = useState("")
   const [treesData, setTreesData] = useState("")
   const [supportProj, setSupportProj] = useState("")
+  const [dppProducts, setDppProducts] = useState([])
   const { addToast } = useToasts();
   console.log(allProductData, "allproducts")
   console.log(userData, sustainData, "themedata")
@@ -124,6 +125,17 @@ const Cancel = ({
   useEffect(() => {
     filteredProductData();
     metricDetails();
+  }, [])
+
+  useEffect(() => {
+    if (userSettings?.dppProducts?.length) {
+      setDppProducts(userSettings.dppProducts)
+    } else {
+      getBusinessProduct().then((res) => {
+        const products = res?.data?.data || []
+        setDppProducts(products.filter(p => p.isPublic !== undefined))
+      }).catch(() => {})
+    }
   }, [])
 
   useEffect(() => {
@@ -421,7 +433,7 @@ width="125"
         description: sustainData?.description,
         title: sustainData?.title,
         certData: userCertificates,
-        dppProducts: userSettings?.dppProducts || [],
+        dppProducts: dppProducts,
         name: sustainData?.name,
         phone: sustainData?.phone,
         email: sustainData?.email,
@@ -459,7 +471,7 @@ width="125"
         description: currentUserSettings?.description,
         title: currentUserSettings?.title,
         certData: userSettings?.userCertificates,
-        dppProducts: userSettings?.dppProducts || [],
+        dppProducts: dppProducts,
         name: currentUserSettings?.name,
         phone: currentUserSettings?.phone,
         email: currentUserSettings?.email,
