@@ -758,11 +758,11 @@ export const uniqhorTemplate = (dynamic) => {
     .uq-chain {
       background: #ebebeb;
       border-top: 1px solid var(--hairline);
-      padding: 80px 24px;
+      padding: 96px 24px;
     }
 
     @media (max-width: 768px) {
-      .uq-chain { padding: 48px 16px; }
+      .uq-chain { padding: 56px 16px; }
     }
 
     .uq-chain-inner {
@@ -792,33 +792,34 @@ export const uniqhorTemplate = (dynamic) => {
     }
 
     .uq-chain-subtitle {
-      margin-top: 20px;
+      margin-top: 16px;
       font-size: 15px;
-      line-height: 1.8;
+      line-height: 1.7;
       color: var(--ink-soft);
       max-width: 640px;
     }
 
     .uq-chain-list {
       position: relative;
-      margin-top: 48px;
-      padding-left: 32px;
+      margin-top: 64px;
+      padding-left: 0;
       list-style: none;
     }
 
     .uq-chain-line {
       position: absolute;
       left: 16px;
-      top: 8px;
-      bottom: 8px;
+      top: 12px;
+      bottom: 12px;
       width: 1px;
-      background: rgba(0, 0, 0, 0.1);
+      background: rgba(0, 0, 0, 0.15);
       transform: translateX(-50%);
     }
 
     .uq-chain-item {
       position: relative;
-      margin-bottom: 48px;
+      padding-left: 40px;
+      margin-bottom: 72px;
     }
 
     .uq-chain-item:last-child { margin-bottom: 0; }
@@ -826,12 +827,13 @@ export const uniqhorTemplate = (dynamic) => {
     .uq-chain-dot {
       position: absolute;
       left: 16px;
-      top: 12px;
-      width: 8px;
-      height: 8px;
-      border: 1px solid rgba(0, 0, 0, 0.4);
+      top: 10px;
+      width: 9px;
+      height: 9px;
+      border: 1px solid rgba(0, 0, 0, 0.5);
       background: #ebebeb;
       transform: translate(-50%, 0) rotate(45deg);
+      z-index: 2;
     }
 
     .uq-chain-card {
@@ -845,30 +847,30 @@ export const uniqhorTemplate = (dynamic) => {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      background: rgba(255, 255, 255, 0.5);
-      padding: 4px 10px;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 0.7);
+      padding: 5px 12px;
       font-size: 10px;
       font-family: monospace;
       font-weight: 500;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: rgba(0, 0, 0, 0.6);
+      color: rgba(0, 0, 0, 0.65);
       margin-bottom: 16px;
       width: fit-content;
     }
 
     .uq-chain-date {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 500;
       color: rgba(0, 0, 0, 0.5);
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .uq-chain-qty {
-      font-size: 12px;
-      color: rgba(0, 0, 0, 0.8);
-      margin-bottom: 16px;
+      font-size: 13px;
+      color: rgba(0, 0, 0, 0.75);
+      margin-bottom: 24px;
     }
 
     .uq-chain-qty strong {
@@ -878,31 +880,32 @@ export const uniqhorTemplate = (dynamic) => {
 
     .uq-chain-project {
       font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 20px;
-      font-weight: 300;
+      font-size: 24px;
+      font-weight: 400;
       letter-spacing: -0.02em;
       color: #000;
-      margin-bottom: 8px;
+      margin-bottom: 16px;
     }
 
     .uq-chain-desc {
       font-size: 14px;
-      line-height: 1.6;
-      color: rgba(0, 0, 0, 0.6);
-      margin-bottom: 16px;
+      line-height: 1.7;
+      color: rgba(0, 0, 0, 0.65);
+      margin-bottom: 24px;
+      max-width: 620px;
     }
 
     .uq-chain-view-link {
       display: inline-block;
-      padding: 8px 16px;
+      padding: 10px 20px;
       font-size: 11px;
       font-weight: 500;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgba(0, 0, 0, 0.8);
-      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: rgba(0, 0, 0, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.2);
       text-decoration: none;
-      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      transition: all 0.2s ease;
     }
 
     .uq-chain-view-link:hover {
@@ -916,14 +919,15 @@ export const uniqhorTemplate = (dynamic) => {
       aspect-ratio: 4 / 3;
       width: 100%;
       overflow: hidden;
-      background: var(--canvas);
+      background: #e2e0dc;
+      border-radius: 2px;
     }
 
     .uq-chain-img {
       height: 100%;
       width: 100%;
       object-fit: cover;
-      transition: transform 0.5s;
+      transition: transform 0.5s ease;
     }
 
     .uq-chain-card:hover .uq-chain-img {
@@ -931,27 +935,26 @@ export const uniqhorTemplate = (dynamic) => {
     }
 
     @media (min-width: 768px) {
-      .uq-chain-list {
-        padding-left: 64px;
-      }
       .uq-chain-line {
-        left: 32px;
-      }
-      .uq-chain-dot {
-        left: 32px;
+        left: 28px;
       }
       .uq-chain-item {
-        margin-bottom: 64px;
+        padding-left: 64px;
+        margin-bottom: 80px;
+      }
+      .uq-chain-dot {
+        left: 28px;
+        top: 10px;
       }
       .uq-chain-card {
-        grid-template-columns: 1fr 240px;
-        gap: 40px;
+        grid-template-columns: 1fr 280px;
+        gap: 48px;
       }
       .uq-chain-img-wrap {
-        width: 240px;
+        width: 280px;
       }
       .uq-chain-project {
-        font-size: 24px;
+        font-size: 30px;
       }
       .uq-chain-date {
         font-size: 14px;
