@@ -756,7 +756,7 @@ export const uniqhorTemplate = (dynamic) => {
 
     /* Chain of Custody */
     .uq-chain {
-      background: var(--canvas-alt);
+      background: #ebebeb;
       border-top: 1px solid var(--hairline);
       padding: 80px 24px;
     }
@@ -801,36 +801,37 @@ export const uniqhorTemplate = (dynamic) => {
 
     .uq-chain-list {
       position: relative;
-      margin-top: 40px;
+      margin-top: 48px;
       padding-left: 32px;
       list-style: none;
     }
 
     .uq-chain-line {
       position: absolute;
-      left: 5px;
+      left: 16px;
       top: 8px;
       bottom: 8px;
       width: 1px;
-      background: var(--hairline);
+      background: rgba(0, 0, 0, 0.1);
+      transform: translateX(-50%);
     }
 
     .uq-chain-item {
       position: relative;
-      margin-bottom: 56px;
+      margin-bottom: 48px;
     }
 
     .uq-chain-item:last-child { margin-bottom: 0; }
 
     .uq-chain-dot {
       position: absolute;
-      left: -32px;
+      left: 16px;
       top: 12px;
-      width: 10px;
-      height: 10px;
-      border: 1px solid var(--ink);
-      background: var(--canvas-alt);
-      transform: rotate(45deg);
+      width: 8px;
+      height: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.4);
+      background: #ebebeb;
+      transform: translate(-50%, 0) rotate(45deg);
     }
 
     .uq-chain-card {
@@ -840,62 +841,54 @@ export const uniqhorTemplate = (dynamic) => {
       gap: 24px;
     }
 
-    @media (min-width: 768px) {
-      .uq-chain-card {
-        grid-template-columns: 1fr 240px;
-        gap: 40px;
-      }
-    }
-
     .uq-chain-cert-tag {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      border: 1px solid var(--hairline);
-      background: #fff;
-      padding: 6px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.5);
+      padding: 4px 10px;
       font-size: 10px;
+      font-family: monospace;
       font-weight: 500;
-      letter-spacing: 0.20em;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: var(--ink-soft);
+      color: rgba(0, 0, 0, 0.6);
       margin-bottom: 16px;
+      width: fit-content;
     }
 
     .uq-chain-date {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.5);
+      margin-bottom: 4px;
     }
 
     .uq-chain-qty {
-      font-size: 13px;
-      color: var(--muted);
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.8);
       margin-bottom: 16px;
     }
 
     .uq-chain-qty strong {
-      color: var(--ink);
+      color: #000;
+      font-weight: 600;
     }
 
     .uq-chain-project {
       font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 300;
       letter-spacing: -0.02em;
-      color: var(--ink);
-      margin-bottom: 12px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-project { font-size: 32px; }
+      color: #000;
+      margin-bottom: 8px;
     }
 
     .uq-chain-desc {
       font-size: 14px;
       line-height: 1.6;
-      color: var(--ink-soft);
-      max-width: 576px;
+      color: rgba(0, 0, 0, 0.6);
       margin-bottom: 16px;
     }
 
@@ -906,38 +899,66 @@ export const uniqhorTemplate = (dynamic) => {
       font-weight: 500;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--ink);
-      border: 1px solid var(--hairline);
+      color: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.1);
       text-decoration: none;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
     }
 
     .uq-chain-view-link:hover {
-      background: var(--ink);
+      background: #000;
       color: #fff;
+      border-color: #000;
     }
 
     .uq-chain-img-wrap {
       position: relative;
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 4 / 3;
       width: 100%;
       overflow: hidden;
       background: var(--canvas);
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-img-wrap { width: 240px; }
     }
 
     .uq-chain-img {
       height: 100%;
       width: 100%;
       object-fit: cover;
-      transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.5s;
     }
 
     .uq-chain-card:hover .uq-chain-img {
       transform: scale(1.04);
+    }
+
+    @media (min-width: 768px) {
+      .uq-chain-list {
+        padding-left: 64px;
+      }
+      .uq-chain-line {
+        left: 32px;
+      }
+      .uq-chain-dot {
+        left: 32px;
+      }
+      .uq-chain-item {
+        margin-bottom: 64px;
+      }
+      .uq-chain-card {
+        grid-template-columns: 1fr 240px;
+        gap: 40px;
+      }
+      .uq-chain-img-wrap {
+        width: 240px;
+      }
+      .uq-chain-project {
+        font-size: 24px;
+      }
+      .uq-chain-date {
+        font-size: 14px;
+      }
+      .uq-chain-qty {
+        font-size: 14px;
+      }
     }
 
     /* Ledger Footer */
@@ -1170,103 +1191,35 @@ export const uniqhorTemplate = (dynamic) => {
 
     /* Footer */
     .uq-footer {
-      background: oklch(0.20 0.005 80);
-      color: #fff;
+      background: #18181b;
+      color: rgba(255, 255, 255, 0.6);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 40px 24px;
     }
-
     .uq-footer-inner {
-      max-width: 1600px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 64px 24px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-footer-inner { padding: 80px 48px; }
-    }
-
-    .uq-footer-grid {
-      display: grid;
-      gap: 40px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-footer-grid {
-        grid-template-columns: 1.5fr 1fr 1fr;
-        gap: 40px;
-      }
-    }
-
-    .uq-footer-brand {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 30px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      text-transform: lowercase;
-      color: #fff;
-    }
-
-    .uq-footer-col h4 {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: #fff;
-    }
-
-    .uq-footer-col ul {
-      list-style: none;
-    }
-
-    .uq-footer-col li {
-      margin-bottom: 8px;
-    }
-
-    .uq-footer-col a {
-      font-size: 14px;
-      color: rgba(255,255,255,0.7);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .uq-footer-col a:hover { color: #fff; }
-
-    .uq-footer-divider {
-      width: 100%;
-      height: 1px;
-      background: rgba(255,255,255,0.15);
-      margin-top: 48px;
-    }
-
-    .uq-footer-bottom {
-      padding-top: 24px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
+      gap: 24px;
     }
-
     @media (min-width: 768px) {
-      .uq-footer-bottom {
+      .uq-footer-inner {
         flex-direction: row;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
       }
     }
-
-    .uq-footer-socials {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .uq-footer-socials a {
-      color: rgba(255,255,255,0.6);
-      transition: color 0.2s;
-      display: inline-flex;
-    }
-
-    .uq-footer-socials a:hover {
+    .uq-footer-brand {
       color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    .uq-footer-copy {
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.5);
     }
 
     /* Social Links */
@@ -1616,36 +1569,8 @@ export const uniqhorTemplate = (dynamic) => {
   <!-- Footer -->
   <footer class="uq-footer">
     <div class="uq-footer-inner">
-      <div class="uq-footer-grid">
-        <div class="uq-footer-brand">${dynamic?.companyName || 'ecostance'}</div>
-        <div class="uq-footer-col">
-          <h4>Navigation</h4>
-          <ul>
-            <li><a href="#about">About</a></li>
-            <li><a href="#chain">Chain of Custody</a></li>
-            <li><a href="#projects">Products</a></li>
-          </ul>
-        </div>
-        <div class="uq-footer-col">
-          <h4>Connect</h4>
-          <ul>
-            ${dynamic?.showTwitter && dynamic?.twitter ? `<li><a href="${dynamic.twitter}" target="_blank">Twitter</a></li>` : ''}
-            ${dynamic?.showLinkedin && dynamic?.linkedin ? `<li><a href="${dynamic.linkedin}" target="_blank">LinkedIn</a></li>` : ''}
-            ${dynamic?.showInstagram && dynamic?.instagram ? `<li><a href="${dynamic.instagram}" target="_blank">Instagram</a></li>` : ''}
-            ${dynamic?.showFacebook && dynamic?.facebook ? `<li><a href="${dynamic.facebook}" target="_blank">Facebook</a></li>` : ''}
-          </ul>
-        </div>
-      </div>
-      <div class="uq-footer-divider"></div>
-      <div class="uq-footer-bottom">
-        <p>&copy; ${new Date().getFullYear()} ${dynamic?.companyName || 'ecostance'}</p>
-        <div class="uq-footer-socials">
-          ${dynamic?.showTwitter && dynamic?.twitter ? `<a href="${dynamic.twitter}" target="_blank" aria-label="Twitter"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>` : ''}
-          ${dynamic?.showLinkedin && dynamic?.linkedin ? `<a href="${dynamic.linkedin}" target="_blank" aria-label="LinkedIn"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>` : ''}
-          ${dynamic?.showInstagram && dynamic?.instagram ? `<a href="${dynamic.instagram}" target="_blank" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>` : ''}
-          ${dynamic?.showFacebook && dynamic?.facebook ? `<a href="${dynamic.facebook}" target="_blank" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>` : ''}
-        </div>
-      </div>
+      <div class="uq-footer-brand">${dynamic?.companyName || 'ecostance'}</div>
+      <p class="uq-footer-copy">&copy; ${new Date().getFullYear()} &mdash; Carbon chain of custody</p>
     </div>
   </footer>
 
