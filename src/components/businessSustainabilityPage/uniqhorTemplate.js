@@ -1194,35 +1194,111 @@ export const uniqhorTemplate = (dynamic) => {
 
     /* Footer */
     .uq-footer {
-      background: #18181b;
-      color: rgba(255, 255, 255, 0.6);
+      background: #2b2e34;
+      color: #fff;
+      padding: 64px 24px 32px;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 40px 24px;
     }
     .uq-footer-inner {
       max-width: 1400px;
       margin: 0 auto;
+    }
+    .uq-footer-main {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 40px;
     }
     @media (min-width: 768px) {
-      .uq-footer-inner {
+      .uq-footer-main {
         flex-direction: row;
-        align-items: center;
         justify-content: space-between;
+        align-items: flex-start;
       }
     }
     .uq-footer-brand {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
       color: #fff;
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
     }
-    .uq-footer-copy {
-      font-size: 11px;
-      letter-spacing: 0.05em;
+    .uq-footer-cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+    }
+    @media (max-width: 600px) {
+      .uq-footer-cols {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+    }
+    .uq-footer-col h4 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .uq-footer-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .uq-footer-col li {
+      margin-bottom: 10px;
+    }
+    .uq-footer-col a {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.65);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .uq-footer-col a:hover {
+      color: #fff;
+    }
+    .uq-footer-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.12);
+      margin: 48px 0 24px;
+    }
+    .uq-footer-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      text-align: center;
+      font-size: 12px;
       color: rgba(255, 255, 255, 0.5);
+    }
+    @media (min-width: 768px) {
+      .uq-footer-bottom {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+      }
+    }
+    .uq-footer-policies a {
+      color: rgba(255, 255, 255, 0.5);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .uq-footer-policies a:hover {
+      color: rgba(255, 255, 255, 0.85);
+    }
+    .uq-footer-socials {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .uq-footer-socials a {
+      color: rgba(255, 255, 255, 0.65);
+      transition: color 0.2s;
+      font-size: 16px;
+    }
+    .uq-footer-socials a:hover {
+      color: #fff;
     }
 
     /* Social Links */
@@ -1560,20 +1636,52 @@ export const uniqhorTemplate = (dynamic) => {
     </div>
   </section>` : ''}
 
-  <!-- Contact -->
-  ${(dynamic?.showName && dynamic?.name) || (dynamic?.showEmail && dynamic?.email) || (dynamic?.showPhone && dynamic?.phone) ? `
-  <section class="uq-contact">
-    ${dynamic?.showName && dynamic?.name ? `<p>${dynamic.name}</p>` : ''}
-    ${dynamic?.showEmail && dynamic?.email ? `<p><a href="mailto:${dynamic.email}">${dynamic.email}</a></p>` : ''}
-    ${dynamic?.showPhone && dynamic?.phone ? `<p>${dynamic.phone}</p>` : ''}
-    ${dynamic?.countryPicture ? `<p>${dynamic.countryPicture}</p>` : ''}
-  </section>` : ''}
-
   <!-- Footer -->
   <footer class="uq-footer">
     <div class="uq-footer-inner">
-      <div class="uq-footer-brand">${dynamic?.companyName || 'ecostance'}</div>
-      <p class="uq-footer-copy">&copy; ${new Date().getFullYear()} &mdash; Carbon chain of custody</p>
+      <div class="uq-footer-main">
+        <div class="uq-footer-brand">${dynamic?.companyName || 'uniqohr'}</div>
+        <div class="uq-footer-cols">
+          <div class="uq-footer-col">
+            <h4>Our Story</h4>
+            <ul>
+              <li><a href="${dynamic?.aboutUsURL || '#about'}">About Us</a></li>
+              <li><a href="#method">Technology</a></li>
+              <li><a href="#journal">Journal</a></li>
+            </ul>
+          </div>
+          <div class="uq-footer-col">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="#faq">FAQ</a></li>
+              <li><a href="${dynamic?.contactPageURL || '#contact'}">Contact</a></li>
+              <li><a href="#fit-guide">Fit Guide</a></li>
+              <li><a href="#garment-care">Garment Care</a></li>
+            </ul>
+          </div>
+          <div class="uq-footer-col">
+            <h4>Shop</h4>
+            <ul>
+              <li><a href="#bestsellers">Bestsellers</a></li>
+              <li><a href="#men">Men</a></li>
+              <li><a href="#women">Women</a></li>
+              <li><a href="#accessories">Accessories</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="uq-footer-divider"></div>
+      <div class="uq-footer-bottom">
+        <div>&copy; ${new Date().getFullYear()} ${dynamic?.companyName || 'Uniqohr'}</div>
+        <div class="uq-footer-policies"><a href="#terms">Terms and Policies</a></div>
+        <div class="uq-footer-socials">
+          ${dynamic?.showFacebook && dynamic?.facebook ? `<a href="${dynamic.facebook}" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>` : `<a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>`}
+          ${dynamic?.showInstagram && dynamic?.instagram ? `<a href="${dynamic.instagram}" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>` : `<a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>`}
+          <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          ${dynamic?.showTwitter && dynamic?.twitter ? `<a href="${dynamic.twitter}" target="_blank" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>` : `<a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>`}
+        </div>
+      </div>
     </div>
   </footer>
 
