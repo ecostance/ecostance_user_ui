@@ -27,15 +27,7 @@ const characterGenerator = (text, arc, radius, className = "", scale = 1) => {
 };
 
 const returnReversedString = (str) => {
-  const strArray = str.split("");
-
-  const returnStr = "";
-
-  for (let i = strArray.length - 1; i >= 0; i--) {
-    returnStr += strArray[i];
-  }
-
-  return returnStr;
+  return str.split("").reverse().join("");
 };
 
 const Circular = ({
@@ -137,8 +129,6 @@ const Circular = ({
     return formatCurrency((price * Math.round(tons))?.toFixed(2), currencyCode);
   };
 
-  const [value, setValue] = useState(value);
-
   const [priceValue, setPriceValue] = useState(0);
 
   const circleRef = useRef(null);
@@ -167,7 +157,6 @@ const Circular = ({
           knobSize={51.52 * scaleFactor}
           data={generateTonsArray()}
           dataIndex={isSingleTon ? generateTonsArray().length - 1 : staticDataIndex}
-          value={value}
           onChange={(value) => {
             if (isSingleTon) return;
             setNewTons(Number(value.split("Tons")[0]));

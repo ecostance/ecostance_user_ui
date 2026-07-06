@@ -1991,7 +1991,7 @@ const BusinessProduct = ({
 
             const qrCodeWidth = canvas.width;
             const qrCodeHeight = canvas.height;
-            
+
             // Find the bounding box of the non-white pixels of the QR code to strip its built-in margins
             const sourceCtx = canvas.getContext("2d");
             let minX = qrCodeWidth;
@@ -2009,7 +2009,7 @@ const BusinessProduct = ({
                         const g = data[idx + 1];
                         const b = data[idx + 2];
                         const a = data[idx + 3];
-                        
+
                         // If pixel is not white (threshold: R, G, B less than 240) and has opacity
                         if (a > 50 && (r < 240 || g < 240 || b < 240)) {
                             if (x < minX) minX = x;
@@ -2071,11 +2071,11 @@ const BusinessProduct = ({
                     const logoSize = Math.min(scaledWidth, scaledHeight) * 0.22;
                     const logoX = centerX - logoSize / 2;
                     const logoY = centerY - logoSize / 2;
-                    
+
                     // Draw a white background square behind the logo (scaled margin of 6px)
                     ctx.fillStyle = "#FFFFFF";
                     ctx.fillRect(logoX - 6, logoY - 6, logoSize + 12, logoSize + 12);
-                    
+
                     ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
                     resolve();
                 };
@@ -3993,7 +3993,7 @@ const BusinessProduct = ({
                             </div>
                             <div
                                 className="sustainability--each-template"
-                                onClick={() => setThemeSelected("green")}
+                                onClick={() => setThemeSelected("template4")}
                             >
                                 <div className="sustainability--each-template-image-holder">
                                     <img
@@ -4007,7 +4007,7 @@ const BusinessProduct = ({
                                 <div className="sustainability--each-template-text-select-holder">
                                     <p>Template 4</p>
                                     <div
-                                        className={`sustainability--each-template-check-holder ${themeSelected === "green" ? "template-clicked" : ""
+                                        className={`sustainability--each-template-check-holder ${themeSelected === "template4" ? "template-clicked" : ""
                                             }`}
                                     >
                                         {" "}
@@ -4226,6 +4226,60 @@ const BusinessProduct = ({
                                     </div>
                                 </div>
                             </div>
+                            <div
+                                className="sustainability--each-template"
+                                onClick={() => setThemeSelected("template8")}
+                            >
+                                <div className="sustainability--each-template-image-holder">
+                                    <img
+                                        src={
+                                            process.env.NEXT_PUBLIC_UI_URL +
+                                            "/assets/images/sustainability/template8.png"
+                                        }
+                                        className="img-responsive"
+                                    />
+                                </div>
+                                <div className="sustainability--each-template-text-select-holder">
+                                    <p>Template 8</p>
+                                    <div
+                                        className={`sustainability--each-template-check-holder ${themeSelected === "template8" ? "template-clicked" : ""
+                                            }`}
+                                    >
+                                        <div className="big-checkmark">
+                                            <svg
+                                                width="14"
+                                                height="10"
+                                                viewBox="0 0 14 10"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    clipRule="evenodd"
+                                                    d="M13.7071 0.292893C14.0976 0.683417 14.0976 1.31658 13.7071 1.70711L5.70711 9.70711C5.31658 10.0976 4.68342 10.0976 4.29289 9.70711L0.292893 5.70711C-0.0976311 5.31658 -0.0976311 4.68342 0.292893 4.29289C0.683417 3.90237 1.31658 3.90237 1.70711 4.29289L5 7.58579L12.2929 0.292893C12.6834 -0.0976311 13.3166 -0.0976311 13.7071 0.292893Z"
+                                                    fill="white"
+                                                />
+                                            </svg>
+                                        </div>
+                                        <div className="small-checkmark">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="14"
+                                                height="14"
+                                                fill="none"
+                                                viewBox="0 0 14 14"
+                                            >
+                                                <path
+                                                    fill="#fff"
+                                                    fillRule="evenodd"
+                                                    d="M11.011 4.3a.628.628 0 010 .889l-5.026 5.027a.628.628 0 01-.89 0L2.583 7.702a.628.628 0 01.89-.888L5.54 8.883 10.123 4.3a.628.628 0 01.889 0z"
+                                                    clipRule="evenodd"
+                                                ></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             {/* <div
                                 className="sustainability--each-template"
                             onClick={() => setThemeSelected("beigelogo")}
@@ -4335,6 +4389,60 @@ const BusinessProduct = ({
                                     </div>
                                 </div>
                             </div> */}
+                            <div
+                                className="sustainability--each-template"
+                                onClick={() => setThemeSelected("template9")}
+                            >
+                                <div className="sustainability--each-template-image-holder">
+                                    <img
+                                        src={
+                                            process.env.NEXT_PUBLIC_UI_URL +
+                                            "/assets/images/sustainability/template9.png"
+                                        }
+                                        className="img-responsive"
+                                    />
+                                </div>
+                                <div className="sustainability--each-template-text-select-holder">
+                                    <p>Template 9</p>
+                                    <div
+                                        className={`sustainability--each-template-check-holder ${themeSelected === "template9" ? "template-clicked" : ""
+                                            }`}
+                                    >
+                                        <div className="big-checkmark">
+                                            <svg
+                                                width="14"
+                                                height="10"
+                                                viewBox="0 0 14 10"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    clipRule="evenodd"
+                                                    d="M13.7071 0.292893C14.0976 0.683417 14.0976 1.31658 13.7071 1.70711L5.70711 9.70711C5.31658 10.0976 4.68342 10.0976 4.29289 9.70711L0.292893 5.70711C-0.0976311 5.31658 -0.0976311 4.68342 0.292893 4.29289C0.683417 3.90237 1.31658 3.90237 1.70711 4.29289L5 7.58579L12.2929 0.292893C12.6834 -0.0976311 13.3166 -0.0976311 13.7071 0.292893Z"
+                                                    fill="white"
+                                                />
+                                            </svg>
+                                        </div>
+                                        <div className="small-checkmark">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="14"
+                                                height="14"
+                                                fill="none"
+                                                viewBox="0 0 14 14"
+                                            >
+                                                <path
+                                                    fill="#fff"
+                                                    fillRule="evenodd"
+                                                    d="M11.011 4.3a.628.628 0 010 .889l-5.026 5.027a.628.628 0 01-.89 0L2.583 7.702a.628.628 0 01.89-.888L5.54 8.883 10.123 4.3a.628.628 0 01.889 0z"
+                                                    clipRule="evenodd"
+                                                ></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <>

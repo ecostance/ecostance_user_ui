@@ -53,7 +53,7 @@ const ShopHeader = ({
                 >
                   <MdViewComfy />
                 </button>
-                {/* {listMode === false ? (
+                {listMode === false ? (
                   ""
                 ) : (
                   <button
@@ -64,7 +64,7 @@ const ShopHeader = ({
                   >
                     <MdList />
                   </button>
-                )} */}
+                )}
               </div>
 
               <div className="single-icon advance-filter-icon">

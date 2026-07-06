@@ -156,7 +156,7 @@ const Circular = ({
     if (localStorage.getItem("carbonroute") != "eventOffset") {
       localStorage.removeItem("eventOwnerOrder")
     }
-    const lowestPriceData = { price: Infinity, name: "", currencySymbol: "" };
+    let lowestPriceData = { price: Infinity, name: "", currencySymbol: "" };
     productData?.map((product) => {
       product?.priceList?.map((priceData) => {
         userData?.currency === priceData?.currency &&

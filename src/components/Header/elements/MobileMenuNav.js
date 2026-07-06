@@ -3,13 +3,20 @@ import Link from "next/link";
 
 const MobileMenuNav = ({ getActiveStatus, handleLogout, loggedInUserInfo }) => {
   // Allowed emails for Dynamic Pricing
-  const allowedEmails = ['rofep35802@calunia.com', 'tgiroti@yahoo.com', "vinu988031@gmail.com"];
-  const currentUserEmail = typeof window !== 'undefined' ? localStorage.getItem('email') : null;
+  const allowedEmails = [
+    "rofep35802@calunia.com",
+    "tgiroti@yahoo.com",
+    "vinu988031@gmail.com",
+    "rafi496@yopmail.com",
+  ];
+  const currentUserEmail =
+    typeof window !== "undefined" ? localStorage.getItem("email") : null;
   const isLoggedIn = loggedInUserInfo?.isLoggedIn || false;
-  const showDynamicPricing = isLoggedIn && allowedEmails.includes(currentUserEmail);
+  const showDynamicPricing =
+    isLoggedIn && allowedEmails.includes(currentUserEmail);
   useEffect(() => {
     const offCanvasNav = document.querySelector(
-      "#offcanvas-mobile-menu__navigation"
+      "#offcanvas-mobile-menu__navigation",
     );
     const offCanvasNavSubMenu =
       offCanvasNav.querySelectorAll(".mobile-sub-menu");
@@ -18,7 +25,7 @@ const MobileMenuNav = ({ getActiveStatus, handleLogout, loggedInUserInfo }) => {
     for (let i = 0; i < offCanvasNavSubMenu.length; i++) {
       offCanvasNavSubMenu[i].insertAdjacentHTML(
         "beforebegin",
-        "<span class='menu-expand'><i></i></span>"
+        "<span class='menu-expand'><i></i></span>",
       );
     }
 
@@ -57,7 +64,7 @@ const MobileMenuNav = ({ getActiveStatus, handleLogout, loggedInUserInfo }) => {
         </li>
         <li
           className="menu-item-has-children"
-        // onClick={() => getActiveStatus(false)}
+          // onClick={() => getActiveStatus(false)}
         >
           <Link
             href="/other/individuals"
@@ -172,7 +179,7 @@ const MobileMenuNav = ({ getActiveStatus, handleLogout, loggedInUserInfo }) => {
         </li> */}
         <li
           className="menu-item-has-children"
-        // onClick={() => getActiveStatus(false)}
+          // onClick={() => getActiveStatus(false)}
         >
           <Link href="/blog" as={process.env.PUBLIC_URL + "/blog"}>
             <a>Resources</a>
@@ -313,24 +320,36 @@ const MobileMenuNav = ({ getActiveStatus, handleLogout, loggedInUserInfo }) => {
             </li>
             <li
               className="menu-item-has-children"
-            // onClick={() => getActiveStatus(false)}
+              // onClick={() => getActiveStatus(false)}
             >
-              <Link href="/other/my-account" as={process.env.PUBLIC_URL + "/other/my-account"}>
+              <Link
+                href="/other/my-account"
+                as={process.env.PUBLIC_URL + "/other/my-account"}
+              >
                 <a>My Account</a>
               </Link>
               <ul className="mobile-sub-menu">
                 <li>
-                  <Link href="/other/my-account" as={process.env.PUBLIC_URL + "/other/my-account"}>
+                  <Link
+                    href="/other/my-account"
+                    as={process.env.PUBLIC_URL + "/other/my-account"}
+                  >
                     <a>My Personal Account</a>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/other/my-employer-account" as={process.env.PUBLIC_URL + "/other/my-employer-account"}>
+                  <Link
+                    href="/other/my-employer-account"
+                    as={process.env.PUBLIC_URL + "/other/my-employer-account"}
+                  >
                     <a>My Employer Account</a>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/other/my-business-account" as={process.env.PUBLIC_URL + "/other/my-business-account"}>
+                  <Link
+                    href="/other/my-business-account"
+                    as={process.env.PUBLIC_URL + "/other/my-business-account"}
+                  >
                     <a>My Business Account</a>
                   </Link>
                 </li>

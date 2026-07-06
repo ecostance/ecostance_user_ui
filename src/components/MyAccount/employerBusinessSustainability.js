@@ -98,6 +98,7 @@ const EmployerSustainability = ({
     const [name, setName] = useState(sustainData?.name);
     const [initSlug, setInitSlug] = useState("")
     const [fixedSlug, setFixedSlug] = useState("")
+    const [hasExistingSlug, setHasExistingSlug] = useState(false)
     const [phone, setPhone] = useState(
         sustainData?.phone ||
         ""
@@ -315,8 +316,12 @@ const EmployerSustainability = ({
         let slugValues = await employerSlugData();
         console.log(slugValues.data, "slugData12")
         if (slugValues?.data?.success) {
-            setInitSlug(slugValues.data.data?.slug)
-            setFixedSlug(slugValues?.data?.data?.slug)
+            const slug = slugValues.data.data?.slug;
+            const hasSlug = !!slug;
+            const defaultSlug = slug || "business";
+            setInitSlug(defaultSlug)
+            setFixedSlug(defaultSlug)
+            setHasExistingSlug(hasSlug)
         }
     };
 
@@ -944,8 +949,14 @@ const EmployerSustainability = ({
             (sustainabilityActionStates?.slugAvailable === SLUG_UNTOUCHED ||
                 sustainabilityActionStates?.slugAvailable === SLUG_AVAILABLE)
         ) {
-            dataForm.append("slug", fixedSlug);
-            dataForm.append("newSlug", initSlug);
+            if (!hasExistingSlug) {
+                // First time saving - only send slug
+                dataForm.append("slug", initSlug);
+            } else {
+                // Editing existing slug - send both current and new
+                dataForm.append("slug", fixedSlug);
+                dataForm.append("newSlug", initSlug);
+            }
         }
         if (phone && phone !== `+${phoneInfo?.numericCode}` && phone.length > 2) {
             const phoneDetails = returnPhoneDetails(phoneInfo);

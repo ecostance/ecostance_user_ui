@@ -305,7 +305,7 @@ const BusinessProductEdit = ({
         console.log(userData, sustainData, "usereditdata")
     }, [])
 
-    
+
 
 
 
@@ -1896,7 +1896,7 @@ const BusinessProductEdit = ({
 
     return (
         <>
-            {localStorage.getItem("MyBusinessDetails") ?
+            {localStorage.getItem("MyBusinessDetails") ? (
                 <>
                     {/* {initSlug ? ( */}
                     <>
@@ -3367,7 +3367,7 @@ const BusinessProductEdit = ({
                                         </div>
                                         <div
                                             className="sustainability--each-template"
-                                            onClick={() => setThemeSelected("green")}
+                                            onClick={() => setThemeSelected("template4")}
                                         >
                                             <div className="sustainability--each-template-image-holder">
                                                 <img
@@ -3381,10 +3381,9 @@ const BusinessProductEdit = ({
                                             <div className="sustainability--each-template-text-select-holder">
                                                 <p>Template 4</p>
                                                 <div
-                                                    className={`sustainability--each-template-check-holder ${themeSelected === "green" ? "template-clicked" : ""
+                                                    className={`sustainability--each-template-check-holder ${themeSelected === "template4" ? "template-clicked" : ""
                                                         }`}
                                                 >
-                                                    {" "}
                                                     <div className="big-checkmark">
                                                         <svg
                                                             width="14"
@@ -3419,7 +3418,8 @@ const BusinessProductEdit = ({
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>{" "}
+                                        </div>
+                                        {" "}
                                         <div
                                             className="sustainability--each-template"
                                             onClick={() => setThemeSelected("beige")}
@@ -3600,6 +3600,114 @@ const BusinessProductEdit = ({
                                                 </div>
                                             </div>
                                         </div>
+                                        <div
+                                            className="sustainability--each-template"
+                                            onClick={() => setThemeSelected("template8")}
+                                        >
+                                            <div className="sustainability--each-template-image-holder">
+                                                <img
+                                                    src={
+                                                        process.env.NEXT_PUBLIC_UI_URL +
+                                                        "/assets/images/sustainability/template8.png"
+                                                    }
+                                                    className="img-responsive"
+                                                />
+                                            </div>
+                                            <div className="sustainability--each-template-text-select-holder">
+                                                <p>Template 8</p>
+                                                <div
+                                                    className={`sustainability--each-template-check-holder ${themeSelected === "template8" ? "template-clicked" : ""
+                                                        }`}
+                                                >
+                                                    <div className="big-checkmark">
+                                                        <svg
+                                                            width="14"
+                                                            height="10"
+                                                            viewBox="0 0 14 10"
+                                                            fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                        >
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                clipRule="evenodd"
+                                                                d="M13.7071 0.292893C14.0976 0.683417 14.0976 1.31658 13.7071 1.70711L5.70711 9.70711C5.31658 10.0976 4.68342 10.0976 4.29289 9.70711L0.292893 5.70711C-0.0976311 5.31658 -0.0976311 4.68342 0.292893 4.29289C0.683417 3.90237 1.31658 3.90237 1.70711 4.29289L5 7.58579L12.2929 0.292893C12.6834 -0.0976311 13.3166 -0.0976311 13.7071 0.292893Z"
+                                                                fill="white"
+                                                            />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="small-checkmark">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="14"
+                                                            height="14"
+                                                            fill="none"
+                                                            viewBox="0 0 14 14"
+                                                        >
+                                                            <path
+                                                                fill="#fff"
+                                                                fillRule="evenodd"
+                                                                d="M11.011 4.3a.628.628 0 010 .889l-5.026 5.027a.628.628 0 01-.89 0L2.583 7.702a.628.628 0 01.89-.888L5.54 8.883 10.123 4.3a.628.628 0 01.889 0z"
+                                                                clipRule="evenodd"
+                                                            ></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {/* <div
+                                            className="sustainability--each-template"
+                                            onClick={() => setThemeSelected("template4")}
+                                        >
+                                            <div className="sustainability--each-template-image-holder">
+                                                <img
+                                                    src={
+                                                        process.env.NEXT_PUBLIC_UI_URL +
+                                                        "/assets/images/sustainability/template4.png"
+                                                    }
+                                                    className="img-responsive"
+                                                />
+                                            </div>
+                                            <div className="sustainability--each-template-text-select-holder">
+                                                <p>Template 9</p>
+                                                <div
+                                                    className={`sustainability--each-template-check-holder ${themeSelected === "template4" ? "template-clicked" : ""
+                                                        }`}
+                                                >
+                                                    <div className="big-checkmark">
+                                                        <svg
+                                                            width="14"
+                                                            height="10"
+                                                            viewBox="0 0 14 10"
+                                                            fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                        >
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                clipRule="evenodd"
+                                                                d="M13.7071 0.292893C14.0976 0.683417 14.0976 1.31658 13.7071 1.70711L5.70711 9.70711C5.31658 10.0976 4.68342 10.0976 4.29289 9.70711L0.292893 5.70711C-0.0976311 5.31658 -0.0976311 4.68342 0.292893 4.29289C0.683417 3.90237 1.31658 3.90237 1.70711 4.29289L5 7.58579L12.2929 0.292893C12.6834 -0.0976311 13.3166 -0.0976311 13.7071 0.292893Z"
+                                                                fill="white"
+                                                            />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="small-checkmark">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="14"
+                                                            height="14"
+                                                            fill="none"
+                                                            viewBox="0 0 14 14"
+                                                        >
+                                                            <path
+                                                                fill="#fff"
+                                                                fillRule="evenodd"
+                                                                d="M11.011 4.3a.628.628 0 010 .889l-5.026 5.027a.628.628 0 01-.89 0L2.583 7.702a.628.628 0 01.89-.888L5.54 8.883 10.123 4.3a.628.628 0 01.889 0z"
+                                                                clipRule="evenodd"
+                                                            ></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> */}
                                         {/* <div
                                             className="sustainability--each-template"
                                             onClick={() => setThemeSelected("beigelogo")}
@@ -3709,37 +3817,85 @@ const BusinessProductEdit = ({
                                                 </div>
                                             </div>
                                         </div> */}
+                                        <div
+                                            className="sustainability--each-template"
+                                            onClick={() => setThemeSelected("template9")}
+                                        >
+                                            <div className="sustainability--each-template-image-holder">
+                                                <img
+                                                    src={
+                                                        process.env.NEXT_PUBLIC_UI_URL +
+                                                        "/assets/images/sustainability/template9.png"
+                                                    }
+                                                    className="img-responsive"
+                                                />
+                                            </div>
+                                            <div className="sustainability--each-template-text-select-holder">
+                                                <p>Template 9</p>
+                                                <div
+                                                    className={`sustainability--each-template-check-holder ${themeSelected === "template9" ? "template-clicked" : ""
+                                                        }`}
+                                                >
+                                                    <div className="big-checkmark">
+                                                        <svg
+                                                            width="14"
+                                                            height="10"
+                                                            viewBox="0 0 14 10"
+                                                            fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                        >
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                clipRule="evenodd"
+                                                                d="M13.7071 0.292893C14.0976 0.683417 14.0976 1.31658 13.7071 1.70711L5.70711 9.70711C5.31658 10.0976 4.68342 10.0976 4.29289 9.70711L0.292893 5.70711C-0.0976311 5.31658 -0.0976311 4.68342 0.292893 4.29289C0.683417 3.90237 1.31658 3.90237 1.70711 4.29289L5 7.58579L12.2929 0.292893C12.6834 -0.0976311 13.3166 -0.0976311 13.7071 0.292893Z"
+                                                                fill="white"
+                                                            />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="small-checkmark">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="14"
+                                                            height="14"
+                                                            fill="none"
+                                                            viewBox="0 0 14 14"
+                                                        >
+                                                            <path
+                                                                fill="#fff"
+                                                                fillRule="evenodd"
+                                                                d="M11.011 4.3a.628.628 0 010 .889l-5.026 5.027a.628.628 0 01-.89 0L2.583 7.702a.628.628 0 01.89-.888L5.54 8.883 10.123 4.3a.628.628 0 01.889 0z"
+                                                                clipRule="evenodd"
+                                                            ></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <>
-                                    <div
-                                        className="sustainability--page-heading-input-holder--heading"
-                                        style={editDisabled ? { pointerEvents: "none", margin: "auto" } : { margin: "auto" }}
-                                    >
-                                        <div className="sustainability--page-text-holder">
-                                            <p>Color Palette:</p>
-                                        </div>
-                                        <div className="heading--input--holder" style={{ display: "flex" }}>
-                                            <input style={{ width: "50px" }}
-                                                type="color"
-                                                onKeyDown={handleKeyDown}
-                                                onChange={(e) => setColorPalette(e.target.value)}
-                                                value={colorPalette}
-                                                className="colorpalette"
-                                            />
-                                            <input type="text" value={colorPalette} className="sustainability--page-input-holder" />
-                                            {/* <div className="sustainability--invalid-message-holder position-absolute">
-                                                        {validationErrors?.title?.error &&
-                                                            generateInvalidMessage({
-                                                                name: validationErrors?.title?.name,
-                                                                type: validationErrors?.title?.type,
-                                                            })}
-                                                    </div> */}
-                                        </div>
-                                    </div>
-                                </>
+                            </div>
+                            <>
                                 <div
-                                    className="sustainability--template-section-holder"
+                                    className="sustainability--page-heading-input-holder--heading"
+                                    style={editDisabled ? { pointerEvents: "none", margin: "auto" } : { margin: "auto" }}
+                                >
+                                    <div className="sustainability--page-text-holder">
+                                        <p>Color Palette:</p>
+                                    </div>
+                                    <div className="heading--input--holder" style={{ display: "flex" }}>
+                                        <input style={{ width: "50px" }}
+                                            type="color"
+                                            onKeyDown={handleKeyDown}
+                                            onChange={(e) => setColorPalette(e.target.value)}
+                                            value={colorPalette}
+                                            className="colorpalette"
+                                        />
+                                        <input type="text" value={colorPalette} className="sustainability--page-input-holder" />
+                                    </div>
+                                </div>
+                            </>
+                            <div
+                                className="sustainability--template-section-holder"
                                     style={editDisabled ? { pointerEvents: "none" } : {}}
                                 >
                                     <h3>Environmental impact (optional)</h3>
@@ -5432,12 +5588,10 @@ const BusinessProductEdit = ({
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
-                            </div>
                         </form>
-                        
+
                     </>
                     {/* ) : (
                         ""
@@ -5461,9 +5615,11 @@ const BusinessProductEdit = ({
         <Spinner animation="border" size="sm" />
       )} */}
                 </>
-                : <p style={{ marginTop: "50px" }} className="text-center">
+            ) : (
+                <p style={{ marginTop: "50px" }} className="text-center">
                     Create a business to view business sustainability page
-                </p>}
+                </p>
+            )}
         </>
     );
 };

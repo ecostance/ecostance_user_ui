@@ -107,6 +107,7 @@ const BusinessSustainability = ({
     const [instagram, setInstagram] = useState(sustainData?.instagram);
     const [facebook, setFacebook] = useState(sustainData?.facebook);
     const [firstSlug, setFirstSlug] = useState("")
+    const [hasExistingSlug, setHasExistingSlug] = useState(false)
     const [image, setImage] = useState("");
     const [businessOrders, setBusinessOrders] = useState([])
 
@@ -343,9 +344,13 @@ const BusinessSustainability = ({
     const getInitalSlugData = async () => {
         let slugValues = await businessSlugData();
         // console.log(slugValues.data.data.slug, "slugData12")
-        setInitSlug(slugValues?.data?.data?.slug)
-        setFirstSlug(slugValues?.data?.data?.slug)
-        setFixedSlug(slugValues?.data?.data?.slug)
+        const slug = slugValues?.data?.data?.slug;
+        const hasSlug = !!slug;
+        const defaultSlug = slug || "business";
+        setInitSlug(defaultSlug)
+        setFirstSlug(defaultSlug)
+        setFixedSlug(defaultSlug)
+        setHasExistingSlug(hasSlug)
     };
 
     useEffect(() => {
@@ -1070,8 +1075,14 @@ const BusinessSustainability = ({
             (sustainabilityActionStates?.slugAvailable === SLUG_UNTOUCHED ||
                 sustainabilityActionStates?.slugAvailable === SLUG_AVAILABLE)
         ) {
-            dataForm.append("slug", fixedSlug);
-            dataForm.append("newSlug", initSlug);
+            if (!hasExistingSlug) {
+                // First time saving - only send slug
+                dataForm.append("slug", initSlug);
+            } else {
+                // Editing existing slug - send both current and new
+                dataForm.append("slug", fixedSlug);
+                dataForm.append("newSlug", initSlug);
+            }
         }
         if (phone && phone !== `+${phoneInfo?.numericCode}` && phone.length > 2) {
             const phoneDetails = returnPhoneDetails(phoneInfo);
@@ -2738,6 +2749,114 @@ const BusinessSustainability = ({
                                                 <p>Elegant</p>
                                                 <div
                                                     className={`sustainability--each-template-check-holder ${themeSelected === "elegant" ? "template-clicked" : ""
+                                                        }`}
+                                                >
+                                                    <div className="big-checkmark">
+                                                        <svg
+                                                            width="14"
+                                                            height="10"
+                                                            viewBox="0 0 14 10"
+                                                            fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                        >
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                clipRule="evenodd"
+                                                                d="M13.7071 0.292893C14.0976 0.683417 14.0976 1.31658 13.7071 1.70711L5.70711 9.70711C5.31658 10.0976 4.68342 10.0976 4.29289 9.70711L0.292893 5.70711C-0.0976311 5.31658 -0.0976311 4.68342 0.292893 4.29289C0.683417 3.90237 1.31658 3.90237 1.70711 4.29289L5 7.58579L12.2929 0.292893C12.6834 -0.0976311 13.3166 -0.0976311 13.7071 0.292893Z"
+                                                                fill="white"
+                                                            />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="small-checkmark">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="14"
+                                                            height="14"
+                                                            fill="none"
+                                                            viewBox="0 0 14 14"
+                                                        >
+                                                            <path
+                                                                fill="#fff"
+                                                                fillRule="evenodd"
+                                                                d="M11.011 4.3a.628.628 0 010 .889l-5.026 5.027a.628.628 0 01-.89 0L2.583 7.702a.628.628 0 01.89-.888L5.54 8.883 10.123 4.3a.628.628 0 01.889 0z"
+                                                                clipRule="evenodd"
+                                                            ></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            className="sustainability--each-template"
+                                            onClick={() => setThemeSelected("black")}
+                                        >
+                                            <div className="sustainability--each-template-image-holder">
+                                                <img
+                                                    src={
+                                                        process.env.NEXT_PUBLIC_UI_URL +
+                                                        "/assets/images/sustainability/black.png"
+                                                    }
+                                                    className="img-responsive"
+                                                />
+                                            </div>
+                                            <div className="sustainability--each-template-text-select-holder">
+                                                <p>Black</p>
+                                                <div
+                                                    className={`sustainability--each-template-check-holder ${themeSelected === "black" ? "template-clicked" : ""
+                                                        }`}
+                                                >
+                                                    <div className="big-checkmark">
+                                                        <svg
+                                                            width="14"
+                                                            height="10"
+                                                            viewBox="0 0 14 10"
+                                                            fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                        >
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                clipRule="evenodd"
+                                                                d="M13.7071 0.292893C14.0976 0.683417 14.0976 1.31658 13.7071 1.70711L5.70711 9.70711C5.31658 10.0976 4.68342 10.0976 4.29289 9.70711L0.292893 5.70711C-0.0976311 5.31658 -0.0976311 4.68342 0.292893 4.29289C0.683417 3.90237 1.31658 3.90237 1.70711 4.29289L5 7.58579L12.2929 0.292893C12.6834 -0.0976311 13.3166 -0.0976311 13.7071 0.292893Z"
+                                                                fill="white"
+                                                            />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="small-checkmark">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="14"
+                                                            height="14"
+                                                            fill="none"
+                                                            viewBox="0 0 14 14"
+                                                        >
+                                                            <path
+                                                                fill="#fff"
+                                                                fillRule="evenodd"
+                                                                d="M11.011 4.3a.628.628 0 010 .889l-5.026 5.027a.628.628 0 01-.89 0L2.583 7.702a.628.628 0 01.89-.888L5.54 8.883 10.123 4.3a.628.628 0 01.889 0z"
+                                                                clipRule="evenodd"
+                                                            ></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            className="sustainability--each-template"
+                                            onClick={() => setThemeSelected("uniqhor")}
+                                        >
+                                            <div className="sustainability--each-template-image-holder">
+                                                <img
+                                                    src={
+                                                        process.env.NEXT_PUBLIC_UI_URL +
+                                                        "/assets/images/sustainability/uniqhor.jpg"
+                                                    }
+                                                    className="img-responsive"
+                                                />
+                                            </div>
+                                            <div className="sustainability--each-template-text-select-holder">
+                                                <p>Uniqhor</p>
+                                                <div
+                                                    className={`sustainability--each-template-check-holder ${themeSelected === "uniqhor" ? "template-clicked" : ""
                                                         }`}
                                                 >
                                                     <div className="big-checkmark">

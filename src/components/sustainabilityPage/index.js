@@ -16,6 +16,7 @@ import { pinkTemplate } from "./pinkTemplate";
 import { beigeTemplate } from "./beigeTemplate";
 import { beigeLogoTemplate } from "./beigeLogoTemplate"
 import { whiteLogoTemplate } from "./whiteLogoTemplate";
+import { uniqhorTemplate } from "../businessSustainabilityPage/uniqhorTemplate";
 import { useToasts } from "react-toast-notifications";
 import { Spinner } from "react-bootstrap";
 import { returnPhoneDetails } from "src/helpers/returnPhoneDetails";
@@ -54,12 +55,61 @@ const Cancel = ({
   const [products, setProducts] = useState([]);
   const [projects, setProjects] = useState([]);
   const [metricData , setMetricData] = useState("")
+  const [dppProducts, setDppProducts] = useState([])
   const { addToast } = useToasts();
 
   useEffect(() => {
     filteredProductData();
     metricDetails();
   }, [])
+
+  useEffect(() => {
+    if (userSettings?.dppProducts?.length) {
+      setDppProducts(userSettings.dppProducts)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleMouseHover = (e) => {
+      const item = e.currentTarget;
+      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      const images = document.querySelectorAll('.uq-method-visual img');
+      if (!items.length || !images.length) return;
+
+      const idx = item.getAttribute('data-index');
+      items.forEach((el) => el.classList.remove('uq-active'));
+      item.classList.add('uq-active');
+      images.forEach((img) => {
+        if (img.getAttribute('data-img') === idx) {
+          img.classList.remove('uq-img-hidden');
+          img.classList.add('uq-img-visible');
+        } else {
+          img.classList.remove('uq-img-visible');
+          img.classList.add('uq-img-hidden');
+        }
+      });
+    };
+
+    const attachListeners = () => {
+      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      items.forEach((item) => {
+        item.addEventListener('mouseenter', handleMouseHover);
+        item.addEventListener('focus', handleMouseHover);
+      });
+    };
+
+    attachListeners();
+    const timer = setTimeout(attachListeners, 500);
+
+    return () => {
+      clearTimeout(timer);
+      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      items.forEach((item) => {
+        item.removeEventListener('mouseenter', handleMouseHover);
+        item.removeEventListener('focus', handleMouseHover);
+      });
+    };
+  });
 
   const filteredProductData = async () => {
     const response = await getAllOrders(1);
@@ -294,7 +344,8 @@ width="125"
     pink: pinkTemplate,
     beige: beigeTemplate,
     beigelogo: beigeLogoTemplate,
-    whitelogo: whiteLogoTemplate
+    whitelogo: whiteLogoTemplate,
+    uniqhor: uniqhorTemplate
   };
 
   const returnCorrectBackgroundColor = (template) => {
@@ -352,6 +403,7 @@ width="125"
         description: sustainData?.description,
         title: sustainData?.title,
         certData: userCertificates,
+        dppProducts: dppProducts,
         name: sustainData?.name,
         phone: sustainData?.phone,
         email: sustainData?.email,
@@ -389,6 +441,7 @@ width="125"
         description: currentUserSettings?.description,
         title: currentUserSettings?.title,
         certData: userSettings?.userCertificates,
+        dppProducts: dppProducts,
         name: currentUserSettings?.name,
         phone: currentUserSettings?.phone,
         email: currentUserSettings?.email,
