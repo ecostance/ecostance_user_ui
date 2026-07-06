@@ -25,11 +25,18 @@
     { title: 'Renewable Energy', count: 3, img: img('eco-wind2.jpg'), alt: 'Wind turbines at dawn' },
   ];
 
+  const formatChainDescription = (text) => {
+    const words = (text || '').trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return '';
+    const excerpt = words.slice(0, 50).join(' ');
+    return excerpt.endsWith('...') ? excerpt : `${excerpt}...`;
+  };
+
   const fallbackCerts = [
-    { id: '100000002043', date: '2026-07-01', tons: '1 Tons', title: 'Piedra Wind Farm', description: 'Utility-scale wind farm displacing fossil-fuel electricity on the Mexican national grid.', image: img('eco-wind2.jpg'), alt: 'Wind turbine at sunrise', url: '#' },
-    { id: '100000002044', date: '2026-07-01', tons: '2 Tons', title: 'Coastal Plastic Recovery', description: 'Removes ocean-bound plastic from coastal waterways and funds local collector livelihoods.', image: img('eco-ocean.jpg'), alt: 'Hands collecting plastic from the ocean', url: '#' },
-    { id: '100000002045', date: '2026-07-01', tons: '3 Tons', title: 'Boreal Reforestation', description: 'Nature-based removal restoring degraded boreal forest with native species and long-term monitoring.', image: img('eco-sapling.jpg'), alt: 'Sapling planted in dark soil', url: '#' },
-    { id: '100000002046', date: '2026-07-01', tons: '1 Tons', title: 'Dairy Methane Capture', description: 'Anaerobic digester capturing methane from dairy operations and converting it into renewable energy.', image: img('eco-methane.jpg'), alt: 'Methane capture facility', url: '#' },
+    { id: '100000002043', date: '2026-07-01', tons: '1 Tons', title: 'Piedra Wind Farm', description: 'Utility-scale wind farm displacing fossil-fuel electricity on the Mexican national grid. Each retired tonne is independently verified through a registry-issued certificate, ensuring no double counting and full traceability from project to retirement. The facility generates renewable electricity for communities while reducing greenhouse gas emissions across the region...', image: img('eco-wind2.jpg'), alt: 'Wind turbine at sunrise', url: '#' },
+    { id: '100000002044', date: '2026-07-01', tons: '2 Tons', title: 'Coastal Plastic Recovery', description: 'Removes ocean-bound plastic from coastal waterways and funds local collector livelihoods. Recovered material is sorted, processed, and redirected away from marine ecosystems while creating fair-wage employment for coastal communities. Every certificate represents verified environmental benefit with transparent chain-of-custody documentation from collection through final processing...', image: img('eco-ocean.jpg'), alt: 'Hands collecting plastic from the ocean', url: '#' },
+    { id: '100000002045', date: '2026-07-01', tons: '3 Tons', title: 'Boreal Reforestation', description: 'Nature-based removal restoring degraded boreal forest with native species and long-term monitoring. Seedlings are planted across previously disturbed land, rebuilding habitat, improving soil health, and sequestering carbon over decades. Independent auditors verify survival rates and growth milestones before credits are issued to the registry...', image: img('eco-sapling.jpg'), alt: 'Sapling planted in dark soil', url: '#' },
+    { id: '100000002046', date: '2026-07-01', tons: '1 Tons', title: 'Dairy Methane Capture', description: 'Anaerobic digester capturing methane from dairy operations and converting it into renewable energy. Methane that would otherwise enter the atmosphere is destroyed or repurposed as biogas, reducing the climate impact of agricultural waste. Each tonne retired is backed by metered data and third-party verification on the public registry...', image: img('eco-methane.jpg'), alt: 'Methane capture facility', url: '#' },
   ];
 
   const chainItems = (dynamic?.certData?.length ? dynamic.certData : []).map((cert) => ({
@@ -37,7 +44,7 @@
     date: cert?.createdAt ? new Date(cert.createdAt).toISOString().split('T')[0] : '',
     tons: cert?.quantity ? `${cert.quantity} Tons` : '',
     title: cert?.product?.name || 'Certificate',
-    description: cert?.product?.shortDescription || cert?.product?.description || '',
+    description: formatChainDescription(cert?.product?.shortDescription || cert?.product?.description || ''),
     image: cert?.product?.thumbImage?.[0] || '',
     alt: cert?.product?.name || 'Certificate',
     url: cert?.certificate?.certificateURL || '#',
@@ -718,7 +725,7 @@
       margin-top: 24px;
       font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
       font-size: 36px;
-      font-weight: 500;
+      font-weight: 400;
       letter-spacing: -0.03em;
       line-height: 1;
       color: var(--ink);
@@ -733,8 +740,14 @@
       margin-top: 24px;
       max-width: 576px;
       font-size: 15px;
+      font-weight: 400;
       line-height: 1.7;
       color: var(--muted);
+    }
+
+    .uq-chain .eyebrow {
+      font-weight: 400;
+      letter-spacing: 0.24em;
     }
 
     .uq-chain-list {
@@ -808,6 +821,7 @@
       background: var(--canvas);
       padding: 6px 12px;
       font-size: 11px;
+      font-weight: 400;
       letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--ink);
@@ -823,22 +837,24 @@
     .uq-chain-date {
       margin-top: 24px;
       font-size: 13px;
+      font-weight: 400;
       color: var(--muted);
     }
 
     .uq-chain-qty {
       margin-top: 4px;
       font-size: 13px;
+      font-weight: 400;
       color: var(--muted);
     }
 
-    .uq-chain-qty strong { color: var(--ink); font-weight: 500; }
+    .uq-chain-qty strong { color: var(--ink); font-weight: 400; }
 
     .uq-chain-project {
       margin-top: 16px;
       font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
       font-size: 24px;
-      font-weight: 500;
+      font-weight: 400;
       letter-spacing: -0.02em;
       color: var(--ink);
     }
@@ -850,8 +866,10 @@
     .uq-chain-desc {
       margin-top: 16px;
       font-size: 15px;
+      font-weight: 400;
       line-height: 1.7;
       color: var(--muted);
+      max-width: 576px;
     }
 
     .uq-chain-img-wrap {
@@ -1502,7 +1520,7 @@
             <div class="uq-chain-content">
               <a href="${c.url}" class="uq-chain-cert-tag" ${c.url !== '#' ? 'target="_blank" rel="noopener noreferrer"' : ''}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>
-                Certificate &middot; ${c.id}
+                Certificate &ndash; ${c.id}
               </a>
               <p class="uq-chain-date">${c.date}</p>
               <p class="uq-chain-qty">Carbon Offset Quantity: <strong>${c.tons}</strong></p>

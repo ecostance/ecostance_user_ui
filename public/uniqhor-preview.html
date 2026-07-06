@@ -39,16 +39,22 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
+    html {
       margin: 0;
       padding: 0;
       overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
       background: var(--canvas);
       color: var(--ink);
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       font-feature-settings: "ss01", "cv11";
-      scroll-behavior: smooth;
     }
 
     .font-display {
@@ -667,7 +673,7 @@
       margin-top: 24px;
       font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
       font-size: 36px;
-      font-weight: 500;
+      font-weight: 400;
       letter-spacing: -0.03em;
       line-height: 1;
       color: var(--ink);
@@ -682,8 +688,14 @@
       margin-top: 24px;
       max-width: 576px;
       font-size: 15px;
+      font-weight: 400;
       line-height: 1.7;
       color: var(--muted);
+    }
+
+    .uq-chain .eyebrow {
+      font-weight: 400;
+      letter-spacing: 0.24em;
     }
 
     .uq-chain-list {
@@ -757,6 +769,7 @@
       background: var(--canvas);
       padding: 6px 12px;
       font-size: 11px;
+      font-weight: 400;
       letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--ink);
@@ -772,22 +785,24 @@
     .uq-chain-date {
       margin-top: 24px;
       font-size: 13px;
+      font-weight: 400;
       color: var(--muted);
     }
 
     .uq-chain-qty {
       margin-top: 4px;
       font-size: 13px;
+      font-weight: 400;
       color: var(--muted);
     }
 
-    .uq-chain-qty strong { color: var(--ink); font-weight: 500; }
+    .uq-chain-qty strong { color: var(--ink); font-weight: 400; }
 
     .uq-chain-project {
       margin-top: 16px;
       font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
       font-size: 24px;
-      font-weight: 500;
+      font-weight: 400;
       letter-spacing: -0.02em;
       color: var(--ink);
     }
@@ -799,8 +814,10 @@
     .uq-chain-desc {
       margin-top: 16px;
       font-size: 15px;
+      font-weight: 400;
       line-height: 1.7;
       color: var(--muted);
+      max-width: 576px;
     }
 
     .uq-chain-img-wrap {
@@ -1502,12 +1519,12 @@
             <div class="uq-chain-content">
               <a href="https://example.com/cert/100000002043" class="uq-chain-cert-tag" target="_blank" rel="noopener noreferrer">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>
-                Certificate &middot; 100000002043
+                Certificate &ndash; 100000002043
               </a>
               <p class="uq-chain-date">2026-07-01</p>
               <p class="uq-chain-qty">Carbon Offset Quantity: <strong>1 Tons</strong></p>
               <h3 class="uq-chain-project">Piedra Wind Farm</h3>
-              <p class="uq-chain-desc">Renewable electricity generation in Mexico through the construction and operation of a 220 MW wind farm.</p>
+              <p class="uq-chain-desc">Renewable electricity generation in Mexico through the construction and operation of a 220 MW wind farm....</p>
             </div>
             
             <div class="uq-chain-img-wrap">
@@ -1521,12 +1538,12 @@
             <div class="uq-chain-content">
               <a href="https://example.com/cert/100000002044" class="uq-chain-cert-tag" target="_blank" rel="noopener noreferrer">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>
-                Certificate &middot; 100000002044
+                Certificate &ndash; 100000002044
               </a>
               <p class="uq-chain-date">2026-06-14</p>
               <p class="uq-chain-qty">Carbon Offset Quantity: <strong>3 Tons</strong></p>
               <h3 class="uq-chain-project">Amazon Reforestation</h3>
-              <p class="uq-chain-desc">Native species reforestation across degraded pastureland in the Brazilian Amazon basin.</p>
+              <p class="uq-chain-desc">Native species reforestation across degraded pastureland in the Brazilian Amazon basin....</p>
             </div>
             
             <div class="uq-chain-img-wrap">
@@ -1540,12 +1557,12 @@
             <div class="uq-chain-content">
               <a href="https://example.com/cert/100000002045" class="uq-chain-cert-tag" target="_blank" rel="noopener noreferrer">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>
-                Certificate &middot; 100000002045
+                Certificate &ndash; 100000002045
               </a>
               <p class="uq-chain-date">2026-05-22</p>
               <p class="uq-chain-qty">Carbon Offset Quantity: <strong>2 Tons</strong></p>
               <h3 class="uq-chain-project">Ocean Plastic Recovery</h3>
-              <p class="uq-chain-desc">Coastal cleanup and marine plastic recovery operations across the Eastern Pacific.</p>
+              <p class="uq-chain-desc">Coastal cleanup and marine plastic recovery operations across the Eastern Pacific....</p>
             </div>
             
             <div class="uq-chain-img-wrap">
@@ -1559,12 +1576,12 @@
             <div class="uq-chain-content">
               <a href="https://example.com/cert/100000002046" class="uq-chain-cert-tag" target="_blank" rel="noopener noreferrer">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>
-                Certificate &middot; 100000002046
+                Certificate &ndash; 100000002046
               </a>
               <p class="uq-chain-date">2026-04-08</p>
               <p class="uq-chain-qty">Carbon Offset Quantity: <strong>5 Tons</strong></p>
               <h3 class="uq-chain-project">Methane Capture</h3>
-              <p class="uq-chain-desc">Engineered methane capture and destruction at industrial waste facilities.</p>
+              <p class="uq-chain-desc">Engineered methane capture and destruction at industrial waste facilities....</p>
             </div>
             
             <div class="uq-chain-img-wrap">
