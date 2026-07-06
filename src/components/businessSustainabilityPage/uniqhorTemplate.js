@@ -1,4 +1,4 @@
-export const uniqhorTemplate = (dynamic) => {
+﻿export const uniqhorTemplate = (dynamic) => {
   const uniqueProducts = [];
   const productNamesSeen = new Set();
   if (dynamic?.certData) {
@@ -1365,11 +1365,11 @@ export const uniqhorTemplate = (dynamic) => {
   <header class="uq-header">
     <div class="uq-header-inner">
       <a href="#" class="uq-nav-brand">
-        ${dynamic?.logo ? `<img src="${dynamic.logo}" alt="Logo" class="uq-nav-logo" />` : 'ecostance'}
+        ${dynamic?.logo ? `<img src="${dynamic.logo}" alt="Logo" class="uq-nav-logo" />` : ''}
       </a>
       <nav>
         <ul class="uq-nav-links">
-          <li><a href="#projects">Projects</a></li>
+          <li><a href="#uq-dpp">Projects</a></li>
           <li><a href="#technology">Technology</a></li>
           <li><a href="#chain">Chain of Custody</a></li>
           <li><a href="#about">About</a></li>
@@ -1410,7 +1410,7 @@ export const uniqhorTemplate = (dynamic) => {
       <div class="uq-about-text">
         <h2>Built from the Ground Up</h2>
         ${dynamic?.aboutUs && dynamic.aboutUs !== '' ? `<p>${dynamic.aboutUs}</p>` : `
-        <p>For more than 30 years, the Ecostance team has worked at the source of environmental accounting — developing carbon measurement frameworks, building transparent supply chains, and helping establish the standards that now define responsible offsetting.</p>
+        <p>For more than 30 years, the Ecostance team has worked at the source of environmental accounting â€” developing carbon measurement frameworks, building transparent supply chains, and helping establish the standards that now define responsible offsetting.</p>
         <p>Long before net zero became a category, we were exploring how natural sequestration and engineered removal could work together to deliver verifiable climate outcomes. The concept was proven. The industry wasn't ready.</p>
         <p class="uq-about-highlight">Today, it is.</p>
         <p>Ecostance brings together decades of measurement, verification and retirement expertise to create a new generation of carbon accounting. Every credit is tracked from source project to retired certificate, guided by a simple belief: <strong>Impact is proven, not claimed.</strong></p>
@@ -1442,11 +1442,11 @@ export const uniqhorTemplate = (dynamic) => {
 
   <!-- Digital Product Passport -->
   ${dynamic?.dppProducts && dynamic.dppProducts.length > 0 ? `
-  <section class="uq-dpp">
+  <section class="uq-dpp" id="uq-dpp">
     <div class="uq-dpp-inner">
       <p class="eyebrow">Digital Product Passport</p>
       <h2 style="font-family:'Inter Tight',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:500;letter-spacing:-0.03em;line-height:1.02;margin-top:16px;">Verified Product Passports</h2>
-      <p style="color:var(--muted);font-size:15px;margin-top:16px;max-width:640px;">Each product carries a Digital Product Passport — transparent, auditable, and independently verified.</p>
+      <p style="color:var(--muted);font-size:15px;margin-top:16px;max-width:640px;">Each product carries a Digital Product Passport â€” transparent, auditable, and independently verified.</p>
       <div class="uq-dpp-grid">
         ${dynamic.dppProducts.map((dpp) => {
           const pub = dpp?.published || {};
@@ -1458,8 +1458,8 @@ export const uniqhorTemplate = (dynamic) => {
           const dppUrl = isPublished ? '/dpp/' + (dpp?.businessSlugName || '') + '/' + (dpp?.slug || '') : '#';
           const qrCodeUrl = isPublished && dppUrl !== '#' ? 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=' + encodeURIComponent(dppUrl) : '';
           const metrics = [];
-          if (pub.showCo2Emission && pub.co2Emission > 0) metrics.push({ label: 'CO₂', value: pub.co2Emission + 'kg' });
-          if (pub.showWaterConsuption && pub.waterConsuption > 0) metrics.push({ label: 'H₂O', value: pub.waterConsuption + 'L' });
+          if (pub.showCo2Emission && pub.co2Emission > 0) metrics.push({ label: 'COâ‚‚', value: pub.co2Emission + 'kg' });
+          if (pub.showWaterConsuption && pub.waterConsuption > 0) metrics.push({ label: 'Hâ‚‚O', value: pub.waterConsuption + 'L' });
           if (pub.showPowerConsuption && pub.powerConsuption > 0) metrics.push({ label: 'Energy', value: pub.powerConsuption + 'kWh' });
           if (pub.showRecycleMaterial && pub.recycleMaterial > 0) metrics.push({ label: 'Recycled', value: pub.recycleMaterial + '%' });
           if (pub.showUpcycleMaterial && pub.upcycleMaterial > 0) metrics.push({ label: 'Upcycled', value: pub.upcycleMaterial + '%' });
@@ -1513,14 +1513,14 @@ export const uniqhorTemplate = (dynamic) => {
               <h3 class="uq-method-item-label">Reduce</h3>
               <span class="uq-method-item-num">02</span>
             </div>
-            <p class="uq-method-item-copy">Cut what we can — renewable energy, efficiency, low-carbon design.</p>
+            <p class="uq-method-item-copy">Cut what we can â€” renewable energy, efficiency, low-carbon design.</p>
           </li>
           <li class="uq-method-item" data-index="2">
             <div class="uq-method-item-head">
               <h3 class="uq-method-item-label">Remove</h3>
               <span class="uq-method-item-num">03</span>
             </div>
-            <p class="uq-method-item-copy">Sequester what we can't — reforestation and engineered removal.</p>
+            <p class="uq-method-item-copy">Sequester what we can't â€” reforestation and engineered removal.</p>
           </li>
           <li class="uq-method-item" data-index="3">
             <div class="uq-method-item-head">
@@ -1640,7 +1640,7 @@ export const uniqhorTemplate = (dynamic) => {
   <footer class="uq-footer">
     <div class="uq-footer-inner">
       <div class="uq-footer-main">
-        <div class="uq-footer-brand">${dynamic?.companyName || 'uniqohr'}</div>
+        <div class="uq-footer-brand">${dynamic?.logo ? `<img src="${dynamic.logo}" alt="Logo" style="max-height:36px;max-width:140px;">` : ''}</div>
         <div class="uq-footer-cols">
           <div class="uq-footer-col">
             <h4>Our Story</h4>
