@@ -124,8 +124,7 @@
       height: 36px;
       width: auto;
       object-fit: contain;
-      filter: brightness(0) invert(1);
-    }
+      }
 
     .uq-nav-links {
       display: flex;
