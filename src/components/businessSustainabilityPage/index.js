@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { getAllOrders } from "src/apiClient/orders";
 import router, { useRouter } from "next/router";
-import { getAllBusinessOrders, getAllSupportedProducts } from "src/apiClient/business";
+import { getAllBusinessOrders, getAllSupportedProducts, getBusinessProduct } from "src/apiClient/business";
 import {
   publishBusinessPage,
   updateUserBusinessSettingInfo,
@@ -19,6 +19,8 @@ import { pinkTemplate } from "./pinkTemplate";
 import { beigeTemplate } from "./beigeTemplate";
 import { beigeLogoTemplate } from "./beigeLogoTemplate"
 import { whiteLogoTemplate } from "./whiteLogoTemplate";
+import { blackTemplate } from "./blackTemplate";
+import { uniqhorTemplate } from "./uniqhorTemplate";
 import { useToasts } from "react-toast-notifications";
 import { Spinner } from "react-bootstrap";
 import { returnPhoneDetails } from "src/helpers/returnPhoneDetails";
@@ -62,6 +64,7 @@ const Cancel = ({
   const [ghgValues, setGHGvalues] = useState("")
   const [treesData, setTreesData] = useState("")
   const [supportProj, setSupportProj] = useState("")
+  const [dppProducts, setDppProducts] = useState([])
   const { addToast } = useToasts();
   console.log(allProductData, "allproducts")
   console.log(userData, sustainData, "themedata")
@@ -127,6 +130,59 @@ const Cancel = ({
     filteredProductData();
     metricDetails();
   }, [])
+
+  useEffect(() => {
+    if (userSettings?.dppProducts?.length) {
+      setDppProducts(userSettings.dppProducts)
+    } else {
+      getBusinessProduct().then((res) => {
+        const products = res?.data?.data || []
+        setDppProducts(products.filter(p => p.isPublic === true && p.status !== 2))
+      }).catch(() => {})
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleMouseHover = (e) => {
+      const item = e.currentTarget;
+      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      const images = document.querySelectorAll('.uq-method-visual img');
+      if (!items.length || !images.length) return;
+
+      const idx = item.getAttribute('data-index');
+      items.forEach((el) => el.classList.remove('uq-active'));
+      item.classList.add('uq-active');
+      images.forEach((img) => {
+        if (img.getAttribute('data-img') === idx) {
+          img.classList.remove('uq-img-hidden');
+          img.classList.add('uq-img-visible');
+        } else {
+          img.classList.remove('uq-img-visible');
+          img.classList.add('uq-img-hidden');
+        }
+      });
+    };
+
+    const attachListeners = () => {
+      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      items.forEach((item) => {
+        item.addEventListener('mouseenter', handleMouseHover);
+        item.addEventListener('focus', handleMouseHover);
+      });
+    };
+
+    attachListeners();
+    const timer = setTimeout(attachListeners, 500);
+
+    return () => {
+      clearTimeout(timer);
+      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      items.forEach((item) => {
+        item.removeEventListener('mouseenter', handleMouseHover);
+        item.removeEventListener('focus', handleMouseHover);
+      });
+    };
+  });
 
   const filteredProductData = async () => {
     const response = await getAllBusinessOrders(1);
@@ -324,7 +380,10 @@ width="125"
     silva : silvaTemplate,
     tempo: tempoTemplate,
     ridge: ridgeTemplate,
-    tide: tideTemplate
+    tide: tideTemplate,
+    black: blackTemplate,
+    uniqhor: uniqhorTemplate,
+    template9: whiteTemplate
   };
 
   const returnCorrectBackgroundColor = (template) => {
@@ -382,6 +441,7 @@ width="125"
         description: sustainData?.description,
         title: sustainData?.title,
         certData: userCertificates,
+        dppProducts: dppProducts,
         name: sustainData?.name,
         phone: sustainData?.phone,
         email: sustainData?.email,
@@ -419,6 +479,7 @@ width="125"
         description: currentUserSettings?.description,
         title: currentUserSettings?.title,
         certData: userSettings?.userCertificates,
+        dppProducts: dppProducts,
         name: currentUserSettings?.name,
         phone: currentUserSettings?.phone,
         email: currentUserSettings?.email,

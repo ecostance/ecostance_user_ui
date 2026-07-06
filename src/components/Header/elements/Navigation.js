@@ -6,10 +6,17 @@ const Navigation = ({ handleTrackWindow, userData }) => {
   const [offCanvasSearchActive, setOffCanvasSearchActive] = useState(false);
 
   // Allowed emails for Dynamic Pricing
-  const allowedEmails = ['rofep35802@calunia.com', 'tgiroti@yahoo.com', "vinu988031@gmail.com"];
-  const currentUserEmail = typeof window !== 'undefined' ? localStorage.getItem('email') : null;
+  const allowedEmails = [
+    "rofep35802@calunia.com",
+    "tgiroti@yahoo.com",
+    "vinu988031@gmail.com",
+    "rafi496@yopmail.com",
+  ];
+  const currentUserEmail =
+    typeof window !== "undefined" ? localStorage.getItem("email") : null;
   const isLoggedIn = userData?.isLoggedIn || false;
-  const showDynamicPricing = isLoggedIn && allowedEmails.includes(currentUserEmail);
+  const showDynamicPricing =
+    isLoggedIn && allowedEmails.includes(currentUserEmail);
 
   return (
     <nav className="header-content__navigation d-none d-xl-block">
@@ -66,7 +73,7 @@ const Navigation = ({ handleTrackWindow, userData }) => {
                 <a>Work Carbon Footprint</a>
               </Link>
             </li>
-			<li>
+            <li>
               {/* <Link
                 href={`${process.env.PUBLIC_BLOG_URL}/why-us-2`}
                 as={`${process.env.PUBLIC_BLOG_URL}/why-us-2`}
