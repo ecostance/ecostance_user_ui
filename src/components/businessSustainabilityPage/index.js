@@ -12,6 +12,7 @@ import {
 import { getMetric } from "src/apiClient/user";
 import { greenTemplate } from "./greenTemplate";
 import { blueTemplate } from "./blueTemplate";
+import { silvaTemplate } from "./silvaTemplate";
 import { whiteTemplate } from "./whiteTemplate";
 import { grayTemplate } from "./grayTemplate";
 import { pinkTemplate } from "./pinkTemplate";
@@ -23,6 +24,9 @@ import { uniqhorTemplate } from "./uniqhorTemplate";
 import { useToasts } from "react-toast-notifications";
 import { Spinner } from "react-bootstrap";
 import { returnPhoneDetails } from "src/helpers/returnPhoneDetails";
+import { tempoTemplate } from "./tempoTemplate";
+import { ridgeTemplate } from "./ridgeTemplate";
+import { tideTemplate } from "./tideTemplate";
 
 const evaluateCertSide = (val) => {
   return val % 2 === 0;
@@ -373,6 +377,10 @@ width="125"
     beige: beigeTemplate,
     beigelogo: beigeLogoTemplate,
     whitelogo: whiteLogoTemplate,
+    silva : silvaTemplate,
+    tempo: tempoTemplate,
+    ridge: ridgeTemplate,
+    tide: tideTemplate,
     black: blackTemplate,
     uniqhor: uniqhorTemplate,
     template9: whiteTemplate
