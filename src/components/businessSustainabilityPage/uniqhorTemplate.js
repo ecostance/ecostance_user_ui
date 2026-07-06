@@ -1,14 +1,53 @@
 ﻿export const uniqhorTemplate = (dynamic) => {
-  const uniqueProducts = [];
-  const productNamesSeen = new Set();
-  if (dynamic?.certData) {
-    for (const cert of dynamic.certData) {
-      if (cert?.product?.name && !productNamesSeen.has(cert.product.name)) {
-        productNamesSeen.add(cert.product.name);
-        uniqueProducts.push(cert.product);
-      }
-    }
-  }
+  const uiUrl = dynamic?.UI_URL || '';
+  const brandName = (dynamic?.companyName || 'uniqohr').toLowerCase();
+  const certCount = dynamic?.certData?.length || 0;
+  const img = (name) => `${uiUrl}/assets/images/sustainability/${name}`;
+
+  const publishedDppPages = (dynamic?.dppProducts || [])
+    .filter((p) => p?.isPublic === true && p?.status !== 2)
+    .map((p) => {
+      const pub = p?.published || {};
+      const businessSlug = p?.businessSlugName || brandName;
+      const slug = p?.slug || '';
+      const pageUrl = slug ? `${uiUrl}/dpp/${businessSlug}/${slug}` : '#';
+      const image = pub?.productImages?.[0] || p?.productImages?.[0] || img('eco-wind2.jpg');
+      const title = pub?.formalName || pub?.name || p?.name || 'Digital Product Passport';
+      const text = pub?.shortDescription || pub?.Category || 'View digital product passport';
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=72x72&data=${encodeURIComponent(pageUrl)}`;
+      return { pageUrl, image, title, text, qrUrl, alt: title };
+    });
+
+  const projectCollections = [
+    { title: 'Nature-Based Removal', count: dynamic?.totalProjects || 12, img: img('eco-sapling.jpg'), alt: 'Sapling planted at reforestation site' },
+    { title: 'Shop Projects', count: dynamic?.dppProducts?.length || 8, img: img('eco-wind2.jpg'), alt: 'Solar farm at golden hour' },
+    { title: 'Registry Certified', count: certCount || 5, img: img('uniqhor.jpg'), alt: 'Verified digital carbon certificate' },
+    { title: 'Renewable Energy', count: 3, img: img('eco-wind2.jpg'), alt: 'Wind turbines at dawn' },
+  ];
+
+  const fallbackCerts = [
+    { id: '100000002043', date: '2026-07-01', tons: '1 Tons', title: 'Piedra Wind Farm', description: 'Utility-scale wind farm displacing fossil-fuel electricity on the Mexican national grid.', image: img('eco-wind2.jpg'), alt: 'Wind turbine at sunrise', url: '#' },
+    { id: '100000002044', date: '2026-07-01', tons: '2 Tons', title: 'Coastal Plastic Recovery', description: 'Removes ocean-bound plastic from coastal waterways and funds local collector livelihoods.', image: img('eco-ocean.jpg'), alt: 'Hands collecting plastic from the ocean', url: '#' },
+    { id: '100000002045', date: '2026-07-01', tons: '3 Tons', title: 'Boreal Reforestation', description: 'Nature-based removal restoring degraded boreal forest with native species and long-term monitoring.', image: img('eco-sapling.jpg'), alt: 'Sapling planted in dark soil', url: '#' },
+    { id: '100000002046', date: '2026-07-01', tons: '1 Tons', title: 'Dairy Methane Capture', description: 'Anaerobic digester capturing methane from dairy operations and converting it into renewable energy.', image: img('eco-methane.jpg'), alt: 'Methane capture facility', url: '#' },
+  ];
+
+  const chainItems = (dynamic?.certData?.length ? dynamic.certData : []).map((cert) => ({
+    id: cert?.originNumber || '',
+    date: cert?.createdAt ? new Date(cert.createdAt).toISOString().split('T')[0] : '',
+    tons: cert?.quantity ? `${cert.quantity} Tons` : '',
+    title: cert?.product?.name || 'Certificate',
+    description: cert?.product?.shortDescription || cert?.product?.description || '',
+    image: cert?.product?.thumbImage?.[0] || '',
+    alt: cert?.product?.name || 'Certificate',
+    url: cert?.certificate?.certificateURL || '#',
+  }));
+
+  const displayChain = chainItems.length > 0 ? chainItems : fallbackCerts;
+  const companyLabel = dynamic?.companyName || 'Uniqohr';
+  const brandLogo = dynamic?.logo
+    ? `<img src="${dynamic.logo}" alt="${companyLabel}" class="uq-brand-logo" width="131" height="31" />`
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -26,17 +65,26 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --ink: oklch(0.18 0.005 80);
       --ink-soft: oklch(0.35 0.005 80);
       --canvas: oklch(0.955 0.004 80);
       --canvas-alt: oklch(0.93 0.005 80);
+      --section-alt: oklch(0.96 0.004 80);
       --hairline: oklch(0.86 0.006 80);
       --muted: oklch(0.45 0.008 80);
-      --nav: oklch(0.24 0.005 80);
-      --nav-deep: oklch(0.20 0.005 80);
+      --ann-bg: #0f1318;
+      --header-bg: #2d3339;
+      --footer-bg: #2d3339;
+      --uq-cream: #f9f8f5;
+      --uq-divider: #707070;
+      --uq-nav-font: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+      --uq-logo-height: 31px;
+      --uq-logo-width: 131px;
+      --uq-logo-width-mobile: 119px;
+      --cream: #f9f8f5;
       --accent-green: #10b981;
     }
 
@@ -79,25 +127,26 @@
       color: rgba(255,255,255,0.6);
     }
 
-    /* Announcement Bar */
+    /* Announcement + Header — Uniqohr */
     .uq-announcement {
       width: 100%;
-      background: var(--nav-deep);
-      color: #fff;
-      font-size: 13px;
-      padding: 10px 0;
+      background: var(--ann-bg);
+      color: var(--uq-cream);
+      font-family: var(--uq-nav-font);
+      font-size: 16px;
+      font-weight: 400;
+      padding: 15px 24px;
       text-align: center;
-      font-weight: 500;
-      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--uq-divider);
     }
 
-    /* Header */
     .uq-header {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: var(--nav);
-      color: #fff;
+      background: var(--header-bg);
+      color: var(--uq-cream);
+      font-family: var(--uq-nav-font);
     }
 
     .uq-header-inner {
@@ -107,61 +156,138 @@
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
       gap: 16px;
-      padding: 20px 24px;
+      padding: 11px 24px;
+      min-height: 66px;
+    }
+
+    @media (min-width: 768px) {
+      .uq-header-inner { padding: 11px 40px; }
     }
 
     .uq-nav-brand {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 24px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      color: rgba(255,255,255,0.6);
+      display: inline-flex;
+      align-items: center;
       text-decoration: none;
+      color: var(--uq-cream);
+      justify-self: start;
+    }
+
+    .uq-brand-logo {
+      display: block;
+      width: var(--uq-logo-width);
+      height: var(--uq-logo-height);
+      max-width: 100%;
+      object-fit: contain;
+      object-position: left center;
+    }
+
+    @media (max-width: 989px) {
+      .uq-brand-logo {
+        width: var(--uq-logo-width-mobile);
+      }
+    }
+
+    .uq-nav-brand .uq-brand-logo {
+      object-position: center center;
+    }
+
+    .uq-nav-brand-text {
+      font-family: var(--uq-nav-font);
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--uq-cream);
       text-transform: lowercase;
     }
 
-    .uq-nav-logo {
-      height: 36px;
-      width: auto;
-      object-fit: contain;
-      }
+    .uq-nav-menu-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: var(--uq-cream);
+      cursor: pointer;
+      padding: 16px;
+      line-height: 0;
+      justify-self: start;
+    }
+
+    .uq-nav-menu-btn svg {
+      width: 14px;
+      height: 14px;
+      display: block;
+    }
 
     .uq-nav-links {
-      display: flex;
+      display: none;
       justify-content: center;
-      gap: 40px;
+      gap: 32px;
       list-style: none;
-      font-size: 15px;
-      font-weight: 500;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    @media (min-width: 990px) {
+      .uq-nav-links { display: flex; }
     }
 
     .uq-nav-links a {
-      color: rgba(255,255,255,0.85);
+      color: rgba(249, 248, 245, 0.7);
       text-decoration: none;
-      transition: opacity 0.2s;
+      transition: color 0.2s;
+      white-space: nowrap;
     }
 
-    .uq-nav-links a:hover { opacity: 0.7; }
+    .uq-nav-links a:hover,
+    .uq-nav-links a.uq-nav-active {
+      color: var(--uq-cream);
+    }
 
     .uq-nav-actions {
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      gap: 20px;
+      gap: 4px;
     }
 
-    .uq-nav-actions a {
-      color: rgba(255,255,255,0.85);
-      text-decoration: none;
+    .uq-nav-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--uq-cream);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 16px;
+      line-height: 0;
       transition: opacity 0.2s;
     }
 
-    .uq-nav-actions a:hover { opacity: 0.7; }
+    .uq-nav-icon:hover { opacity: 0.7; }
 
-    @media (max-width: 768px) {
-      .uq-header-inner { padding: 16px; }
-      .uq-nav-links { display: none; }
-      .uq-nav-actions { display: none; }
+    .uq-nav-icon svg {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+
+    .uq-nav-icon--account svg {
+      width: 15px;
+      height: 17px;
+    }
+
+    .uq-header nav {
+      display: block;
+    }
+
+    @media (max-width: 989px) {
+      .uq-header-inner {
+        grid-template-columns: auto 1fr auto;
+        padding: 11px 20px;
+      }
+      .uq-nav-menu-btn { display: inline-flex; }
+      .uq-header nav { display: none; }
+      .uq-nav-brand { justify-self: center; }
     }
 
     /* Hero */
@@ -223,7 +349,7 @@
       .uq-hero-desc { font-size: 18px; }
     }
 
-    /* About Founder Section */
+    /* Built from the Ground Up */
     .uq-about {
       background: var(--canvas);
     }
@@ -231,46 +357,55 @@
     .uq-about-inner {
       max-width: 1600px;
       margin: 0 auto;
-      display: grid;
-      gap: 40px;
       padding: 96px 24px;
-      align-items: center;
     }
 
-    .uq-about-img {
-      width: 100%;
-      aspect-ratio: 3 / 4;
-      object-fit: cover;
+    @media (min-width: 768px) {
+      .uq-about-inner { padding: 144px 48px; }
     }
 
-    .uq-about-text {
-      max-width: 520px;
-    }
-
-    .uq-about-text h2 {
+    .uq-about-title {
       font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 30px;
+      font-size: 36px;
       font-weight: 500;
       letter-spacing: -0.03em;
-      line-height: 1.02;
+      line-height: 1;
       color: var(--ink);
+      margin-bottom: 64px;
+      max-width: 768px;
     }
 
+    @media (min-width: 768px) {
+      .uq-about-title { font-size: 60px; margin-bottom: 96px; }
+    }
+
+    .uq-about-grid {
+      display: grid;
+      gap: 56px;
+      align-items: start;
+    }
+
+    @media (min-width: 768px) {
+      .uq-about-grid { grid-template-columns: 1fr 1fr; gap: 96px; }
+    }
+
+    .uq-about-text { max-width: 520px; }
+
     .uq-about-text p {
-      margin-top: 24px;
       font-size: 15px;
       line-height: 1.7;
       color: var(--ink-soft);
+      margin-top: 24px;
     }
 
-    .uq-about-text p.uq-about-highlight {
-      color: var(--ink);
-      font-weight: 500;
-    }
+    .uq-about-text p:first-child { margin-top: 0; }
+
+    .uq-about-text p.uq-about-highlight,
+    .uq-about-text p strong { color: var(--ink); font-weight: 500; }
 
     .uq-about-link {
       display: inline-block;
-      margin-top: 24px;
+      margin-top: 16px;
       font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.16em;
@@ -284,1020 +419,892 @@
 
     .uq-about-link:hover { opacity: 0.7; }
 
-    .uq-about-img-wrap {
-      order: 1;
+    .uq-about-img {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
     }
-    .uq-about-text {
-      order: 2;
+
+    /* Verified Chain */
+    .uq-verified {
+      background: var(--section-alt);
+      border-top: 1px solid var(--hairline);
+    }
+
+    .uq-verified-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 96px 24px;
     }
 
     @media (min-width: 768px) {
-      .uq-about-inner {
+      .uq-verified-inner { padding: 144px 48px; }
+    }
+
+    .uq-verified-top {
+      display: grid;
+      gap: 48px;
+      margin-bottom: 64px;
+    }
+
+    @media (min-width: 768px) {
+      .uq-verified-top {
         grid-template-columns: 1fr 1fr;
         gap: 80px;
-        padding: 144px 48px;
+        margin-bottom: 96px;
       }
-      .uq-about-img-wrap { order: 2; }
-      .uq-about-text { order: 1; }
-      .uq-about-text h2 { font-size: 48px; }
     }
 
-    /* Stats Band */
-    .uq-stats {
-      border-top: 1px solid var(--hairline);
-      border-bottom: 1px solid var(--hairline);
-      background: var(--canvas);
-    }
-
-    .uq-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      max-width: 1600px;
-      margin: 0 auto;
-    }
-
-    .uq-stat-item {
-      padding: 48px 24px;
-      text-align: center;
-      border-right: 1px solid var(--hairline);
-    }
-
-    .uq-stat-item:last-child { border-right: none; }
-
-    .uq-stat-value {
+    .uq-verified-title {
       font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 48px;
-      font-weight: 300;
-      letter-spacing: -0.02em;
-      color: var(--ink);
-    }
-
-    .uq-stat-label {
-      margin-top: 12px;
-      font-size: 11px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    @media (max-width: 768px) {
-      .uq-stats-grid { grid-template-columns: 1fr; }
-      .uq-stat-item { border-right: none; border-bottom: 1px solid var(--hairline); padding: 32px 16px; }
-      .uq-stat-item:last-child { border-bottom: none; }
-      .uq-stat-value { font-size: 40px; }
-    }
-
-    /* Product Gallery */
-    .uq-gallery {
-      background: var(--canvas);
-      border-top: 1px solid var(--hairline);
-      padding: 96px 0;
-    }
-
-    .uq-gallery-header {
-      max-width: 1600px;
-      margin: 0 auto 56px;
-      padding: 0 24px;
-    }
-
-    .uq-gallery-header h2 {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 30px;
+      font-size: 36px;
       font-weight: 500;
       letter-spacing: -0.03em;
-      line-height: 1.02;
-      margin-top: 16px;
+      line-height: 1;
       color: var(--ink);
+      max-width: 448px;
     }
 
-    .uq-gallery-header p {
-      margin-top: 16px;
+    @media (min-width: 768px) {
+      .uq-verified-title { font-size: 60px; }
+    }
+
+    .uq-verified-sub {
+      margin-top: 24px;
       font-size: 15px;
       line-height: 1.7;
       color: var(--muted);
-      max-width: 520px;
+    }
+
+    .uq-verified-body { max-width: 520px; }
+
+    @media (min-width: 768px) {
+      .uq-verified-body { justify-self: end; }
+    }
+
+    .uq-verified-body p {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-top: 24px;
+    }
+
+    .uq-verified-body p:first-child {
+      color: var(--ink);
+      margin-top: 0;
+    }
+
+    .uq-verified-cta {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 16px;
+      background: var(--ink);
+      color: var(--canvas);
+      padding: 16px 32px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .uq-verified-cta:hover { opacity: 0.9; }
+
+    .uq-verified-strip-wrap {
+      position: relative;
+      margin: 0 -24px;
     }
 
     @media (min-width: 768px) {
-      .uq-gallery { padding: 128px 0; }
-      .uq-gallery-header { padding: 0 48px; margin-bottom: 56px; }
-      .uq-gallery-header h2 { font-size: 48px; }
+      .uq-verified-strip-wrap { margin: 0 -48px; }
     }
 
-    .uq-gallery-scroll {
+    .uq-verified-strip {
       overflow-x: auto;
       scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
-      overscroll-behavior-x: contain;
-      cursor: grab;
-      user-select: none;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .uq-gallery-scroll::-webkit-scrollbar { display: none; }
+    .uq-verified-strip::-webkit-scrollbar { display: none; }
 
-    .uq-gallery-track {
+    .uq-verified-strip-track {
       display: flex;
-      gap: 16px;
-      padding: 0 24px 8px;
+      gap: 8px;
+      padding: 0 24px;
     }
 
     @media (min-width: 768px) {
-      .uq-gallery-track { gap: 24px; padding: 0 48px 8px; }
+      .uq-verified-strip-track { gap: 12px; padding: 0 48px; }
     }
 
-    .uq-gallery-card {
+    .uq-verified-strip-item {
       flex-shrink: 0;
       scroll-snap-align: start;
-      width: 75vw;
+      width: 80vw;
+      max-width: 280px;
+    }
+
+    @media (min-width: 640px) {
+      .uq-verified-strip-item { width: 45vw; max-width: 300px; }
+    }
+
+    @media (min-width: 768px) {
+      .uq-verified-strip-item { width: calc((100vw - 6rem - 2.25rem) / 4); max-width: 320px; }
+    }
+
+    .uq-dpp-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 320px;
+      background: #fff;
+      border: 1px solid var(--hairline);
       text-decoration: none;
       color: inherit;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .uq-dpp-card:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .uq-dpp-card-image {
+      flex: 2;
+      min-height: 0;
+      overflow: hidden;
+      background: var(--canvas-alt);
+    }
+
+    .uq-dpp-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       display: block;
     }
 
-    @media (min-width: 640px) { .uq-gallery-card { width: 45vw; } }
-    @media (min-width: 768px) { .uq-gallery-card { width: 32vw; } }
-    @media (min-width: 1024px) { .uq-gallery-card { width: 24vw; max-width: 420px; } }
-
-    .uq-gallery-img-wrap {
-      aspect-ratio: 3 / 4;
-      width: 100%;
-      overflow: hidden;
-      background: var(--canvas-alt);
-      position: relative;
-    }
-
-    .uq-gallery-img {
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
-      transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .uq-gallery-card:hover .uq-gallery-img {
-      transform: scale(1.04);
-    }
-
-    .uq-gallery-card-title {
-      margin-top: 16px;
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 18px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      color: var(--ink);
-    }
-
-    .uq-gallery-card-type {
-      margin-top: 4px;
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-    }
-
-    .uq-gallery-hint {
-      max-width: 1600px;
-      margin: 24px auto 0;
-      padding: 0 24px;
-      font-size: 12px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    @media (min-width: 768px) {
-      .uq-gallery-hint { padding: 0 48px; }
-    }
-
-    /* Hover Story (Uniqohr Method) */
-    .uq-method {
-      background: oklch(0.16 0.005 80);
-      color: #fff;
-      padding: 96px 24px;
-    }
-
-    .uq-method-inner {
-      max-width: 1600px;
-      margin: 0 auto;
-    }
-
-    .uq-method-header {
-      margin-bottom: 64px;
-      max-width: 640px;
-    }
-
-    .uq-method-header h2 {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 30px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      line-height: 1.02;
-      margin-top: 16px;
-      color: #fff;
-    }
-
-    @media (min-width: 768px) {
-      .uq-method { padding: 144px 48px; }
-      .uq-method-header h2 { font-size: 48px; }
-    }
-
-    .uq-method-grid {
-      display: grid;
-      gap: 40px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-method-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 64px;
-      }
-    }
-
-    .uq-method-list {
-      list-style: none;
-      border-top: 1px solid rgba(255,255,255,0.15);
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-    }
-
-    .uq-method-item {
-      padding: 32px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-      cursor: pointer;
-      transition: opacity 0.3s;
-    }
-
-    .uq-method-item:last-child { border-bottom: none; }
-
-    .uq-method-item-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 24px;
-    }
-
-    .uq-method-item-label {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 30px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      line-height: 1.02;
-      color: #fff;
-    }
-
-    .uq-method-item-num {
-      font-size: 12px;
-      letter-spacing: 0.16em;
-      color: rgba(255,255,255,0.5);
-    }
-
-    .uq-method-item-copy {
-      margin-top: 12px;
-      font-size: 15px;
-      line-height: 1.6;
-      max-width: 480px;
-      color: rgba(255,255,255,0.9);
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: max-height 0.5s, opacity 0.5s;
-    }
-
-    .uq-method-item.uq-active .uq-method-item-copy {
-      max-height: 100px;
-      opacity: 1;
-    }
-
-    .uq-method-item:not(.uq-active) {
-      opacity: 0.4;
-    }
-
-    .uq-method-item:not(.uq-active):hover {
-      opacity: 0.7;
-    }
-
-    @media (min-width: 768px) {
-      .uq-method-item-label { font-size: 48px; }
-      .uq-method-item { padding: 40px 0; }
-    }
-
-    .uq-method-visual {
-      position: relative;
-      aspect-ratio: 4 / 5;
-      overflow: hidden;
-      background: rgba(0,0,0,0.3);
-    }
-
-    @media (min-width: 768px) {
-      .uq-method-visual {
-        aspect-ratio: auto;
-        min-height: 560px;
-      }
-    }
-
-    .uq-method-visual img {
-      position: absolute;
-      inset: 0;
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
-      transition: opacity 0.7s;
-    }
-
-    .uq-method-visual img.uq-img-hidden {
-      opacity: 0;
-    }
-
-    .uq-method-visual img.uq-img-visible {
-      opacity: 1;
-    }
-
-    /* DPP Info Cards */
-    .uq-dpp {
-      background: var(--canvas);
-      border-top: 1px solid var(--hairline);
-      padding: 96px 24px;
-    }
-    .uq-dpp-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .uq-dpp-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-      margin-top: 48px;
-    }
-    @media (min-width: 640px) {
-      .uq-dpp-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (min-width: 1024px) {
-      .uq-dpp-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    .uq-dpp-card {
-      background: #fff;
-      border: 1px solid var(--hairline);
-      border-radius: 8px;
-      padding: 20px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .uq-dpp-card:hover {
-      border-color: rgba(0,0,0,0.2);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .uq-dpp-card-top {
-      display: flex;
-      gap: 16px;
-    }
-    .uq-dpp-card-img {
-      width: 72px;
-      height: 72px;
+    .uq-dpp-card-divider {
       flex-shrink: 0;
-      border-radius: 6px;
-      overflow: hidden;
-      background: var(--canvas-alt);
+      height: 1px;
+      background: var(--hairline);
     }
-    .uq-dpp-card-img img {
+
+    .uq-dpp-card-meta {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      min-height: 0;
+    }
+
+    .uq-dpp-card-qr {
+      flex-shrink: 0;
+      width: 56px;
+      height: 56px;
+      background: #fff;
+    }
+
+    .uq-dpp-card-qr img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      display: block;
     }
-    .uq-dpp-card-info {
+
+    .uq-dpp-card-text {
       flex: 1;
       min-width: 0;
     }
-    .uq-dpp-card-name {
+
+    .uq-dpp-card-title {
+      font-family: var(--uq-nav-font);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .uq-dpp-card-desc {
+      font-family: var(--uq-nav-font);
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 1.45;
+      color: var(--muted);
+      margin: 4px 0 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .uq-verified-strip-img {
+      aspect-ratio: 4 / 5;
+      width: 100%;
+      overflow: hidden;
+      background: var(--canvas-alt);
+    }
+
+    .uq-verified-strip-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Founder Quote */
+    .uq-quote {
+      background: var(--canvas);
+      border-top: 1px solid var(--hairline);
+    }
+
+    .uq-quote-inner {
+      max-width: 896px;
+      margin: 0 auto;
+      padding: 112px 24px 64px;
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .uq-quote-inner { padding: 160px 48px 96px; }
+    }
+
+    .uq-quote-text {
       font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 16px;
+      font-size: 24px;
       font-weight: 500;
+      line-height: 1.25;
       letter-spacing: -0.02em;
       color: var(--ink);
-      line-height: 1.3;
-    }
-    .uq-dpp-card-meta {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 4px;
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-    }
-    .uq-dpp-verified {
-      color: var(--accent-green);
-      font-weight: 500;
-    }
-    .uq-dpp-metrics {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
-    }
-    .uq-dpp-metric {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      background: var(--canvas-alt);
-      border-radius: 4px;
-      padding: 4px 8px;
-      min-width: 52px;
-    }
-    .uq-dpp-metric-label {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-    }
-    .uq-dpp-metric-value {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--ink);
-      margin-top: 1px;
-    }
-    .uq-dpp-card-desc {
-      font-size: 13px;
-      line-height: 1.5;
-      color: var(--muted);
-    }
-    .uq-dpp-card-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: auto;
-      padding-top: 14px;
-      border-top: 1px solid var(--hairline);
-    }
-    .uq-dpp-qr {
-      width: 40px;
-      height: 40px;
-      border-radius: 3px;
-      background: #fff;
-      padding: 2px;
-      border: 1px solid var(--hairline);
-    }
-    .uq-dpp-link {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ink);
-      text-decoration: none;
-      border-bottom: 1px solid var(--hairline);
-      padding-bottom: 2px;
-      transition: border-color 0.2s;
-    }
-    .uq-dpp-link:hover {
-      border-color: var(--ink);
     }
 
-    /* Chain of Custody */
+    @media (min-width: 768px) {
+      .uq-quote-text { font-size: 36px; }
+    }
+
+    .uq-quote-author {
+      margin-top: 40px;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .uq-quote-banner {
+      width: 100%;
+      aspect-ratio: 21 / 9;
+      object-fit: cover;
+    }
+
+    /* Chain of Custody — diamond timeline */
     .uq-chain {
-      background: #ebebeb;
+      background: var(--section-alt);
       border-top: 1px solid var(--hairline);
-      padding: 96px 24px;
-    }
-
-    @media (max-width: 768px) {
-      .uq-chain { padding: 56px 16px; }
     }
 
     .uq-chain-inner {
       max-width: 1400px;
       margin: 0 auto;
-    }
-
-    .uq-chain-label {
-      font-size: 11px;
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .uq-chain-title {
-      margin-top: 12px;
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 36px;
-      font-weight: 300;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      color: var(--ink);
+      padding: 96px 24px;
     }
 
     @media (min-width: 768px) {
-      .uq-chain-title { font-size: 48px; }
+      .uq-chain-inner { padding: 144px 48px; }
+    }
+
+    .uq-chain-title {
+      margin-top: 24px;
+      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+      font-size: 36px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--ink);
+      max-width: 768px;
+    }
+
+    @media (min-width: 768px) {
+      .uq-chain-title { font-size: 60px; }
     }
 
     .uq-chain-subtitle {
-      margin-top: 16px;
+      margin-top: 24px;
+      max-width: 576px;
       font-size: 15px;
       line-height: 1.7;
-      color: var(--ink-soft);
-      max-width: 640px;
+      color: var(--muted);
     }
 
     .uq-chain-list {
       position: relative;
-      margin-top: 64px;
-      padding-left: 0;
       list-style: none;
+      margin-top: 64px;
+    }
+
+    @media (min-width: 768px) {
+      .uq-chain-list { margin-top: 96px; }
     }
 
     .uq-chain-line {
       position: absolute;
-      left: 16px;
-      top: 12px;
-      bottom: 12px;
+      left: 7px;
+      top: 8px;
+      bottom: 8px;
       width: 1px;
-      background: rgba(0, 0, 0, 0.15);
-      transform: translateX(-50%);
+      background: var(--hairline);
+    }
+
+    @media (min-width: 768px) {
+      .uq-chain-line { left: 9px; }
     }
 
     .uq-chain-item {
       position: relative;
-      padding-left: 40px;
-      margin-bottom: 72px;
+      padding-left: 32px;
+      padding-bottom: 64px;
     }
 
-    .uq-chain-item:last-child { margin-bottom: 0; }
+    @media (min-width: 768px) {
+      .uq-chain-item { padding-left: 56px; padding-bottom: 96px; }
+    }
 
-    .uq-chain-dot {
+    .uq-chain-item:last-child { padding-bottom: 0; }
+
+    .uq-chain-diamond {
       position: absolute;
-      left: 16px;
-      top: 10px;
-      width: 9px;
-      height: 9px;
-      border: 1px solid rgba(0, 0, 0, 0.5);
-      background: #ebebeb;
-      transform: translate(-50%, 0) rotate(45deg);
-      z-index: 2;
+      left: 0;
+      top: 4px;
+      width: 15px;
+      height: 15px;
+      transform: rotate(45deg);
+      border: 1px solid var(--ink);
+      background: var(--canvas);
+      z-index: 1;
+    }
+
+    @media (min-width: 768px) {
+      .uq-chain-diamond { width: 19px; height: 19px; }
     }
 
     .uq-chain-card {
       display: grid;
-      grid-template-columns: 1fr;
+      gap: 32px;
       align-items: start;
-      gap: 24px;
     }
+
+    @media (min-width: 768px) {
+      .uq-chain-card { grid-template-columns: 1fr auto; gap: 64px; }
+    }
+
+    .uq-chain-content { max-width: 576px; }
 
     .uq-chain-cert-tag {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      border: 1px solid rgba(0, 0, 0, 0.15);
-      background: rgba(255, 255, 255, 0.7);
-      padding: 5px 12px;
-      font-size: 10px;
-      font-family: monospace;
-      font-weight: 500;
-      letter-spacing: 0.16em;
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+      padding: 6px 12px;
+      font-size: 11px;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: rgba(0, 0, 0, 0.65);
-      margin-bottom: 16px;
-      width: fit-content;
+      color: var(--ink);
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .uq-chain-cert-tag:hover {
+      background: var(--ink);
+      color: var(--canvas);
     }
 
     .uq-chain-date {
+      margin-top: 24px;
       font-size: 13px;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.5);
-      margin-bottom: 6px;
+      color: var(--muted);
     }
 
     .uq-chain-qty {
+      margin-top: 4px;
       font-size: 13px;
-      color: rgba(0, 0, 0, 0.75);
-      margin-bottom: 24px;
+      color: var(--muted);
     }
 
-    .uq-chain-qty strong {
-      color: #000;
-      font-weight: 600;
-    }
+    .uq-chain-qty strong { color: var(--ink); font-weight: 500; }
 
     .uq-chain-project {
+      margin-top: 16px;
       font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
       font-size: 24px;
-      font-weight: 400;
+      font-weight: 500;
       letter-spacing: -0.02em;
-      color: #000;
-      margin-bottom: 16px;
-    }
-
-    .uq-chain-desc {
-      font-size: 14px;
-      line-height: 1.7;
-      color: rgba(0, 0, 0, 0.65);
-      margin-bottom: 24px;
-      max-width: 620px;
-    }
-
-    .uq-chain-view-link {
-      display: inline-block;
-      padding: 10px 20px;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: rgba(0, 0, 0, 0.85);
-      border: 1px solid rgba(0, 0, 0, 0.2);
-      text-decoration: none;
-      transition: all 0.2s ease;
-    }
-
-    .uq-chain-view-link:hover {
-      background: #000;
-      color: #fff;
-      border-color: #000;
-    }
-
-    .uq-chain-img-wrap {
-      position: relative;
-      aspect-ratio: 4 / 3;
-      width: 100%;
-      overflow: hidden;
-      background: #e2e0dc;
-      border-radius: 2px;
-    }
-
-    .uq-chain-img {
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
-      transition: transform 0.5s ease;
-    }
-
-    .uq-chain-card:hover .uq-chain-img {
-      transform: scale(1.04);
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-line {
-        left: 28px;
-      }
-      .uq-chain-item {
-        padding-left: 64px;
-        margin-bottom: 80px;
-      }
-      .uq-chain-dot {
-        left: 28px;
-        top: 10px;
-      }
-      .uq-chain-card {
-        grid-template-columns: 1fr 280px;
-        gap: 48px;
-      }
-      .uq-chain-img-wrap {
-        width: 280px;
-      }
-      .uq-chain-project {
-        font-size: 30px;
-      }
-      .uq-chain-date {
-        font-size: 14px;
-      }
-      .uq-chain-qty {
-        font-size: 14px;
-      }
-    }
-
-    /* Ledger Footer */
-    .uq-ledger-footer {
-      margin-top: 56px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      border-top: 1px solid var(--hairline);
-      padding-top: 32px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-ledger-footer {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 80px;
-        padding-top: 32px;
-      }
-    }
-
-    .uq-ledger-footer-text {
-      font-size: 12px;
-      color: var(--muted);
-      max-width: 480px;
-    }
-
-    .uq-ledger-cta {
-      display: inline-block;
-      background: var(--ink);
-      color: #fff;
-      padding: 16px 32px;
-      font-size: 12px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      font-weight: 500;
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-
-    .uq-ledger-cta:hover { opacity: 0.9; }
-
-    /* Why Section */
-    .uq-why {
-      background: #fff;
-      border-top: 1px solid var(--hairline);
-      padding: 80px 24px;
-    }
-
-    .uq-why-inner {
-      max-width: 1600px;
-      margin: 0 auto;
-      display: grid;
-      gap: 48px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-why { padding: 128px 48px; }
-      .uq-why-inner {
-        grid-template-columns: 1fr 1fr;
-        gap: 80px;
-        align-items: center;
-      }
-    }
-
-    .uq-why h2 {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 30px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      line-height: 1.02;
-      margin-top: 16px;
       color: var(--ink);
     }
 
     @media (min-width: 768px) {
-      .uq-why h2 { font-size: 48px; }
+      .uq-chain-project { font-size: 36px; }
     }
 
-    .uq-why p {
-      margin-top: 24px;
+    .uq-chain-desc {
+      margin-top: 16px;
       font-size: 15px;
       line-height: 1.7;
-      color: var(--ink-soft);
-      max-width: 640px;
+      color: var(--muted);
     }
 
-    .uq-why-btn {
-      margin-top: 40px;
-      display: inline-flex;
+    .uq-chain-img-wrap {
+      width: 100%;
+      aspect-ratio: 1;
+      overflow: hidden;
+      background: var(--canvas-alt);
+    }
+
+    @media (min-width: 768px) {
+      .uq-chain-img-wrap { width: 320px; }
+    }
+
+    @media (min-width: 1024px) {
+      .uq-chain-img-wrap { width: 380px; }
+    }
+
+    .uq-chain-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Project Grid */
+    .uq-projects {
+      background: var(--canvas);
+      border-top: 1px solid var(--hairline);
+    }
+
+    .uq-projects-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 96px 24px;
+    }
+
+    @media (min-width: 768px) {
+      .uq-projects-inner { padding: 144px 48px; }
+    }
+
+    .uq-projects-grid {
+      display: grid;
+      gap: 56px;
       align-items: center;
-      background: var(--ink);
-      color: #fff;
-      padding: 12px 24px;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.2em;
-      text-decoration: none;
-      text-transform: uppercase;
-      transition: opacity 0.2s;
     }
 
-    .uq-why-btn:hover { opacity: 0.9; }
+    @media (min-width: 768px) {
+      .uq-projects-grid { grid-template-columns: 1fr 1fr; gap: 80px; }
+    }
 
-    .uq-why-img-wrap {
+    .uq-projects-list {
+      list-style: none;
+    }
+
+    .uq-projects-list li + li { margin-top: 24px; }
+
+    @media (min-width: 768px) {
+      .uq-projects-list li + li { margin-top: 32px; }
+    }
+
+    .uq-projects-link {
+      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: rgba(0, 0, 0, 0.35);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    @media (min-width: 768px) {
+      .uq-projects-link { font-size: 48px; }
+    }
+
+    .uq-projects-link sup {
+      margin-left: 8px;
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      vertical-align: super;
+      color: var(--muted);
+    }
+
+    .uq-projects-link.uq-active,
+    .uq-projects-link:hover { color: var(--ink); }
+
+    .uq-projects-visual {
       position: relative;
       width: 100%;
       aspect-ratio: 4 / 5;
       overflow: hidden;
+      background: var(--canvas-alt);
     }
 
-    .uq-why-img {
-      height: 100%;
+    .uq-projects-visual img {
+      position: absolute;
+      inset: 0;
       width: 100%;
+      height: 100%;
       object-fit: cover;
+      transition: opacity 0.5s;
     }
 
-    /* Newsletter */
-    .uq-newsletter {
-      background: var(--canvas);
-      border-top: 1px solid var(--hairline);
-      padding: 64px 24px;
+    .uq-projects-visual img.uq-img-hidden { opacity: 0; }
+    .uq-projects-visual img.uq-img-visible { opacity: 1; }
+
+    /* Join Community — Uniqohr */
+    .uq-join {
+      background: #f7f7f7;
     }
 
-    .uq-newsletter-inner {
+    .uq-join-inner {
       max-width: 1600px;
       margin: 0 auto;
-      display: grid;
-      gap: 32px;
-      align-items: center;
+      padding: 70px 40px 40px;
     }
 
-    @media (min-width: 768px) {
-      .uq-newsletter { padding: 80px 48px; }
-      .uq-newsletter-inner {
-        grid-template-columns: auto 1fr;
-        gap: 32px;
+    @media (max-width: 749px) {
+      .uq-join-inner { padding: 40px 20px; }
+    }
+
+    .uq-join-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 16px;
+    }
+
+    @media (max-width: 749px) {
+      .uq-join-row {
+        grid-template-columns: 1fr;
+        gap: 24px;
       }
     }
 
-    .uq-newsletter h3 {
+    .uq-join-title {
+      margin: 0 0 12px;
       font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 24px;
+      font-size: clamp(2.25rem, 4vw, 3rem);
       font-weight: 500;
       letter-spacing: -0.03em;
-      color: var(--ink);
+      line-height: 1.1;
+      color: #2d3339;
     }
 
-    .uq-newsletter-sub {
-      margin-top: 8px;
-      font-size: 14px;
-      color: var(--muted);
+    .uq-join-sub {
+      margin: 0;
+      font-family: var(--uq-nav-font);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: rgba(45, 51, 57, 0.65);
     }
 
-    .uq-newsletter-form {
-      display: flex;
+    .uq-join-form-wrap {
       width: 100%;
-      max-width: 640px;
+      min-width: 0;
     }
 
-    @media (min-width: 768px) {
-      .uq-newsletter-form { justify-self: end; }
+    .uq-join-form {
+      width: 100%;
     }
 
-    .uq-newsletter-input {
+    .uq-join-input-group {
+      display: flex;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .uq-join-input {
       flex: 1;
-      border: 1px solid var(--hairline);
-      background: var(--canvas);
+      min-width: 0;
+      border: 1px solid #dfdfdf;
+      border-radius: 0;
+      background: #fff;
       padding: 16px 20px;
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .uq-newsletter-input:focus {
-      border-color: var(--ink);
-    }
-
-    .uq-newsletter-submit {
-      background: var(--ink);
-      color: #fff;
-      padding: 16px 24px;
-      border: none;
       font-size: 16px;
+      font-family: var(--uq-nav-font);
+      color: #333;
+      outline: none;
+    }
+
+    .uq-join-input:focus {
+      border-color: #2d3339;
+    }
+
+    .uq-join-input::placeholder {
+      color: rgba(51, 51, 51, 0.55);
+    }
+
+    .uq-join-submit {
+      flex-shrink: 0;
+      width: 56px;
+      background: #2d3339;
+      color: #f9f8f5;
+      border: none;
+      border-radius: 0;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       transition: opacity 0.2s;
     }
 
-    .uq-newsletter-submit:hover { opacity: 0.9; }
+    .uq-join-submit:hover { opacity: 0.85; }
 
-    /* About Us Section */
-    .uq-aboutus {
-      background: var(--canvas-alt);
-      border-top: 1px solid var(--hairline);
-      padding: 80px 24px;
+    .uq-join-submit svg {
+      width: 24px;
+      height: 24px;
+      display: block;
     }
 
-    .uq-aboutus-inner {
+    /* Footer — Uniqohr */
+    .uq-footer {
+      background: var(--footer-bg);
+      color: var(--uq-cream);
+      font-family: var(--uq-nav-font);
+    }
+
+    .uq-footer-main {
       max-width: 1600px;
       margin: 0 auto;
+      padding: 0 40px;
     }
 
-    @media (min-width: 768px) {
-      .uq-aboutus { padding: 128px 48px; }
+    @media (max-width: 768px) {
+      .uq-footer-main { padding: 0 20px; }
     }
 
-    .uq-aboutus h2 {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 30px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      line-height: 1.02;
-      margin-top: 12px;
-      color: var(--ink);
-    }
-
-    @media (min-width: 768px) {
-      .uq-aboutus h2 { font-size: 48px; }
-    }
-
-    .uq-aboutus p {
-      margin-top: 24px;
-      font-size: 15px;
-      line-height: 1.8;
-      color: var(--ink-soft);
-      max-width: 640px;
-    }
-
-    /* Footer */
-    .uq-footer {
-      background: #2b2e34;
-      color: #fff;
-      padding: 64px 24px 32px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .uq-footer-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    .uq-footer-main {
+    .uq-footer-top {
       display: flex;
-      flex-direction: column;
-      gap: 40px;
-    }
-    @media (min-width: 768px) {
-      .uq-footer-main {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: flex-start;
-      }
-    }
-    .uq-footer-brand {
-      font-family: 'Inter Tight', sans-serif;
-      font-size: 26px;
-      font-weight: 600;
-      letter-spacing: -0.03em;
-      color: #fff;
-    }
-    .uq-footer-cols {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      align-items: flex-start;
+      justify-content: space-between;
       gap: 48px;
+      padding: 48px 0 24px;
     }
-    @media (max-width: 600px) {
-      .uq-footer-cols {
-        grid-template-columns: 1fr;
+
+    @media (max-width: 989px) {
+      .uq-footer-top {
+        flex-direction: column;
         gap: 32px;
+        padding: 40px 0 20px;
       }
     }
-    .uq-footer-col h4 {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      color: #fff;
-      margin-bottom: 16px;
+
+    .uq-footer-brand-col {
+      flex: 0 0 auto;
+      padding-top: 9px;
     }
+
+    .uq-footer-brand {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      max-width: 230px;
+    }
+
+    .uq-footer-brand .uq-brand-logo {
+      width: var(--uq-logo-width);
+      height: var(--uq-logo-height);
+      object-position: left center;
+    }
+
+    .uq-footer-brand-text {
+      font-family: var(--uq-nav-font);
+      font-size: clamp(1.75rem, 3vw, 2rem);
+      font-weight: 500;
+      color: var(--uq-cream);
+      text-transform: lowercase;
+      line-height: 1.1;
+    }
+
+    .uq-footer-nav-col {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .uq-footer-nav {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-start;
+      gap: 12px;
+      width: 100%;
+    }
+
+    @media (max-width: 989px) {
+      .uq-footer-nav {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 32px 48px;
+      }
+    }
+
+    .uq-footer-col {
+      flex: 1 1 0;
+      min-width: 140px;
+      max-width: 240px;
+      padding: 23px;
+    }
+
+    @media (max-width: 989px) {
+      .uq-footer-col {
+        flex: 1 1 160px;
+        max-width: none;
+        padding: 0;
+      }
+    }
+
+    .uq-footer-col h4 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--uq-cream);
+      margin: 0 0 16px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    @media (max-width: 768px) {
+      .uq-footer-col h4 { font-size: 1.5rem; }
+    }
+
     .uq-footer-col ul {
       list-style: none;
       padding: 0;
       margin: 0;
     }
-    .uq-footer-col li {
-      margin-bottom: 10px;
-    }
+
+    .uq-footer-col li { margin-bottom: 0; }
+
     .uq-footer-col a {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.65);
+      display: inline-block;
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--uq-cream);
       text-decoration: none;
-      transition: color 0.2s;
+      padding: 6px 0;
+      line-height: 1.6;
+      transition: opacity 0.2s;
     }
-    .uq-footer-col a:hover {
-      color: #fff;
-    }
+
+    .uq-footer-col a:hover { opacity: 0.7; }
+
     .uq-footer-divider {
-      width: 100%;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    @media (max-width: 768px) {
+      .uq-footer-divider { padding: 0 20px; }
+    }
+
+    .uq-footer-divider-line {
+      display: block;
       height: 1px;
-      background: rgba(255, 255, 255, 0.12);
-      margin: 48px 0 24px;
+      background: #fff;
+      border: 0;
     }
-    .uq-footer-bottom {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+
+    .uq-footer-utilities {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px 40px 48px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      text-align: center;
+      gap: 24px;
+      color: rgba(249, 248, 245, 0.6);
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.5);
+      font-weight: 400;
+      line-height: 1.5;
     }
-    @media (min-width: 768px) {
-      .uq-footer-bottom {
-        flex-direction: row;
-        justify-content: space-between;
-        text-align: left;
+
+    @media (max-width: 749px) {
+      .uq-footer-utilities {
+        padding: 20px 20px 40px;
+        grid-template-columns: 1fr;
+        text-align: center;
+        justify-items: center;
       }
     }
-    .uq-footer-policies a {
-      color: rgba(255, 255, 255, 0.5);
+
+    .uq-footer-copy {
+      color: rgba(249, 248, 245, 0.6);
+      font-size: 12px;
+      justify-self: start;
+    }
+
+    @media (max-width: 749px) {
+      .uq-footer-copy { justify-self: center; }
+    }
+
+    .uq-footer-copy a {
+      color: rgba(249, 248, 245, 0.6);
       text-decoration: none;
       transition: color 0.2s;
     }
-    .uq-footer-policies a:hover {
-      color: rgba(255, 255, 255, 0.85);
+
+    .uq-footer-copy a:hover { color: var(--uq-cream); }
+
+    .uq-footer-policies {
+      font-size: 12px;
+      color: rgba(249, 248, 245, 0.6);
+      text-align: center;
     }
+
+    .uq-footer-policies a {
+      color: rgba(249, 248, 245, 0.6);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .uq-footer-policies a:hover { color: var(--uq-cream); }
+
     .uq-footer-socials {
       display: flex;
       align-items: center;
+      justify-content: flex-end;
       gap: 16px;
+      flex-wrap: wrap;
     }
+
+    @media (max-width: 768px) {
+      .uq-footer-socials { justify-content: center; }
+    }
+
     .uq-footer-socials a {
-      color: rgba(255, 255, 255, 0.65);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(249, 248, 245, 0.6);
+      text-decoration: none;
       transition: color 0.2s;
-      font-size: 16px;
+      line-height: 0;
     }
-    .uq-footer-socials a:hover {
-      color: #fff;
+
+    .uq-footer-socials a:hover { color: var(--uq-cream); }
+
+    .uq-footer-socials svg {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+
+    .uq-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     /* Social Links */
@@ -1357,274 +1364,203 @@
 <body>
   <!-- Announcement Bar -->
   <div class="uq-announcement">
-    Verified carbon offsets &middot; Chain of custody live
+    Advanced orders begin 07.01.2026
   </div>
 
   <!-- Header -->
   <header class="uq-header">
     <div class="uq-header-inner">
-      <a href="#" class="uq-nav-brand">
-        ${dynamic?.logo ? `<img src="${dynamic.logo}" alt="Logo" class="uq-nav-logo" />` : ''}
+      <button type="button" class="uq-nav-menu-btn" aria-label="Menu">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 3.5H13" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"></path>
+          <path d="M1 10.5H13" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"></path>
+        </svg>
+      </button>
+      <a href="#top" class="uq-nav-brand">
+        ${brandLogo || `<span class="uq-nav-brand-text">${brandName}</span>`}
       </a>
-      <nav>
+      <nav aria-label="Main">
         <ul class="uq-nav-links">
-          <li><a href="#uq-dpp">Projects</a></li>
+          <li><a href="#gallery">Shop</a></li>
           <li><a href="#technology">Technology</a></li>
-          <li><a href="#chain">Chain of Custody</a></li>
-          <li><a href="#about">About</a></li>
+          <li><a href="#gallery">Journal</a></li>
+          <li><a href="#about" class="uq-nav-active">About</a></li>
         </ul>
       </nav>
       <div class="uq-nav-actions">
-        <a href="#"><i class="fa-solid fa-magnifying-glass" style="font-size: 16px;"></i></a>
-        <a href="#"><i class="fa-solid fa-user" style="font-size: 16px;"></i></a>
+        <button type="button" aria-label="Search" class="uq-nav-icon">
+          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+            <circle cx="9" cy="9" r="4.75" stroke="currentColor" stroke-width="1.25"></circle>
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="m12.5 12.5 3.25 3.25"></path>
+          </svg>
+        </button>
+        <button type="button" aria-label="Account" class="uq-nav-icon uq-nav-icon--account">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 17" fill="none">
+            <path stroke="currentColor" stroke-linejoin="round" stroke-width="1.25" d="M10.375 3.813a3.063 3.063 0 1 1-6.125 0 3.063 3.063 0 0 1 6.125 0ZM7.313 9.5c-3.667 0-6.24 2.691-6.563 6.125h13.125C13.552 12.191 10.979 9.5 7.312 9.5Z"></path>
+          </svg>
+        </button>
       </div>
     </div>
   </header>
 
   <!-- Hero -->
   <section class="uq-hero" id="top">
-    <img
-      src="${dynamic?.UI_URL || ''}/assets/images/sustainability/eco-hero.jpg"
-      alt="Aerial view of misty boreal forest at dawn"
-      class="uq-hero-img"
-    />
+    <img src="${img('eco-hero.jpg')}" alt="Aerial view of misty boreal forest at dawn" class="uq-hero-img" />
     <div class="uq-hero-overlay"></div>
     <div class="uq-hero-content">
       <h1 class="uq-hero-title">${dynamic?.title && dynamic.title !== '' ? dynamic.title : 'Carbon,<br/>accounted for.'}</h1>
-      ${dynamic?.description && dynamic.description !== '' ? `<p class="uq-hero-desc">${dynamic.description}</p>` : `<p class="uq-hero-desc">Three decades of environmental expertise. Every tonne measured, retired and verifiable.</p>`}
+      ${dynamic?.description && dynamic.description !== '' ? `<p class="uq-hero-desc">${dynamic.description}</p>` : `<p class="uq-hero-desc">Three decades of environmental expertise.<br/>One verified system.</p>`}
     </div>
   </section>
 
-  <!-- About Founder -->
-  <section class="uq-about" id="about-founder">
+  <!-- Built from the Ground Up -->
+  <section class="uq-about" id="about">
     <div class="uq-about-inner">
-      <div class="uq-about-img-wrap">
-        <img
-          src="${dynamic?.UI_URL || ''}/assets/images/sustainability/eco-founder.jpg"
-          alt="Ecostance founder portrait"
-          loading="lazy"
-          class="uq-about-img"
-        />
-      </div>
-      <div class="uq-about-text">
-        <h2>Built from the Ground Up</h2>
-        ${dynamic?.aboutUs && dynamic.aboutUs !== '' ? `<p>${dynamic.aboutUs}</p>` : `
-        <p>For more than 30 years, the Ecostance team has worked at the source of environmental accounting â€” developing carbon measurement frameworks, building transparent supply chains, and helping establish the standards that now define responsible offsetting.</p>
-        <p>Long before net zero became a category, we were exploring how natural sequestration and engineered removal could work together to deliver verifiable climate outcomes. The concept was proven. The industry wasn't ready.</p>
-        <p class="uq-about-highlight">Today, it is.</p>
-        <p>Ecostance brings together decades of measurement, verification and retirement expertise to create a new generation of carbon accounting. Every credit is tracked from source project to retired certificate, guided by a simple belief: <strong>Impact is proven, not claimed.</strong></p>
-        `}
-        <a href="#technology" class="uq-about-link">Learn about the technology</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Stats Band -->
-  <section class="uq-stats">
-    <div class="uq-stats-grid">
-      <div class="uq-stat-item">
-        <div class="uq-stat-value">${dynamic?.totalOffset || '0'}</div>
-        <div class="uq-stat-label">GHG Reduced (Metric Tons)</div>
-      </div>
-      <div class="uq-stat-item">
-        <div class="uq-stat-value">${dynamic?.metricTons || '0'}</div>
-        <div class="uq-stat-label">Trees Planted</div>
-      </div>
-      <div class="uq-stat-item">
-        <div class="uq-stat-value">${dynamic?.totalProjects || '0'}</div>
-        <div class="uq-stat-label">Projects Supported</div>
-      </div>
-    </div>
-  </section>
-
-
-
-  <!-- Digital Product Passport -->
-  ${dynamic?.dppProducts && dynamic.dppProducts.length > 0 ? `
-  <section class="uq-dpp" id="uq-dpp">
-    <div class="uq-dpp-inner">
-      <p class="eyebrow">Digital Product Passport</p>
-      <h2 style="font-family:'Inter Tight',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:500;letter-spacing:-0.03em;line-height:1.02;margin-top:16px;">Verified Product Passports</h2>
-      <p style="color:var(--muted);font-size:15px;margin-top:16px;max-width:640px;">Each product carries a Digital Product Passport â€” transparent, auditable, and independently verified.</p>
-      <div class="uq-dpp-grid">
-        ${dynamic.dppProducts.map((dpp) => {
-          const pub = dpp?.published || {};
-          const isPublished = dpp?.isPublic === true;
-          const dppImage = pub.productImages?.[0] || pub.thumbImage?.[0] || pub.image?.[0] || '';
-          const dppName = pub.formalName || pub.name || dpp?.name || 'Product';
-          const dppCategory = pub.Category || '';
-          const dppDesc = pub.shortDescription || '';
-          const dppUrl = isPublished ? '/dpp/' + (dpp?.businessSlugName || '') + '/' + (dpp?.slug || '') : '#';
-          const qrCodeUrl = isPublished && dppUrl !== '#' ? 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=' + encodeURIComponent(dppUrl) : '';
-          const metrics = [];
-          if (pub.showCo2Emission && pub.co2Emission > 0) metrics.push({ label: 'COâ‚‚', value: pub.co2Emission + 'kg' });
-          if (pub.showWaterConsuption && pub.waterConsuption > 0) metrics.push({ label: 'Hâ‚‚O', value: pub.waterConsuption + 'L' });
-          if (pub.showPowerConsuption && pub.powerConsuption > 0) metrics.push({ label: 'Energy', value: pub.powerConsuption + 'kWh' });
-          if (pub.showRecycleMaterial && pub.recycleMaterial > 0) metrics.push({ label: 'Recycled', value: pub.recycleMaterial + '%' });
-          if (pub.showUpcycleMaterial && pub.upcycleMaterial > 0) metrics.push({ label: 'Upcycled', value: pub.upcycleMaterial + '%' });
-          return `
-        <div class="uq-dpp-card" style="${!isPublished ? 'opacity:0.55;' : ''}">
-          <div class="uq-dpp-card-top">
-            <div class="uq-dpp-card-img">
-              ${dppImage ? `<img src="${dppImage}" alt="${dppName}">` : '<div style="width:100%;height:100%;background:var(--canvas-alt);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);letter-spacing:0.1em;">DPP</div>'}
-            </div>
-            <div class="uq-dpp-card-info">
-              <h3 class="uq-dpp-card-name">${dppName}</h3>
-              <div class="uq-dpp-card-meta">
-                ${dppCategory ? '<span>' + dppCategory + '</span>' : ''}
-                ${isPublished ? '<span class="uq-dpp-verified">&#10003; Verified</span>' : '<span style="color:#999;">Draft</span>'}
-              </div>
-              ${metrics.length > 0 ? `
-              <div class="uq-dpp-metrics">
-                ${metrics.map(m => '<span class="uq-dpp-metric"><span class="uq-dpp-metric-label">' + m.label + '</span><span class="uq-dpp-metric-value">' + m.value + '</span></span>').join('')}
-              </div>` : ''}
-            </div>
-          </div>
-          ${dppDesc ? '<p class="uq-dpp-card-desc">' + (dppDesc.length > 140 ? dppDesc.substring(0, 140) + '...' : dppDesc) + '</p>' : ''}
-          <div class="uq-dpp-card-footer">
-            ${isPublished && qrCodeUrl ? '<img src="' + qrCodeUrl + '" alt="QR" class="uq-dpp-qr">' : ''}
-            ${isPublished ? '<a href="' + dppUrl + '" target="_blank" rel="noopener noreferrer" class="uq-dpp-link">View Passport &rarr;</a>' : '<span class="uq-dpp-link" style="opacity:0.4;cursor:default;">Not published</span>'}
-          </div>
-        </div>`;
-        }).join('')}
-      </div>
-    </div>
-  </section>` : ''}
-
-  <!-- Hover Story / Method Section -->
-  <section class="uq-method" id="technology">
-    <div class="uq-method-inner">
-      <div class="uq-method-header">
-        <p class="eyebrow-light">Our Method</p>
-        <h2>Four steps to verified impact.</h2>
-      </div>
-      <div class="uq-method-grid">
-        <ul class="uq-method-list" id="uq-method-list">
-          <li class="uq-method-item uq-active" data-index="0">
-            <div class="uq-method-item-head">
-              <h3 class="uq-method-item-label">Measure</h3>
-              <span class="uq-method-item-num">01</span>
-            </div>
-            <p class="uq-method-item-copy">Every emission source quantified with lab-grade accuracy.</p>
-          </li>
-          <li class="uq-method-item" data-index="1">
-            <div class="uq-method-item-head">
-              <h3 class="uq-method-item-label">Reduce</h3>
-              <span class="uq-method-item-num">02</span>
-            </div>
-            <p class="uq-method-item-copy">Cut what we can â€” renewable energy, efficiency, low-carbon design.</p>
-          </li>
-          <li class="uq-method-item" data-index="2">
-            <div class="uq-method-item-head">
-              <h3 class="uq-method-item-label">Remove</h3>
-              <span class="uq-method-item-num">03</span>
-            </div>
-            <p class="uq-method-item-copy">Sequester what we can't â€” reforestation and engineered removal.</p>
-          </li>
-          <li class="uq-method-item" data-index="3">
-            <div class="uq-method-item-head">
-              <h3 class="uq-method-item-label">Retire</h3>
-              <span class="uq-method-item-num">04</span>
-            </div>
-            <p class="uq-method-item-copy">Retire each credit against a single owner. No double counting, ever.</p>
-          </li>
-        </ul>
-        <div class="uq-method-visual">
-          <img src="${dynamic?.UI_URL || ''}/assets/images/sustainability/eco-methane.jpg" alt="Measure" class="uq-img-visible" data-img="0" />
-          <img src="${dynamic?.UI_URL || ''}/assets/images/sustainability/eco-wind2.jpg" alt="Reduce" class="uq-img-hidden" data-img="1" />
-          <img src="${dynamic?.UI_URL || ''}/assets/images/sustainability/eco-sapling.jpg" alt="Remove" class="uq-img-hidden" data-img="2" />
-          <img src="${dynamic?.UI_URL || ''}/assets/images/sustainability/eco-ocean.jpg" alt="Retire" class="uq-img-hidden" data-img="3" />
+      <h2 class="uq-about-title">Built from the Ground Up</h2>
+      <div class="uq-about-grid">
+        <div class="uq-about-text">
+          ${dynamic?.aboutUs && dynamic.aboutUs !== '' ? `<p>${dynamic.aboutUs}</p>` : `
+          <p>For more than 30 years, the Ecostance team has worked at the source of environmental accounting — developing carbon measurement frameworks, building transparent supply chains, and helping establish the standards that now define responsible offsetting.</p>
+          <p>Long before net zero became a category, we were exploring how natural sequestration and engineered removal could work together to deliver verifiable climate outcomes. The concept was proven. The industry wasn't ready.</p>
+          <p class="uq-about-highlight">Today, it is.</p>
+          <p>Ecostance brings together decades of measurement, verification and retirement expertise to create a new generation of carbon accounting. Every credit is tracked from source project to retired certificate, guided by a simple belief: <strong>Impact is proven, not claimed.</strong></p>
+          `}
+          <a href="#technology" class="uq-about-link">Learn about the technology &rarr;</a>
+        </div>
+        <div>
+          <img src="${img('eco-founder.jpg')}" alt="Ecostance field team documenting a reforestation site" loading="lazy" class="uq-about-img" />
         </div>
       </div>
     </div>
   </section>
 
+  <!-- Digital Product Passports -->
+  <section class="uq-verified" id="technology">
+    <div class="uq-verified-inner">
+      <div class="uq-verified-top">
+        <div>
+          <h2 class="uq-verified-title">Digital Product<br/>Passports</h2>
+          <p class="uq-verified-sub">Transparency built into every product.</p>
+        </div>
+        <div class="uq-verified-body">
+          <p>Verified product data begins long before a garment is sold. It starts at the source.</p>
+          <p>Every published passport brings together material specifications, environmental reporting, and supply chain records in one place — creating a transparent record that can be independently verified, not simply claimed. Scan the QR code on any product below to open its full digital passport.</p>
+          <p>We believe accountability matters more than marketing. That's why we document progress openly, continue working toward higher-integrity product data, and avoid making claims that cannot be verified. Because trust should be earned through evidence.</p>
+          <a href="#dpp-passports" class="uq-verified-cta">Access the passports &rarr;</a>
+        </div>
+      </div>
+      ${publishedDppPages.length ? `
+      <div class="uq-verified-strip-wrap" id="dpp-passports">
+        <div class="uq-verified-strip uq-gallery-scroll">
+          <div class="uq-verified-strip-track">
+            ${publishedDppPages.map((item) => `
+            <div class="uq-verified-strip-item">
+              <a href="${item.pageUrl}" class="uq-dpp-card" target="_blank" rel="noopener noreferrer" aria-label="Open ${item.title} digital product passport">
+                <div class="uq-dpp-card-image">
+                  <img src="${item.image}" alt="${item.alt}" loading="lazy" />
+                </div>
+                <div class="uq-dpp-card-divider" aria-hidden="true"></div>
+                <div class="uq-dpp-card-meta">
+                  <div class="uq-dpp-card-qr">
+                    <img src="${item.qrUrl}" alt="" width="56" height="56" loading="lazy" />
+                  </div>
+                  <div class="uq-dpp-card-text">
+                    <p class="uq-dpp-card-title">${item.title}</p>
+                    <p class="uq-dpp-card-desc">${item.text}</p>
+                  </div>
+                </div>
+              </a>
+            </div>`).join('')}
+            <div style="flex-shrink:0;width:24px;" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>` : ''}
+    </div>
+  </section>
+
+  <!-- Founder Quote -->
+  <section class="uq-quote">
+    <div class="uq-quote-inner">
+      <p class="uq-quote-text">&ldquo;Being early in systemic change can be indistinguishable from being wrong — but timing does not invalidate principle.&rdquo;</p>
+      <p class="uq-quote-author">Elena Marsh, Founder</p>
+    </div>
+    <img src="${img('eco-hero.jpg')}" alt="Aerial view of protected forest at dawn" loading="lazy" class="uq-quote-banner" />
+  </section>
+
   <!-- Chain of Custody -->
-  ${dynamic?.certData && dynamic.certData.length > 0 ? `
   <section class="uq-chain" id="chain">
     <div class="uq-chain-inner">
-      <div class="uq-chain-label">CHAIN OF CUSTODY</div>
-      <h2 class="uq-chain-title" style="font-weight: 300;">Carbon Offset Chain of Custody Certificates</h2>
-      <p class="uq-chain-subtitle">Every offset we retire is issued a unique certificate that eliminates double counting.</p>
-      <div class="uq-chain-list">
-        <div class="uq-chain-line" aria-hidden></div>
-        ${dynamic.certData.map((cert) => `
-          <div class="uq-chain-item">
-            <div class="uq-chain-dot"></div>
-            <div class="uq-chain-card">
-              <div>
-                <div class="uq-chain-cert-tag">
-                  <i class="fa-regular fa-file-lines"></i>
-                  CERTIFICATE &middot; ${cert?.originNumber || ''}
-                </div>
-                <div class="uq-chain-date">
-                  ${cert?.createdAt ? new Date(cert.createdAt).toISOString().split('T')[0] : ''}
-                </div>
-                ${cert?.quantity ? `
-                <div class="uq-chain-qty">
-                  Carbon Offset Quantity: <strong>${cert.quantity} Tons</strong>
-                </div>` : ''}
-                <h3 class="uq-chain-project">${cert?.product?.name || 'Certificate'}</h3>
-                <p class="uq-chain-desc">${(function() { const d = cert?.product?.shortDescription || cert?.product?.description || ''; const w = d.split(' '); return w.length > 25 ? w.slice(0, 25).join(' ') + '...' : d; })()}</p>
-                ${cert?.certificate?.certificateURL ? `<a href="${cert.certificate.certificateURL}" target="_blank" class="uq-chain-view-link">View Certificate</a>` : ''}
-              </div>
-              ${cert?.product?.thumbImage?.[0] ? `
-              <div class="uq-chain-img-wrap">
-                <img src="${cert.product.thumbImage[0]}" alt="${cert?.product?.name || 'Certificate'}" class="uq-chain-img" />
-              </div>
-              ` : ''}
+      <p class="eyebrow">Chain of Custody</p>
+      <h2 class="uq-chain-title">Carbon Offset Chain of Custody Certificates</h2>
+      <p class="uq-chain-subtitle">Every offset we retire is issued a unique certificate that eliminates double counting.<br/>Click any project to see the full record.</p>
+      <ol class="uq-chain-list">
+        <div class="uq-chain-line" aria-hidden="true"></div>
+        ${displayChain.map((c) => `
+        <li class="uq-chain-item">
+          <span class="uq-chain-diamond" aria-hidden="true"></span>
+          <div class="uq-chain-card">
+            <div class="uq-chain-content">
+              <a href="${c.url}" class="uq-chain-cert-tag" ${c.url !== '#' ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>
+                Certificate &middot; ${c.id}
+              </a>
+              <p class="uq-chain-date">${c.date}</p>
+              <p class="uq-chain-qty">Carbon Offset Quantity: <strong>${c.tons}</strong></p>
+              <h3 class="uq-chain-project">${c.title}</h3>
+              <p class="uq-chain-desc">${c.description}</p>
             </div>
+            ${c.image ? `
+            <div class="uq-chain-img-wrap">
+              <img src="${c.image}" alt="${c.alt}" loading="lazy" class="uq-chain-img" />
+            </div>` : ''}
           </div>
-        `).join('')}
-      </div>
+        </li>`).join('')}
+      </ol>
     </div>
-  </section>` : ''}
+  </section>
 
-  <!-- Why Carbon Offsets -->
-  <section class="uq-why">
-    <div class="uq-why-inner">
-      <div>
-        <p class="eyebrow">Why Carbon Offsets</p>
-        <h2>To achieve NetZero &mdash; now.</h2>
-        <p>Carbon offsets let individuals and businesses invest in environmental projects to balance out their greenhouse gas footprints &mdash; replacing fossil fuel with renewable energy, removing methane, cleaning oceans, restoring forests.</p>
-        <p>We don't wait for 2030 or 2050. We act today, and we prove it.</p>
-        <a href="#projects" class="uq-why-btn">Take Action <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px; margin-left: 6px;"></i></a>
-      </div>
-      <div class="uq-why-img-wrap">
-        <img
-          src="${dynamic?.UI_URL || ''}/assets/images/sustainability/eco-why.jpg"
-          alt="Industrial smokestacks at sunset"
-          class="uq-why-img"
-        />
+  <!-- Project Grid -->
+  <section class="uq-projects" id="gallery">
+    <div class="uq-projects-inner">
+      <div class="uq-projects-grid">
+        <ul class="uq-projects-list" id="uq-project-list">
+          ${projectCollections.map((item, i) => `
+          <li>
+            <a href="#chain" class="uq-projects-link ${i === 1 ? 'uq-active' : ''}" data-index="${i}" tabindex="0">${item.title}<sup>${item.count}</sup></a>
+          </li>`).join('')}
+        </ul>
+        <div class="uq-projects-visual">
+          ${projectCollections.map((item, i) => `
+          <img src="${item.img}" alt="${item.alt}" loading="lazy" class="${i === 1 ? 'uq-img-visible' : 'uq-img-hidden'}" data-img="${i}" />`).join('')}
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- About Us -->
-  ${dynamic?.aboutUs && dynamic.aboutUs !== '' ? `
-  <section class="uq-aboutus" id="about">
-    <div class="uq-aboutus-inner">
-      <p class="eyebrow">About Us</p>
-      <h2>We are not waiting for 2030 or 2050 for NetZero.</h2>
-      <p>${dynamic.aboutUs}</p>
-    </div>
-  </section>` : ''}
-
-  <!-- Newsletter -->
-  <section class="uq-newsletter">
-    <div class="uq-newsletter-inner">
-      <div>
-        <h3>Join the Community</h3>
-        <p class="uq-newsletter-sub">Get updates, project releases and impact reports.</p>
+  <!-- Join the Community -->
+  <section class="uq-join">
+    <div class="uq-join-inner">
+      <div class="uq-join-row">
+        <div class="uq-join-copy">
+          <h2 class="uq-join-title">Join the Community</h2>
+          <p class="uq-join-sub">Get updates, offers and invites</p>
+        </div>
+        <div class="uq-join-form-wrap">
+          <form class="uq-join-form" onsubmit="event.preventDefault()">
+            <div class="uq-join-input-group">
+              <input type="email" required placeholder="Email address" aria-label="Email address" class="uq-join-input" />
+              <button type="submit" aria-label="Sign up" class="uq-join-submit">
+                <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">
+                  <path clip-rule="evenodd" d="m11.246 5.31759c.0322-.07821.0833-.14723.1486-.20093.0654-.0537.143-.09041.2259-.10686.083-.01645.1688-.01214.2497.01257.0808.0247.1544.06902.214.12902l4.104 4.104c.0478.04765.0857.10426.1115.16659.0259.06232.0392.12913.0392.19661 0 .06747-.0133.13429-.0392.19661-.0258.06233-.0637.11893-.1115.16659l-4.104 4.10401c-.0963.0963-.227.1504-.3632.1504s-.2669-.0541-.3632-.1504-.1504-.227-.1504-.3632.0541-.2669.1504-.3632l3.2288-3.2278h-11.0736c-.13606 0-.26654-.0541-.36275-.15027-.0962-.0962-.15025-.22669-.15025-.36274 0-.13606.05405-.26654.15025-.36275.09621-.0962.22669-.15025.36275-.15025h11.0736l-3.2288-3.2278c-.0721-.07178-.1212-.16335-.1411-.2631s-.0097-.20316.0293-.2971z" fill="currentColor" fill-rule="evenodd"></path>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-      <form class="uq-newsletter-form" onsubmit="event.preventDefault()">
-        <input type="email" placeholder="Email address" class="uq-newsletter-input" />
-        <button type="submit" aria-label="Subscribe" class="uq-newsletter-submit">&rarr;</button>
-      </form>
     </div>
   </section>
 
-  <!-- Social Links -->
   ${dynamic?.showSocial ? `
   <section class="uq-social-section">
     <div class="uq-social-links">
@@ -1637,67 +1573,106 @@
 
   <!-- Footer -->
   <footer class="uq-footer">
-    <div class="uq-footer-inner">
-      <div class="uq-footer-main">
-        <div class="uq-footer-brand">${dynamic?.logo ? `<img src="${dynamic.logo}" alt="Logo" style="max-height:36px;max-width:140px;">` : ''}</div>
-        <div class="uq-footer-cols">
-          <div class="uq-footer-col">
-            <h4>Our Story</h4>
-            <ul>
-              <li><a href="${dynamic?.aboutUsURL || '#about'}">About Us</a></li>
-              <li><a href="#method">Technology</a></li>
-              <li><a href="#journal">Journal</a></li>
-            </ul>
-          </div>
-          <div class="uq-footer-col">
-            <h4>Support</h4>
-            <ul>
-              <li><a href="#faq">FAQ</a></li>
-              <li><a href="${dynamic?.contactPageURL || '#contact'}">Contact</a></li>
-              <li><a href="#fit-guide">Fit Guide</a></li>
-              <li><a href="#garment-care">Garment Care</a></li>
-            </ul>
-          </div>
-          <div class="uq-footer-col">
-            <h4>Shop</h4>
-            <ul>
-              <li><a href="#bestsellers">Bestsellers</a></li>
-              <li><a href="#men">Men</a></li>
-              <li><a href="#women">Women</a></li>
-              <li><a href="#accessories">Accessories</a></li>
-            </ul>
+    <div class="uq-footer-main">
+      <div class="uq-footer-top">
+        <div class="uq-footer-brand-col">
+          <a href="#top" class="uq-footer-brand">
+            ${brandLogo || `<span class="uq-footer-brand-text">${brandName}</span>`}
+          </a>
+        </div>
+        <div class="uq-footer-nav-col">
+          <div class="uq-footer-nav">
+            <div class="uq-footer-col">
+              <h4>Our Story</h4>
+              <ul>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#technology">Technology</a></li>
+                <li><a href="#gallery">Journal</a></li>
+              </ul>
+            </div>
+            <div class="uq-footer-col">
+              <h4>Support</h4>
+              <ul>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="${dynamic?.contactPageURL || '#contact'}">Contact</a></li>
+                <li><a href="#fit-guide">Fit Guide</a></li>
+                <li><a href="#garment-care">Garment Care</a></li>
+              </ul>
+            </div>
+            <div class="uq-footer-col">
+              <h4>Shop</h4>
+              <ul>
+                <li><a href="#gallery">Bestsellers</a></li>
+                <li><a href="#gallery">Men</a></li>
+                <li><a href="#gallery">Women</a></li>
+                <li><a href="#gallery">Accessories</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-      <div class="uq-footer-divider"></div>
-      <div class="uq-footer-bottom">
-        <div>&copy; ${new Date().getFullYear()} ${dynamic?.companyName || 'Uniqohr'}</div>
-        <div class="uq-footer-policies"><a href="#terms">Terms and Policies</a></div>
-        <div class="uq-footer-socials">
-          ${dynamic?.showFacebook && dynamic?.facebook ? `<a href="${dynamic.facebook}" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>` : `<a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>`}
-          ${dynamic?.showInstagram && dynamic?.instagram ? `<a href="${dynamic.instagram}" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>` : `<a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>`}
-          <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
-          <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-          ${dynamic?.showTwitter && dynamic?.twitter ? `<a href="${dynamic.twitter}" target="_blank" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>` : `<a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>`}
-        </div>
+    </div>
+    <div class="uq-footer-divider">
+      <span class="uq-footer-divider-line" aria-hidden="true"></span>
+    </div>
+    <div class="uq-footer-utilities">
+      <div class="uq-footer-copy">
+        &copy; ${new Date().getFullYear()} <a href="#top">${companyLabel}</a>
+      </div>
+      <div class="uq-footer-policies">
+        <a href="#terms">Terms and Policies</a>
+      </div>
+      <div class="uq-footer-socials">
+        ${dynamic?.showFacebook && dynamic?.facebook ? `
+        <a href="${dynamic.facebook}" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+          <span class="uq-sr-only">Facebook</span>
+          <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M18 10.049C18 5.603 14.419 2 10 2c-4.419 0-8 3.603-8 8.049C2 14.067 4.925 17.396 8.75 18v-5.624H6.719V10.5h2.031V8.844c0-2 1.194-3.104 3.016-3.104.874 0 1.79.156 1.79.156v1.969h-1.008c-.993 0-1.303.616-1.303 1.25v1.485h2.219l-.355 2.875H10.75V18c3.825-.604 6.75-3.933 6.75-7.951Z"/></svg>
+        </a>` : `
+        <a href="https://www.facebook.com/profile.php?id=61579275997604" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+          <span class="uq-sr-only">Facebook</span>
+          <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M18 10.049C18 5.603 14.419 2 10 2c-4.419 0-8 3.603-8 8.049C2 14.067 4.925 17.396 8.75 18v-5.624H6.719V10.5h2.031V8.844c0-2 1.194-3.104 3.016-3.104.874 0 1.79.156 1.79.156v1.969h-1.008c-.993 0-1.303.616-1.303 1.25v1.485h2.219l-.355 2.875H10.75V18c3.825-.604 6.75-3.933 6.75-7.951Z"/></svg>
+        </a>`}
+        ${dynamic?.showInstagram && dynamic?.instagram ? `
+        <a href="${dynamic.instagram}" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <span class="uq-sr-only">Instagram</span>
+          <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.23 3.492c-.84-.037-1.096-.046-3.23-.046-2.144 0-2.39.01-3.238.055-.776.027-1.168.197-1.633.325-.457.128-.79.292-1.088.52-.298.228-.536.5-.714.816-.178.316-.267.66-.267 1.032v8.782c0 .372.089.716.267 1.032.178.316.416.588.714.816.298.228.631.392 1.088.52.457.128.978.298 1.633.325.848.045 1.094.055 3.238.055 2.134 0 2.39-.01 3.23-.055.655-.027 1.176-.197 1.633-.325.457-.128.79-.292 1.088-.52.298-.228.536-.5.714-.816.178-.316.267-.66.267-1.032V6.185c0-.372-.089-.716-.267-1.032a2.07 2.07 0 0 0-.714-.816 2.382 2.382 0 0 0-1.088-.52c-.457-.128-.978-.298-1.633-.325ZM10 6.808a4.192 4.192 0 1 0 0 8.384 4.192 4.192 0 0 0 0-8.384Zm0 1.5a2.692 2.692 0 1 1 0 5.384 2.692 2.692 0 0 1 0-5.384Zm4.423-2.577a.98.98 0 1 0 0 1.96.98.98 0 0 0 0-1.96Z"/></svg>
+        </a>` : `
+        <a href="https://www.instagram.com/uniqohr" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <span class="uq-sr-only">Instagram</span>
+          <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.23 3.492c-.84-.037-1.096-.046-3.23-.046-2.144 0-2.39.01-3.238.055-.776.027-1.168.197-1.633.325-.457.128-.79.292-1.088.52-.298.228-.536.5-.714.816-.178.316-.267.66-.267 1.032v8.782c0 .372.089.716.267 1.032.178.316.416.588.714.816.298.228.631.392 1.088.52.457.128.978.298 1.633.325.848.045 1.094.055 3.238.055 2.134 0 2.39-.01 3.23-.055.655-.027 1.176-.197 1.633-.325.457-.128.79-.292 1.088-.52.298-.228.536-.5.714-.816.178-.316.267-.66.267-1.032V6.185c0-.372-.089-.716-.267-1.032a2.07 2.07 0 0 0-.714-.816 2.382 2.382 0 0 0-1.088-.52c-.457-.128-.978-.298-1.633-.325ZM10 6.808a4.192 4.192 0 1 0 0 8.384 4.192 4.192 0 0 0 0-8.384Zm0 1.5a2.692 2.692 0 1 1 0 5.384 2.692 2.692 0 0 1 0-5.384Zm4.423-2.577a.98.98 0 1 0 0 1.96.98.98 0 0 0 0-1.96Z"/></svg>
+        </a>`}
+        <a href="https://www.youtube.com/unioqhr" target="_blank" rel="noopener noreferrer" aria-label="Youtube">
+          <span class="uq-sr-only">Youtube</span>
+          <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M18.16 5.87c.34 1.309.34 4.08.34 4.08s0 2.771-.34 4.08a2.125 2.125 0 0 1-1.53 1.53c-1.309.34-6.63.34-6.63.34s-5.321 0-6.63-.34a2.125 2.125 0 0 1-1.53-1.53c-.34-1.309-.34-4.08-.34-4.08s0-2.771.34-4.08a2.125 2.125 0 0 1 1.53-1.53c1.309-.34 6.63-.34 6.63-.34s5.321 0 6.63.34a2.125 2.125 0 0 1 1.53 1.53ZM8.3 12.96V7.04L13.3 10l-5 2.96Z"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/unioqhr" target="_blank" rel="noopener noreferrer" aria-label="Tiktok">
+          <span class="uq-sr-only">Tiktok</span>
+          <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.511 1.705h2.74s-.157 3.51 3.795 3.768v2.711s-2.114.129-3.796-1.158l.028 5.606A5.073 5.073 0 1 1 8.437 9.35v-2.74a2.333 2.333 0 1 0 2.074 2.095V1.705Z"/></svg>
+        </a>
+        ${dynamic?.showTwitter && dynamic?.twitter ? `
+        <a href="${dynamic.twitter}" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+          <span class="uq-sr-only">Twitter</span>
+          <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.273 2.8 10.8 7.822l4.418-5.022h1.768l-5.4 6.142 5.686 7.336h-3.132l-4.4-5.693-5.032 5.693H2.4l5.786-6.57L2.8 2.8h3.473Zm-.815 1.35H4.332l8.818 11.7h1.126L6.458 4.15Z"/></svg>
+        </a>` : `
+        <a href="https://x.com/unioqhr" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+          <span class="uq-sr-only">Twitter</span>
+          <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.273 2.8 10.8 7.822l4.418-5.022h1.768l-5.4 6.142 5.686 7.336h-3.132l-4.4-5.693-5.032 5.693H2.4l5.786-6.57L2.8 2.8h3.473Zm-.815 1.35H4.332l8.818 11.7h1.126L6.458 4.15Z"/></svg>
+        </a>`}
       </div>
     </div>
   </footer>
 
-  <!-- Hover Interaction & Drag-to-Scroll Script -->
   <script>
     (function() {
-      // Hover/focus interaction for method items
-      var items = document.querySelectorAll('#uq-method-list .uq-method-item');
-      var images = document.querySelectorAll('.uq-method-visual img');
-      if (items.length && images.length) {
+      function bindHover(listId, imageSelector, linkSelector) {
+        var items = document.querySelectorAll(listId + ' ' + linkSelector);
+        var images = document.querySelectorAll(imageSelector);
+        if (!items.length || !images.length) return;
         items.forEach(function(item) {
-          item.addEventListener('mouseenter', function() {
-            var idx = this.getAttribute('data-index');
-            items.forEach(function(el) {
-              el.classList.remove('uq-active');
-            });
-            this.classList.add('uq-active');
+          function activate() {
+            var idx = item.getAttribute('data-index');
+            items.forEach(function(el) { el.classList.remove('uq-active'); });
+            item.classList.add('uq-active');
             images.forEach(function(img) {
               if (img.getAttribute('data-img') === idx) {
                 img.classList.remove('uq-img-hidden');
@@ -1707,87 +1682,25 @@
                 img.classList.add('uq-img-hidden');
               }
             });
-          });
-
-          item.addEventListener('focus', function() {
-            var idx = this.getAttribute('data-index');
-            items.forEach(function(el) {
-              el.classList.remove('uq-active');
-            });
-            this.classList.add('uq-active');
-            images.forEach(function(img) {
-              if (img.getAttribute('data-img') === idx) {
-                img.classList.remove('uq-img-hidden');
-                img.classList.add('uq-img-visible');
-              } else {
-                img.classList.remove('uq-img-visible');
-                img.classList.add('uq-img-hidden');
-              }
-            });
-          });
+          }
+          item.addEventListener('mouseenter', activate);
+          item.addEventListener('focus', activate);
         });
       }
+      bindHover('#uq-project-list', '.uq-projects-visual img', '.uq-projects-link');
 
-      // Drag to scroll for uq-gallery-scroll containers
-      var sliders = document.querySelectorAll('.uq-gallery-scroll');
-      sliders.forEach(function(slider) {
-        // Mouse wheel horizontal scroll
+      document.querySelectorAll('.uq-gallery-scroll').forEach(function(slider) {
         slider.addEventListener('wheel', function(e) {
-          if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-            e.preventDefault();
-            slider.scrollLeft += e.deltaY;
-          }
+          if (!e.shiftKey) return;
+          if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+          e.preventDefault();
+          slider.scrollLeft += e.deltaY;
         }, { passive: false });
-        var isDown = false;
-        var startX;
-        var scrollLeft;
-        var moved = false;
-
-        slider.addEventListener('mousedown', function(e) {
-          isDown = true;
-          slider.style.cursor = 'grabbing';
-          slider.style.scrollSnapType = 'none';
-          startX = e.pageX - slider.offsetLeft;
-          scrollLeft = slider.scrollLeft;
-          moved = false;
-        });
-
-        slider.addEventListener('mouseleave', function() {
-          isDown = false;
-          slider.style.cursor = 'grab';
-          slider.style.scrollSnapType = 'x mandatory';
-        });
-
-        slider.addEventListener('mouseup', function() {
-          isDown = false;
-          slider.style.cursor = 'grab';
-          slider.style.scrollSnapType = 'x mandatory';
-        });
-
-        slider.addEventListener('mousemove', function(e) {
-          if (!isDown) return;
-          e.preventDefault();
-          var x = e.pageX - slider.offsetLeft;
-          var walk = (x - startX) * 2;
-          if (Math.abs(walk) > 5) {
-            moved = true;
-          }
-          slider.scrollLeft = scrollLeft - walk;
-        });
-
-        slider.addEventListener('dragstart', function(e) {
-          e.preventDefault();
-        });
-
-        slider.addEventListener('click', function(e) {
-          if (moved) {
-            e.preventDefault();
-          }
-        });
       });
     })();
   </script>
 </body>
 </html>
+
 `;
 };
