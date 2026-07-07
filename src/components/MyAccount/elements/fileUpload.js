@@ -2,18 +2,38 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { useToasts } from "react-toast-notifications";
 
-const App = ({ image, setImage }) => {
+const LOGO_SPECS = {
+  uniqhor: {
+    minWidth: 131,
+    minHeight: 31,
+    minRatio: 3,
+    maxRatio: 6,
+    previewMaxWidth: 230,
+    previewMaxHeight: 31,
+    hint: "PNG, JPG, JPEG up to 10MB. Recommended: 131×31px wide logo (or proportional, e.g. 262×62px).",
+    errorMin: "Logo must be at least 131×31px for the Uniqohr template.",
+    errorRatio: "Logo should be a wide horizontal image (roughly 4:1 aspect ratio).",
+  },
+  default: {
+    minWidth: 180,
+    minHeight: 180,
+    previewMaxWidth: 870,
+    previewMaxHeight: 150,
+    hint: "PNG, JPG, JPEG up to 10MB",
+    errorMin: "Image must have a minimum resolution of 180px × 180px",
+  },
+};
+
+const App = ({ image, setImage, themeSelected = "blue" }) => {
   const { addToast } = useToasts();
   const [currentImage, setCurrentImage] = useState("");
+  const logoSpec = themeSelected === "uniqhor" ? LOGO_SPECS.uniqhor : LOGO_SPECS.default;
 
   useEffect(() => {
     if (image && typeof image === "string") {
       setCurrentImage(image);
     }
   }, [image]);
-
-  let imagesarray = []
-
 
   const handleImageChange = (e) => {
     if (!e?.target?.files) {
@@ -27,16 +47,28 @@ const App = ({ image, setImage }) => {
     const img = new Image();
     const uploadedImgURL = _URL.createObjectURL(uploadedImg);
     img.onload = function () {
-      if (Number(this.width) < 180 || Number(this.height) < 180) {
+      const width = Number(this.width);
+      const height = Number(this.height);
+
+      if (width < logoSpec.minWidth || height < logoSpec.minHeight) {
         setImage(null);
         setCurrentImage(null);
-        return addToast(
-          "Image must have a minimum resolution of 180px * 180px",
-          {
+        return addToast(logoSpec.errorMin, {
+          appearance: "error",
+          autoDismiss: true,
+        });
+      }
+
+      if (logoSpec.minRatio && logoSpec.maxRatio) {
+        const ratio = width / height;
+        if (ratio < logoSpec.minRatio || ratio > logoSpec.maxRatio) {
+          setImage(null);
+          setCurrentImage(null);
+          return addToast(logoSpec.errorRatio, {
             appearance: "error",
             autoDismiss: true,
-          }
-        );
+          });
+        }
       }
     };
     img.src = uploadedImgURL;
@@ -106,7 +138,7 @@ const App = ({ image, setImage }) => {
               <span>Upload a file</span>
               <p>or drag and drop</p>
             </div>
-            <p>PNG, JPG, JPEG up to 10MB</p>
+            <p>{logoSpec.hint}</p>
           </div>
         </div>
       )}
@@ -114,7 +146,14 @@ const App = ({ image, setImage }) => {
         <div className="d-flex" style={{ justifyContent: "center" }}>
           <img
             src={currentImage || image}
-            style={{ maxHeight: "150px", maxWidth: "870px" }}
+            alt="Uploaded logo preview"
+            style={{
+              maxHeight: `${logoSpec.previewMaxHeight}px`,
+              maxWidth: `${logoSpec.previewMaxWidth}px`,
+              width: "auto",
+              height: "auto",
+              objectFit: "contain",
+            }}
           />
         </div>
       )}

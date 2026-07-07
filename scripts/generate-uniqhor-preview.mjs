@@ -24,7 +24,7 @@ const asset = (name) => `./assets/images/sustainability/${name}`;
 const sampleDynamic = {
   UI_URL: '.',
   companyName: 'Uniqohr',
-  title: 'Carbon,<br/>accounted for.',
+  title: 'Carbon,<br/>Accounted For.',
   description:
     'Three decades of environmental expertise. Every tonne measured, retired and verifiable.',
   logo: asset('uniqhor.jpg'),
@@ -38,59 +38,65 @@ const sampleDynamic = {
       quantity: 1,
       product: {
         name: 'Piedra Wind Farm',
-        category: 'Renewable Energy · Mexico',
-        shortDescription:
-          'Renewable electricity generation in Mexico through the construction and operation of a 220 MW wind farm.',
+        shortDescription: 'Utility-scale wind farm displacing fossil-fuel electricity on the Mexican national grid.',
         thumbImage: [asset('eco-wind2.jpg')],
       },
-      certificate: {
-        certificateURL: 'https://example.com/cert/100000002043',
-      },
+      certificate: { certificateURL: 'https://example.com/cert/100000002043' },
     },
     {
       originNumber: '100000002044',
-      createdAt: '2026-06-14T10:00:00.000Z',
-      quantity: 3,
+      createdAt: '2026-07-01T10:00:00.000Z',
+      quantity: 2,
       product: {
-        name: 'Amazon Reforestation',
-        category: 'Nature Based · Brazil',
-        shortDescription:
-          'Native species reforestation across degraded pastureland in the Brazilian Amazon basin.',
-        thumbImage: [asset('eco-hero.jpg')],
+        name: 'Coastal Plastic Recovery',
+        shortDescription: 'Removes ocean-bound plastic from coastal waterways and funds local collector livelihoods.',
+        thumbImage: [asset('eco-ocean.jpg')],
       },
-      certificate: {
-        certificateURL: 'https://example.com/cert/100000002044',
-      },
+      certificate: { certificateURL: 'https://example.com/cert/100000002044' },
     },
     {
       originNumber: '100000002045',
-      createdAt: '2026-05-22T10:00:00.000Z',
-      quantity: 2,
+      createdAt: '2026-07-01T10:00:00.000Z',
+      quantity: 3,
       product: {
-        name: 'Ocean Plastic Recovery',
-        category: 'Marine · Pacific',
-        shortDescription:
-          'Coastal cleanup and marine plastic recovery operations across the Eastern Pacific.',
-        thumbImage: [asset('eco-ocean.jpg')],
+        name: 'Atlantic Reforestation',
+        shortDescription: 'Native-species planting that restores degraded Atlantic Forest and rebuilds habitat corridors.',
+        thumbImage: [asset('eco-sapling.jpg')],
       },
-      certificate: {
-        certificateURL: 'https://example.com/cert/100000002045',
-      },
+      certificate: { certificateURL: 'https://example.com/cert/100000002045' },
     },
     {
       originNumber: '100000002046',
-      createdAt: '2026-04-08T10:00:00.000Z',
-      quantity: 5,
+      createdAt: '2026-07-01T10:00:00.000Z',
+      quantity: 2,
       product: {
-        name: 'Methane Capture',
-        category: 'Engineered Removal',
-        shortDescription:
-          'Engineered methane capture and destruction at industrial waste facilities.',
+        name: 'Rajasthan Solar Array',
+        shortDescription: 'Grid-connected solar generation displacing coal-fired power across northern India.',
+        thumbImage: [asset('eco-wind2.jpg')],
+      },
+      certificate: { certificateURL: 'https://example.com/cert/100000002046' },
+    },
+    {
+      originNumber: '100000002047',
+      createdAt: '2026-07-01T10:00:00.000Z',
+      quantity: 4,
+      product: {
+        name: 'Sundarbans Mangrove Restoration',
+        shortDescription: 'Community-led mangrove replanting that sequesters blue carbon and protects coastal villages.',
+        thumbImage: [asset('eco-hero.jpg')],
+      },
+      certificate: { certificateURL: 'https://example.com/cert/100000002047' },
+    },
+    {
+      originNumber: '100000002048',
+      createdAt: '2026-07-01T10:00:00.000Z',
+      quantity: 1,
+      product: {
+        name: 'Efficient Cookstoves Programme',
+        shortDescription: 'High-efficiency cookstoves that cut wood use, indoor smoke, and household carbon footprints.',
         thumbImage: [asset('eco-methane.jpg')],
       },
-      certificate: {
-        certificateURL: 'https://example.com/cert/100000002046',
-      },
+      certificate: { certificateURL: 'https://example.com/cert/100000002048' },
     },
   ],
   dppProducts: [
