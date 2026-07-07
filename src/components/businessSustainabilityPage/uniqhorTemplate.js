@@ -20,9 +20,9 @@
 
   const projectCollections = [
     { title: 'Nature-Based Removal', count: dynamic?.totalProjects || 12, img: img('eco-sapling.jpg'), alt: 'Sapling planted at reforestation site' },
-    { title: 'Shop Projects', count: dynamic?.dppProducts?.length || 8, img: img('eco-wind2.jpg'), alt: 'Solar farm at golden hour' },
-    { title: 'Registry Certified', count: certCount || 5, img: img('uniqhor.jpg'), alt: 'Verified digital carbon certificate' },
-    { title: 'Renewable Energy', count: 3, img: img('eco-wind2.jpg'), alt: 'Wind turbines at dawn' },
+    { title: 'Shop Projects', count: dynamic?.dppProducts?.length || 8, img: img('eco-wind2.jpg'), alt: 'Wind farm at golden hour' },
+    { title: 'Registry Certified', count: certCount || 5, img: img('eco-ocean.jpg'), alt: 'Verified digital carbon certificate' },
+    { title: 'Renewable Energy', count: 3, img: img('eco-hero.jpg'), alt: 'Renewable energy landscape' },
   ];
 
   const formatChainDescription = (text) => {
@@ -33,7 +33,7 @@
     if (!clean) return '';
 
     const words = clean.split(' ');
-    const maxWords = 30;
+    const maxWords = 15;
 
     if (words.length <= maxWords) return clean;
     return `${words.slice(0, maxWords).join(' ')}...`;
@@ -59,7 +59,12 @@
     url: cert?.certificate?.certificateURL || '#',
   }));
 
-  const displayChain = chainItems.length > 0 ? chainItems : fallbackCerts;
+  const displayChain = chainItems.length > 0
+    ? chainItems
+    : fallbackCerts.map((c) => ({
+        ...c,
+        description: formatChainDescription(c.description),
+      }));
   const companyLabel = dynamic?.companyName || 'Uniqohr';
   const defaultLogoUrl = 'https://www.uniqohr.com/cdn/shop/files/LogoUniqohrSquareW.png?height=31&v=1774282937';
   const logoUrl = dynamic?.logo || defaultLogoUrl;
@@ -109,16 +114,29 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
+    html {
       margin: 0;
       padding: 0;
       overflow-x: hidden;
+      overflow-y: auto;
+      height: auto;
+      min-height: 100%;
+      background: var(--canvas);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      overflow-y: visible;
+      height: auto;
+      min-height: 100%;
       background: var(--canvas);
       color: var(--ink);
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       font-feature-settings: "ss01", "cv11";
-      scroll-behavior: smooth;
     }
 
     .font-display {
@@ -674,7 +692,8 @@
     }
 
     @media (min-width: 768px) {
-      .uq-verified-strip-item { width: calc((100vw - 6rem - 2.25rem) / 4); max-width: 320px; }
+      .uq-verified-strip-item { width: calc((100% - 2.25rem) / 4); max-width: 320px; min-width: 200px; }
+      .uq-verified-strip-track { width: 100%; }
     }
 
     .uq-dpp-card {
@@ -1095,11 +1114,31 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      opacity: 0;
+      z-index: 0;
       transition: opacity 0.5s;
     }
 
-    .uq-projects-visual img.uq-img-hidden { opacity: 0; }
-    .uq-projects-visual img.uq-img-visible { opacity: 1; }
+    .uq-projects-visual img.uq-img-hidden { opacity: 0; z-index: 0; }
+    .uq-projects-visual img.uq-img-visible { opacity: 1; z-index: 1; }
+
+    .uq-projects-grid:has(.uq-projects-link:hover) .uq-projects-visual img.uq-img-visible,
+    .uq-projects-grid:has(.uq-projects-link:focus-visible) .uq-projects-visual img.uq-img-visible {
+      opacity: 0;
+      z-index: 0;
+    }
+
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(1) .uq-projects-link:hover) .uq-projects-visual img[data-img="0"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(1) .uq-projects-link:focus-visible) .uq-projects-visual img[data-img="0"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(2) .uq-projects-link:hover) .uq-projects-visual img[data-img="1"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(2) .uq-projects-link:focus-visible) .uq-projects-visual img[data-img="1"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(3) .uq-projects-link:hover) .uq-projects-visual img[data-img="2"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(3) .uq-projects-link:focus-visible) .uq-projects-visual img[data-img="2"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(4) .uq-projects-link:hover) .uq-projects-visual img[data-img="3"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(4) .uq-projects-link:focus-visible) .uq-projects-visual img[data-img="3"] {
+      opacity: 1;
+      z-index: 1;
+    }
 
     /* Join Community — Uniqohr footer-group */
     .uq-join {
@@ -1861,31 +1900,36 @@
   </footer>
 
   <script>
-    (function() {
-      function bindHover(listId, imageSelector, linkSelector) {
-        var items = document.querySelectorAll(listId + ' ' + linkSelector);
-        var images = document.querySelectorAll(imageSelector);
-        if (!items.length || !images.length) return;
-        items.forEach(function(item) {
-          function activate() {
-            var idx = item.getAttribute('data-index');
-            items.forEach(function(el) { el.classList.remove('uq-active'); });
-            item.classList.add('uq-active');
-            images.forEach(function(img) {
-              if (img.getAttribute('data-img') === idx) {
-                img.classList.remove('uq-img-hidden');
-                img.classList.add('uq-img-visible');
-              } else {
-                img.classList.remove('uq-img-visible');
-                img.classList.add('uq-img-hidden');
-              }
-            });
+    window.initUniqhorProjectHover = function() {
+      var list = document.getElementById('uq-project-list');
+      if (!list || list.dataset.hoverBound === 'true') return;
+      var items = list.querySelectorAll('.uq-projects-link');
+      var images = document.querySelectorAll('.uq-projects-visual img');
+      if (!items.length || !images.length) return;
+      list.dataset.hoverBound = 'true';
+
+      function activate(link) {
+        var idx = link.getAttribute('data-index');
+        items.forEach(function(el) { el.classList.remove('uq-active'); });
+        link.classList.add('uq-active');
+        images.forEach(function(img) {
+          if (img.getAttribute('data-img') === idx) {
+            img.classList.remove('uq-img-hidden');
+            img.classList.add('uq-img-visible');
+          } else {
+            img.classList.remove('uq-img-visible');
+            img.classList.add('uq-img-hidden');
           }
-          item.addEventListener('mouseenter', activate);
-          item.addEventListener('focus', activate);
         });
       }
-      bindHover('#uq-project-list', '.uq-projects-visual img', '.uq-projects-link');
+
+      items.forEach(function(item) {
+        item.addEventListener('mouseenter', function() { activate(item); });
+        item.addEventListener('focus', function() { activate(item); });
+      });
+    };
+
+    window.initUniqhorProjectHover();
 
       var menuBtn = document.getElementById('uqNavMenuBtn');
       var mobileNav = document.getElementById('uqMobileNav');
@@ -1904,7 +1948,6 @@
           slider.scrollLeft += e.deltaY;
         }, { passive: false });
       });
-    })();
   </script>
 </body>
 </html>

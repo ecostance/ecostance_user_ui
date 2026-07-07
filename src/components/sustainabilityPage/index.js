@@ -70,10 +70,15 @@ const Cancel = ({
   }, [])
 
   useEffect(() => {
+    const theme = main
+      ? userSettings?.published?.themeSelected
+      : sustainData?.themeSelected;
+    if (theme !== 'uniqhor') return;
+
     const handleMouseHover = (e) => {
       const item = e.currentTarget;
-      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
-      const images = document.querySelectorAll('.uq-method-visual img');
+      const items = document.querySelectorAll('#uq-project-list .uq-projects-link');
+      const images = document.querySelectorAll('.uq-projects-visual img');
       if (!items.length || !images.length) return;
 
       const idx = item.getAttribute('data-index');
@@ -91,25 +96,33 @@ const Cancel = ({
     };
 
     const attachListeners = () => {
-      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      const items = document.querySelectorAll('#uq-project-list .uq-projects-link');
       items.forEach((item) => {
         item.addEventListener('mouseenter', handleMouseHover);
         item.addEventListener('focus', handleMouseHover);
       });
     };
 
-    attachListeners();
-    const timer = setTimeout(attachListeners, 500);
+    const timer = window.setTimeout(attachListeners, 0);
+    const retryTimer = window.setTimeout(attachListeners, 500);
 
     return () => {
-      clearTimeout(timer);
-      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      window.clearTimeout(timer);
+      window.clearTimeout(retryTimer);
+      const items = document.querySelectorAll('#uq-project-list .uq-projects-link');
       items.forEach((item) => {
         item.removeEventListener('mouseenter', handleMouseHover);
         item.removeEventListener('focus', handleMouseHover);
       });
     };
-  });
+  }, [
+    main,
+    userSettings?.published?.themeSelected,
+    sustainData?.themeSelected,
+    products,
+    dppProducts,
+    metricData,
+  ]);
 
   const filteredProductData = async () => {
     const response = await getAllOrders(1);
