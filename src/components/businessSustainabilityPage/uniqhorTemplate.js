@@ -120,7 +120,6 @@
       overflow-x: hidden;
       overflow-y: auto;
       height: auto;
-      min-height: 100%;
       background: var(--canvas);
       scroll-behavior: smooth;
     }
@@ -131,7 +130,6 @@
       overflow-x: hidden;
       overflow-y: visible;
       height: auto;
-      min-height: 100%;
       background: var(--canvas);
       color: var(--ink);
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;

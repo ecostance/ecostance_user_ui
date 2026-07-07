@@ -25,32 +25,19 @@ import { Spinner } from "react-bootstrap";
 import { returnPhoneDetails } from "src/helpers/returnPhoneDetails";
 
 // Full-document templates (uniqhor) include their own <html>, <style>, and <script>.
-// Injecting via dangerouslySetInnerHTML nests scroll contexts and skips scripts; iframe + srcDoc fixes both.
-const handleStandaloneHtmlIframeLoad = (e) => {
-  const iframe = e.currentTarget;
-  try {
-    const win = iframe.contentWindow;
-    const doc = win.document;
-    const resize = () => {
-      iframe.style.height = `${doc.documentElement.scrollHeight}px`;
-    };
-    resize();
-    if (win.ResizeObserver) {
-      const observer = new win.ResizeObserver(resize);
-      observer.observe(doc.documentElement);
-    }
-    win.addEventListener("resize", resize);
-  } catch (err) {
-    console.error("Uniqhor iframe resize error:", err);
-  }
-};
-
-const UniqhorTemplateFrame = ({ html }) => (
+// Render in an iframe so scripts run and styles stay isolated. Use a fixed viewport
+// height — auto-resizing via scrollHeight + min-height: 100% causes runaway page height.
+const UniqhorTemplateFrame = ({ html, fillViewport = false }) => (
   <iframe
     title="Sustainability Page"
     srcDoc={html}
-    onLoad={handleStandaloneHtmlIframeLoad}
-    style={{ width: "100%", border: "none", display: "block", minHeight: "100vh" }}
+    style={{
+      width: "100%",
+      border: "none",
+      display: "block",
+      height: fillViewport ? "100%" : "80vh",
+      minHeight: fillViewport ? undefined : 560,
+    }}
   />
 );
 
@@ -548,7 +535,11 @@ width="125"
       const theme = userSettings?.published?.themeSelected;
       const html = returnCorrectTemplate(mapTemplate[theme]);
       if (theme === "uniqhor") {
-        return <UniqhorTemplateFrame html={html} />;
+        return (
+          <div style={{ height: "100vh", overflow: "hidden" }}>
+            <UniqhorTemplateFrame html={html} fillViewport />
+          </div>
+        );
       }
       return (
         <div
