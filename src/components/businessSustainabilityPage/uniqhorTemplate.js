@@ -766,10 +766,11 @@ export const uniqhorTemplate = (dynamic) => {
     .uq-dpp-card-title {
       font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
       font-size: 16px;
-      font-weight: 400;
+      font-weight: bold;
       line-height: 1.3;
       color: #0e1319;
       margin: 0;
+      text-align: right;
     }
 
     .uq-dpp-card-desc {
@@ -1581,7 +1582,7 @@ export const uniqhorTemplate = (dynamic) => {
 <body>
   <!-- Announcement Bar -->
   <div class="uq-announcement">
-    Advanced orders begin 07.01.2026
+    Verified Carbon Neutral Business &mdash; Powered by EcoStance
   </div>
 
   <!-- Header -->
@@ -1696,13 +1697,16 @@ export const uniqhorTemplate = (dynamic) => {
                   <img src="${item.image}" alt="${item.alt}" loading="lazy" />
                 </div>
                 <div class="uq-dpp-card-divider" aria-hidden="true"></div>
-                <div class="uq-dpp-card-meta">
-                  <div class="uq-dpp-card-qr">
-                    <img src="${item.qrUrl}" alt="" width="56" height="56" loading="lazy" />
+                <div class="uq-dpp-card-meta" style="flex-direction: column; justify-content: center; align-items: stretch; gap: 8px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+                    <div class="uq-dpp-card-qr">
+                      <img src="${item.qrUrl}" alt="" width="56" height="56" loading="lazy" />
+                    </div>
+                    <div class="uq-dpp-card-text">
+                      <p class="uq-dpp-card-title">DIGITAL PASSPORT</p>
+                    </div>
                   </div>
-                  <div class="uq-dpp-card-text">
-                    <p class="uq-dpp-card-title">Digital Product Passport</p>
-                  </div>
+                  <div class="uq-dpp-card-product-name" style="font-size: 13px; font-weight: 400; color: #565c61;">${item.title}</div>
                 </div>
               </a>
             </div>`).join('')}
@@ -1946,7 +1950,15 @@ export const uniqhorTemplate = (dynamic) => {
       var sections = document.querySelectorAll('section[id]');
       
       navLinks.forEach(function(link) {
-        link.addEventListener('click', function() {
+        link.addEventListener('click', function(e) {
+          var targetId = link.getAttribute('href');
+          if (targetId && targetId.startsWith('#')) {
+            var targetSection = document.getElementById(targetId.substring(1));
+            if (targetSection) {
+              e.preventDefault();
+              targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
           navLinks.forEach(function(el) { el.classList.remove('uq-nav-active'); });
           link.classList.add('uq-nav-active');
         });
@@ -1954,7 +1966,15 @@ export const uniqhorTemplate = (dynamic) => {
 
       var mobileLinks = document.querySelectorAll('.uq-mobile-nav a');
       mobileLinks.forEach(function(link) {
-        link.addEventListener('click', function() {
+        link.addEventListener('click', function(e) {
+          var targetId = link.getAttribute('href');
+          if (targetId && targetId.startsWith('#')) {
+            var targetSection = document.getElementById(targetId.substring(1));
+            if (targetSection) {
+              e.preventDefault();
+              targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
           if (mobileNav) mobileNav.classList.remove('is-open');
           if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
         });
