@@ -1,4 +1,4 @@
-﻿export const uniqhorTemplate = (dynamic) => {
+export const uniqhorTemplate = (dynamic) => {
   const uiUrl = dynamic?.UI_URL || '';
   const brandName = (dynamic?.companyName || 'uniqohr').toLowerCase();
   const certCount = dynamic?.certData?.length || 0;
@@ -20,29 +20,38 @@
 
   const projectCollections = [
     { title: 'Nature-Based Removal', count: dynamic?.totalProjects || 12, img: img('eco-sapling.jpg'), alt: 'Sapling planted at reforestation site' },
-    { title: 'Shop Projects', count: dynamic?.dppProducts?.length || 8, img: img('eco-wind2.jpg'), alt: 'Solar farm at golden hour' },
-    { title: 'Registry Certified', count: certCount || 5, img: img('uniqhor.jpg'), alt: 'Verified digital carbon certificate' },
-    { title: 'Renewable Energy', count: 3, img: img('eco-wind2.jpg'), alt: 'Wind turbines at dawn' },
+    { title: 'Shop Projects', count: dynamic?.dppProducts?.length || 8, img: img('eco-wind2.jpg'), alt: 'Wind farm at golden hour' },
+    { title: 'Registry Certified', count: certCount || 5, img: img('eco-ocean.jpg'), alt: 'Verified digital carbon certificate' },
+    { title: 'Renewable Energy', count: 3, img: img('eco-hero.jpg'), alt: 'Renewable energy landscape' },
   ];
 
   const formatChainDescription = (text) => {
-    const words = (text || '').trim().split(/\s+/).filter(Boolean);
-    if (!words.length) return '';
-    const excerpt = words.slice(0, 50).join(' ');
-    return excerpt.endsWith('...') ? excerpt : `${excerpt}...`;
+    const clean = (text || '')
+      .replace(/<[^>]*>/g, ' ')
+      .trim()
+      .replace(/\s+/g, ' ');
+    if (!clean) return '';
+
+    const words = clean.split(' ');
+    const maxWords = 15;
+
+    if (words.length <= maxWords) return clean;
+    return `${words.slice(0, maxWords).join(' ')}...`;
   };
 
   const fallbackCerts = [
-    { id: '100000002043', date: '2026-07-01', tons: '1 Tons', title: 'Piedra Wind Farm', description: 'Utility-scale wind farm displacing fossil-fuel electricity on the Mexican national grid. Each retired tonne is independently verified through a registry-issued certificate, ensuring no double counting and full traceability from project to retirement. The facility generates renewable electricity for communities while reducing greenhouse gas emissions across the region...', image: img('eco-wind2.jpg'), alt: 'Wind turbine at sunrise', url: '#' },
-    { id: '100000002044', date: '2026-07-01', tons: '2 Tons', title: 'Coastal Plastic Recovery', description: 'Removes ocean-bound plastic from coastal waterways and funds local collector livelihoods. Recovered material is sorted, processed, and redirected away from marine ecosystems while creating fair-wage employment for coastal communities. Every certificate represents verified environmental benefit with transparent chain-of-custody documentation from collection through final processing...', image: img('eco-ocean.jpg'), alt: 'Hands collecting plastic from the ocean', url: '#' },
-    { id: '100000002045', date: '2026-07-01', tons: '3 Tons', title: 'Boreal Reforestation', description: 'Nature-based removal restoring degraded boreal forest with native species and long-term monitoring. Seedlings are planted across previously disturbed land, rebuilding habitat, improving soil health, and sequestering carbon over decades. Independent auditors verify survival rates and growth milestones before credits are issued to the registry...', image: img('eco-sapling.jpg'), alt: 'Sapling planted in dark soil', url: '#' },
-    { id: '100000002046', date: '2026-07-01', tons: '1 Tons', title: 'Dairy Methane Capture', description: 'Anaerobic digester capturing methane from dairy operations and converting it into renewable energy. Methane that would otherwise enter the atmosphere is destroyed or repurposed as biogas, reducing the climate impact of agricultural waste. Each tonne retired is backed by metered data and third-party verification on the public registry...', image: img('eco-methane.jpg'), alt: 'Methane capture facility', url: '#' },
+    { id: '100000002043', date: '2026-07-01', tons: '1', title: 'Piedra Wind Farm', description: 'Utility-scale wind farm displacing fossil-fuel electricity on the Mexican national grid.', image: img('eco-wind2.jpg'), alt: 'Piedra Wind Farm', url: '#' },
+    { id: '100000002044', date: '2026-07-01', tons: '2', title: 'Coastal Plastic Recovery', description: 'Removes ocean-bound plastic from coastal waterways and funds local collector livelihoods.', image: img('eco-ocean.jpg'), alt: 'Coastal Plastic Recovery', url: '#' },
+    { id: '100000002045', date: '2026-07-01', tons: '3', title: 'Atlantic Reforestation', description: 'Native-species planting that restores degraded Atlantic Forest and rebuilds habitat corridors.', image: img('eco-sapling.jpg'), alt: 'Atlantic Reforestation', url: '#' },
+    { id: '100000002046', date: '2026-07-01', tons: '2', title: 'Rajasthan Solar Array', description: 'Grid-connected solar generation displacing coal-fired power across northern India.', image: img('eco-wind2.jpg'), alt: 'Rajasthan Solar Array', url: '#' },
+    { id: '100000002047', date: '2026-07-01', tons: '4', title: 'Sundarbans Mangrove Restoration', description: 'Community-led mangrove replanting that sequesters blue carbon and protects coastal villages.', image: img('eco-hero.jpg'), alt: 'Sundarbans Mangrove Restoration', url: '#' },
+    { id: '100000002048', date: '2026-07-01', tons: '1', title: 'Efficient Cookstoves Programme', description: 'High-efficiency cookstoves that cut wood use, indoor smoke, and household carbon footprints.', image: img('eco-methane.jpg'), alt: 'Efficient Cookstoves Programme', url: '#' },
   ];
 
   const chainItems = (dynamic?.certData?.length ? dynamic.certData : []).map((cert) => ({
     id: cert?.originNumber || '',
     date: cert?.createdAt ? new Date(cert.createdAt).toISOString().split('T')[0] : '',
-    tons: cert?.quantity ? `${cert.quantity} Tons` : '',
+    tons: cert?.quantity ? String(cert.quantity) : '',
     title: cert?.product?.name || 'Certificate',
     description: formatChainDescription(cert?.product?.shortDescription || cert?.product?.description || ''),
     image: cert?.product?.thumbImage?.[0] || '',
@@ -50,11 +59,17 @@
     url: cert?.certificate?.certificateURL || '#',
   }));
 
-  const displayChain = chainItems.length > 0 ? chainItems : fallbackCerts;
+  const displayChain = chainItems.length > 0
+    ? chainItems
+    : fallbackCerts.map((c) => ({
+        ...c,
+        description: formatChainDescription(c.description),
+      }));
   const companyLabel = dynamic?.companyName || 'Uniqohr';
-  const brandLogo = dynamic?.logo
-    ? `<img src="${dynamic.logo}" alt="${companyLabel}" class="uq-brand-logo" width="131" height="31" />`
-    : '';
+  const defaultLogoUrl = 'https://www.uniqohr.com/cdn/shop/files/LogoUniqohrSquareW.png?height=31&v=1774282937';
+  const logoUrl = dynamic?.logo || defaultLogoUrl;
+  const brandLogo = `<img src="${logoUrl}" alt="${companyLabel}" class="uq-brand-logo" width="131" height="31" />`;
+  const footerLogo = `<img src="${logoUrl}" alt="${companyLabel}" class="uq-footer-logo" width="131" height="29" />`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -72,16 +87,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --ink: oklch(0.18 0.005 80);
-      --ink-soft: oklch(0.35 0.005 80);
-      --canvas: oklch(0.955 0.004 80);
-      --canvas-alt: oklch(0.93 0.005 80);
-      --section-alt: oklch(0.96 0.004 80);
-      --hairline: oklch(0.86 0.006 80);
-      --muted: oklch(0.45 0.008 80);
+      --ink: #0e1319;
+      --ink-soft: #565c61;
+      --canvas: #f7f7f7;
+      --canvas-alt: #ffffff;
+      --section-alt: #f7f7f7;
+      --hairline: #e5e5e5;
+      --muted: #565c61;
       --ann-bg: #0f1318;
       --header-bg: #2d3339;
       --footer-bg: #2d3339;
@@ -91,22 +106,35 @@
       --uq-logo-height: 31px;
       --uq-logo-width: 131px;
       --uq-logo-width-mobile: 119px;
+      --uq-logo-height-mobile: 28px;
+      --uq-icon-stroke: 1.5px;
       --cream: #f9f8f5;
       --accent-green: #10b981;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
+    html {
       margin: 0;
       padding: 0;
       overflow-x: hidden;
+      overflow-y: auto;
+      height: auto;
+      background: var(--canvas);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      overflow-y: visible;
+      height: auto;
       background: var(--canvas);
       color: var(--ink);
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       font-feature-settings: "ss01", "cv11";
-      scroll-behavior: smooth;
     }
 
     .font-display {
@@ -134,14 +162,16 @@
       color: rgba(255,255,255,0.6);
     }
 
-    /* Announcement + Header — Uniqohr */
+    /* Announcement + Header — Uniqohr (matches uniqohr.com/pages/about) */
     .uq-announcement {
       width: 100%;
       background: var(--ann-bg);
       color: var(--uq-cream);
-      font-family: var(--uq-nav-font);
-      font-size: 16px;
+      font-family: 'Archivo', var(--uq-nav-font);
+      font-size: 0.75rem;
       font-weight: 400;
+      line-height: 1;
+      letter-spacing: 0;
       padding: 15px 24px;
       text-align: center;
       border-bottom: 1px solid var(--uq-divider);
@@ -157,18 +187,39 @@
     }
 
     .uq-header-inner {
+      position: relative;
       max-width: 1600px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
+      grid-template-areas: 'left center right';
       align-items: center;
-      gap: 16px;
-      padding: 11px 24px;
+      gap: 24px;
+      padding: 11px 40px;
       min-height: 66px;
     }
 
-    @media (min-width: 768px) {
-      .uq-header-inner { padding: 11px 40px; }
+    .uq-header-left {
+      grid-area: left;
+      display: flex;
+      align-items: center;
+      justify-self: start;
+      gap: 0;
+      min-width: 0;
+    }
+
+    .uq-header-center {
+      grid-area: center;
+      justify-self: center;
+    }
+
+    .uq-header-right {
+      grid-area: right;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0;
+      justify-self: end;
     }
 
     .uq-nav-brand {
@@ -176,26 +227,17 @@
       align-items: center;
       text-decoration: none;
       color: var(--uq-cream);
-      justify-self: start;
+      line-height: 0;
+      flex-shrink: 0;
     }
 
     .uq-brand-logo {
       display: block;
-      width: var(--uq-logo-width);
+      width: auto;
       height: var(--uq-logo-height);
-      max-width: 100%;
+      max-width: var(--uq-logo-width);
       object-fit: contain;
       object-position: left center;
-    }
-
-    @media (max-width: 989px) {
-      .uq-brand-logo {
-        width: var(--uq-logo-width-mobile);
-      }
-    }
-
-    .uq-nav-brand .uq-brand-logo {
-      object-position: center center;
     }
 
     .uq-nav-brand-text {
@@ -204,6 +246,7 @@
       font-weight: 400;
       color: var(--uq-cream);
       text-transform: lowercase;
+      line-height: 1.2;
     }
 
     .uq-nav-menu-btn {
@@ -216,7 +259,6 @@
       cursor: pointer;
       padding: 16px;
       line-height: 0;
-      justify-self: start;
     }
 
     .uq-nav-menu-btn svg {
@@ -226,22 +268,23 @@
     }
 
     .uq-nav-links {
-      display: none;
+      display: flex;
       justify-content: center;
+      align-items: center;
       gap: 32px;
       list-style: none;
-      font-size: 14px;
-      font-weight: 400;
-    }
-
-    @media (min-width: 990px) {
-      .uq-nav-links { display: flex; }
+      margin: 0;
+      padding: 0;
     }
 
     .uq-nav-links a {
+      font-family: var(--uq-nav-font);
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: calc(1.1 + 0.5 * min(16 / 14));
       color: rgba(249, 248, 245, 0.7);
       text-decoration: none;
-      transition: color 0.2s;
+      transition: color 0.2s ease;
       white-space: nowrap;
     }
 
@@ -252,9 +295,9 @@
 
     .uq-nav-actions {
       display: flex;
-      justify-content: flex-end;
       align-items: center;
-      gap: 4px;
+      justify-content: flex-end;
+      gap: 0;
     }
 
     .uq-nav-icon {
@@ -267,7 +310,7 @@
       cursor: pointer;
       padding: 16px;
       line-height: 0;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s ease;
     }
 
     .uq-nav-icon:hover { opacity: 0.7; }
@@ -283,18 +326,55 @@
       height: 17px;
     }
 
-    .uq-header nav {
+    .uq-mobile-nav {
+      display: none;
+      background: var(--ann-bg);
+      border-top: 1px solid rgba(249, 248, 245, 0.08);
+      padding: 8px 20px 20px;
+    }
+
+    .uq-mobile-nav.is-open { display: block; }
+
+    .uq-mobile-nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .uq-mobile-nav li + li { margin-top: 4px; }
+
+    .uq-mobile-nav a {
       display: block;
+      padding: 14px 0;
+      font-family: var(--uq-nav-font);
+      font-size: 1.75rem;
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--uq-cream);
+      text-decoration: none;
     }
 
     @media (max-width: 989px) {
       .uq-header-inner {
-        grid-template-columns: auto 1fr auto;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
         padding: 11px 20px;
       }
+
       .uq-nav-menu-btn { display: inline-flex; }
-      .uq-header nav { display: none; }
-      .uq-nav-brand { justify-self: center; }
+
+      .uq-header-center { display: none; }
+
+      .uq-brand-logo {
+        width: auto;
+        height: var(--uq-logo-height-mobile);
+        max-width: var(--uq-logo-width-mobile);
+      }
+    }
+
+    @media (min-width: 990px) {
+      .uq-nav-menu-btn { display: none; }
+      .uq-mobile-nav { display: none !important; }
     }
 
     /* Hero */
@@ -333,27 +413,26 @@
     }
 
     .uq-hero-title {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 42px;
-      font-weight: 500;
-      letter-spacing: -0.04em;
+      font-family: 'Archivo', 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+      font-size: clamp(2.25rem, 4.8vw, 3rem);
+      font-weight: 300;
+      letter-spacing: 0;
       line-height: 1;
       color: #fff;
-      text-transform: uppercase;
     }
 
     .uq-hero-desc {
       margin-top: 24px;
       max-width: 100%;
-      font-size: 16px;
-      line-height: 1.7;
+      font-family: 'Archivo', 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+      font-size: 1.5rem;
+      font-weight: 300;
+      line-height: 1.1;
       color: rgba(255,255,255,0.9);
     }
 
     @media (min-width: 768px) {
       .uq-hero-content { padding: 0 48px 96px; }
-      .uq-hero-title { font-size: 96px; }
-      .uq-hero-desc { font-size: 18px; }
     }
 
     /* Built from the Ground Up */
@@ -368,63 +447,90 @@
     }
 
     @media (min-width: 768px) {
-      .uq-about-inner { padding: 144px 48px; }
+      .uq-about-inner { padding: 100px 48px; }
     }
 
     .uq-about-title {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 36px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      color: var(--ink);
-      margin-bottom: 64px;
-      max-width: 768px;
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+      font-size: 32px;
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 1.05;
+      color: #0e1319;
+      margin: 0 0 12px;
+      max-width: 19.5em;
     }
 
-    @media (min-width: 768px) {
-      .uq-about-title { font-size: 60px; margin-bottom: 96px; }
+    @media (max-width: 767px) {
+      .uq-about-title { font-size: 28px; }
     }
 
     .uq-about-grid {
       display: grid;
       gap: 56px;
-      align-items: start;
+      align-items: center;
     }
 
     @media (min-width: 768px) {
-      .uq-about-grid { grid-template-columns: 1fr 1fr; gap: 96px; }
+      .uq-about-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: max(24px, 3.125rem);
+      }
     }
 
-    .uq-about-text { max-width: 520px; }
+    .uq-about-copy {
+      max-width: 471px;
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .uq-about-text { max-width: 100%; }
+
+    .uq-about-media {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+    }
+
+    @media (max-width: 767px) {
+      .uq-about-grid { align-items: start; }
+    }
 
     .uq-about-text p {
-      font-size: 15px;
-      line-height: 1.7;
-      color: var(--ink-soft);
-      margin-top: 24px;
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: #565c61;
+      margin-top: 20px;
     }
 
     .uq-about-text p:first-child { margin-top: 0; }
 
     .uq-about-text p.uq-about-highlight,
-    .uq-about-text p strong { color: var(--ink); font-weight: 500; }
+    .uq-about-text p strong {
+      color: #0e1319;
+      font-weight: 500;
+    }
 
     .uq-about-link {
       display: inline-block;
-      margin-top: 16px;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.16em;
+      margin-top: 25px;
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--ink);
-      text-decoration: none;
-      border-bottom: 1px solid var(--ink);
-      padding-bottom: 4px;
+      color: #2c333a;
+      text-decoration: underline;
+      text-underline-offset: 3px;
       transition: opacity 0.2s;
     }
 
-    .uq-about-link:hover { opacity: 0.7; }
+    .uq-about-link:hover {
+      opacity: 0.7;
+      text-decoration: none;
+    }
 
     .uq-about-img {
       width: 100%;
@@ -432,99 +538,125 @@
       object-fit: cover;
     }
 
-    /* Verified Chain */
+    /* Digital Product Passports — matches uniqohr Verified Supply Chain */
     .uq-verified {
-      background: var(--section-alt);
-      border-top: 1px solid var(--hairline);
+      background: var(--canvas);
     }
 
     .uq-verified-inner {
       max-width: 1600px;
       margin: 0 auto;
-      padding: 96px 24px;
+      padding: 25px 24px 0;
     }
 
     @media (min-width: 768px) {
-      .uq-verified-inner { padding: 144px 48px; }
+      .uq-verified-inner { padding: 25px 48px 0; }
     }
 
     .uq-verified-top {
       display: grid;
-      gap: 48px;
-      margin-bottom: 64px;
+      gap: 32px;
+      align-items: center;
+      margin-bottom: 35px;
     }
 
     @media (min-width: 768px) {
       .uq-verified-top {
-        grid-template-columns: 1fr 1fr;
-        gap: 80px;
-        margin-bottom: 96px;
+        grid-template-columns: 45% 55%;
+        gap: 0;
+        margin-bottom: 0;
+      }
+    }
+
+    .uq-verified-intro {
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+    }
+
+    @media (min-width: 768px) {
+      .uq-verified-body {
+        padding-left: 50px;
+        padding-bottom: 0;
       }
     }
 
     .uq-verified-title {
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 36px;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      color: var(--ink);
-      max-width: 448px;
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+      font-size: 32px;
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 1.05;
+      color: #0e1319;
+      margin: 0 0 10px;
+      max-width: none;
     }
 
-    @media (min-width: 768px) {
-      .uq-verified-title { font-size: 60px; }
+    @media (max-width: 767px) {
+      .uq-verified-title { font-size: 28px; }
     }
 
     .uq-verified-sub {
-      margin-top: 24px;
-      font-size: 15px;
-      line-height: 1.7;
-      color: var(--muted);
+      margin: 0;
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: #565c61;
     }
 
-    .uq-verified-body { max-width: 520px; }
-
-    @media (min-width: 768px) {
-      .uq-verified-body { justify-self: end; }
+    .uq-verified-body {
+      max-width: none;
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
     }
 
     .uq-verified-body p {
-      font-size: 15px;
-      line-height: 1.7;
-      color: var(--muted);
-      margin-top: 24px;
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: #565c61;
+      margin-top: 20px;
     }
 
     .uq-verified-body p:first-child {
-      color: var(--ink);
+      color: #565c61;
       margin-top: 0;
     }
 
     .uq-verified-cta {
       display: inline-flex;
       align-items: center;
-      margin-top: 16px;
-      background: var(--ink);
-      color: var(--canvas);
-      padding: 16px 32px;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.2em;
+      margin-top: 25px;
+      background: #0e1319;
+      color: #fff;
+      padding: 21px 45px;
+      border: 1px solid #0e1319;
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: normal;
       text-transform: uppercase;
       text-decoration: none;
-      transition: opacity 0.2s;
+      transition: background 0.2s, color 0.2s;
     }
 
-    .uq-verified-cta:hover { opacity: 0.9; }
+    .uq-verified-cta:hover {
+      background: transparent;
+      color: #0e1319;
+    }
 
     .uq-verified-strip-wrap {
       position: relative;
       margin: 0 -24px;
+      padding-top: 35px;
+      padding-bottom: 48px;
     }
 
     @media (min-width: 768px) {
-      .uq-verified-strip-wrap { margin: 0 -48px; }
+      .uq-verified-strip-wrap {
+        margin: 0 -48px;
+        padding-top: 48px;
+        padding-bottom: 48px;
+      }
     }
 
     .uq-verified-strip {
@@ -558,7 +690,8 @@
     }
 
     @media (min-width: 768px) {
-      .uq-verified-strip-item { width: calc((100vw - 6rem - 2.25rem) / 4); max-width: 320px; }
+      .uq-verified-strip-item { width: calc((100% - 2.25rem) / 4); max-width: 320px; min-width: 200px; }
+      .uq-verified-strip-track { width: 100%; }
     }
 
     .uq-dpp-card {
@@ -576,6 +709,10 @@
     .uq-dpp-card:hover {
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
       transform: translateY(-2px);
+    }
+
+    .uq-dpp-card:hover .uq-dpp-card-title {
+      text-decoration: underline;
     }
 
     .uq-dpp-card-image {
@@ -627,20 +764,21 @@
     }
 
     .uq-dpp-card-title {
-      font-family: var(--uq-nav-font);
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1.35;
-      color: var(--ink);
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+      font-size: 16px;
+      font-weight: bold;
+      line-height: 1.3;
+      color: #0e1319;
       margin: 0;
+      text-align: right;
     }
 
     .uq-dpp-card-desc {
-      font-family: var(--uq-nav-font);
-      font-size: 11px;
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+      font-size: 14px;
       font-weight: 400;
-      line-height: 1.45;
-      color: var(--muted);
+      line-height: 20px;
+      color: #565c61;
       margin: 4px 0 0;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -664,7 +802,6 @@
     /* Founder Quote */
     .uq-quote {
       background: var(--canvas);
-      border-top: 1px solid var(--hairline);
     }
 
     .uq-quote-inner {
@@ -705,49 +842,61 @@
       object-fit: cover;
     }
 
-    /* Chain of Custody — diamond timeline */
+    /* Chain of Custody — matches uniqo-style-showcase.lovable.app */
     .uq-chain {
-      background: var(--section-alt);
-      border-top: 1px solid var(--hairline);
+      --chain-ink: oklch(15% 0.005 240);
+      --chain-ink-soft: oklch(28% 0.005 240);
+      --chain-canvas: #ffffff;
+      --chain-canvas-alt: var(--canvas);
+      --chain-hairline: oklch(86% 0.003 240);
+      --chain-muted: oklch(45% 0.005 240);
+      background: var(--canvas);
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
     }
 
     .uq-chain-inner {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 96px 24px;
+      padding: 80px 24px;
     }
 
     @media (min-width: 768px) {
-      .uq-chain-inner { padding: 144px 48px; }
+      .uq-chain-inner { padding: 96px 24px; }
     }
 
-    .uq-chain-title {
-      margin-top: 24px;
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 36px;
-      font-weight: 400;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      color: var(--ink);
-      max-width: 768px;
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-title { font-size: 60px; }
-    }
-
-    .uq-chain-subtitle {
-      margin-top: 24px;
-      max-width: 576px;
-      font-size: 15px;
-      font-weight: 400;
-      line-height: 1.7;
-      color: var(--muted);
+    .uq-chain-header {
+      max-width: 48rem;
     }
 
     .uq-chain .eyebrow {
+      font-size: 11px;
       font-weight: 400;
       letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--chain-muted);
+    }
+
+    .uq-chain-title {
+      margin-top: 12px;
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      font-size: 1.875rem;
+      font-weight: 300;
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+      color: var(--chain-ink);
+    }
+
+    @media (min-width: 768px) {
+      .uq-chain-title { font-size: 3rem; }
+    }
+
+    .uq-chain-subtitle {
+      margin-top: 20px;
+      max-width: 36rem;
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.625;
+      color: var(--chain-muted);
     }
 
     .uq-chain-list {
@@ -756,147 +905,146 @@
       margin-top: 64px;
     }
 
-    @media (min-width: 768px) {
-      .uq-chain-list { margin-top: 96px; }
-    }
-
     .uq-chain-line {
       position: absolute;
-      left: 7px;
+      left: 0.3125rem;
       top: 8px;
       bottom: 8px;
       width: 1px;
-      background: var(--hairline);
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-line { left: 9px; }
+      background: var(--chain-hairline);
+      pointer-events: none;
     }
 
     .uq-chain-item {
       position: relative;
       padding-left: 32px;
-      padding-bottom: 64px;
+    }
+
+    .uq-chain-item + .uq-chain-item {
+      margin-top: 56px;
     }
 
     @media (min-width: 768px) {
-      .uq-chain-item { padding-left: 56px; padding-bottom: 96px; }
+      .uq-chain-item { padding-left: 48px; }
     }
-
-    .uq-chain-item:last-child { padding-bottom: 0; }
 
     .uq-chain-diamond {
       position: absolute;
       left: 0;
-      top: 4px;
-      width: 15px;
-      height: 15px;
+      top: 8px;
+      width: 10px;
+      height: 10px;
       transform: rotate(45deg);
-      border: 1px solid var(--ink);
-      background: var(--canvas);
+      border: 1px solid var(--chain-ink);
+      background: var(--chain-canvas-alt);
       z-index: 1;
-    }
-
-    @media (min-width: 768px) {
-      .uq-chain-diamond { width: 19px; height: 19px; }
     }
 
     .uq-chain-card {
       display: grid;
-      gap: 32px;
+      gap: 24px;
       align-items: start;
+      text-decoration: none;
+      color: inherit;
     }
 
     @media (min-width: 768px) {
-      .uq-chain-card { grid-template-columns: 1fr auto; gap: 64px; }
+      .uq-chain-card {
+        grid-template-columns: 1fr 240px;
+        gap: 40px;
+      }
     }
-
-    .uq-chain-content { max-width: 576px; }
 
     .uq-chain-cert-tag {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      border: 1px solid var(--hairline);
-      background: var(--canvas);
+      border: 1px solid var(--chain-hairline);
+      background: var(--chain-canvas);
       padding: 6px 12px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 400;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--ink);
-      text-decoration: none;
-      transition: background 0.2s, color 0.2s;
+      color: var(--chain-ink-soft);
     }
 
-    .uq-chain-cert-tag:hover {
-      background: var(--ink);
-      color: var(--canvas);
+    .uq-chain-cert-tag svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
     }
 
     .uq-chain-date {
-      margin-top: 24px;
+      margin-top: 16px;
       font-size: 13px;
       font-weight: 400;
-      color: var(--muted);
+      color: var(--chain-muted);
     }
 
     .uq-chain-qty {
       margin-top: 4px;
       font-size: 13px;
       font-weight: 400;
-      color: var(--muted);
+      color: var(--chain-muted);
     }
 
-    .uq-chain-qty strong { color: var(--ink); font-weight: 400; }
+    .uq-chain-qty span { color: var(--chain-ink); }
 
     .uq-chain-project {
-      margin-top: 16px;
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 24px;
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      color: var(--ink);
+      margin-top: 20px;
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      font-size: 1.5rem;
+      font-weight: 300;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      color: var(--chain-ink);
     }
 
     @media (min-width: 768px) {
-      .uq-chain-project { font-size: 36px; }
+      .uq-chain-project { font-size: 1.875rem; }
+    }
+
+    .uq-chain-card:hover .uq-chain-project {
+      text-decoration: underline;
+      text-underline-offset: 4px;
     }
 
     .uq-chain-desc {
-      margin-top: 16px;
-      font-size: 15px;
+      margin-top: 12px;
+      font-size: 14px;
       font-weight: 400;
-      line-height: 1.7;
-      color: var(--muted);
-      max-width: 576px;
+      line-height: 1.625;
+      color: var(--chain-ink-soft);
+      max-width: 36rem;
     }
 
     .uq-chain-img-wrap {
+      position: relative;
       width: 100%;
       aspect-ratio: 1;
       overflow: hidden;
-      background: var(--canvas-alt);
+      background: var(--chain-canvas);
     }
 
     @media (min-width: 768px) {
-      .uq-chain-img-wrap { width: 320px; }
-    }
-
-    @media (min-width: 1024px) {
-      .uq-chain-img-wrap { width: 380px; }
+      .uq-chain-img-wrap { width: 240px; }
     }
 
     .uq-chain-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 0.7s ease-out;
+    }
+
+    .uq-chain-card:hover .uq-chain-img {
+      transform: scale(1.04);
     }
 
     /* Project Grid */
     .uq-projects {
       background: var(--canvas);
-      border-top: 1px solid var(--hairline);
     }
 
     .uq-projects-inner {
@@ -969,58 +1117,87 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      opacity: 0;
+      z-index: 0;
       transition: opacity 0.5s;
     }
 
-    .uq-projects-visual img.uq-img-hidden { opacity: 0; }
-    .uq-projects-visual img.uq-img-visible { opacity: 1; }
+    .uq-projects-visual img.uq-img-hidden { opacity: 0; z-index: 0; }
+    .uq-projects-visual img.uq-img-visible { opacity: 1; z-index: 1; }
 
-    /* Join Community — Uniqohr */
+    .uq-projects-grid:has(.uq-projects-link:hover) .uq-projects-visual img.uq-img-visible,
+    .uq-projects-grid:has(.uq-projects-link:focus-visible) .uq-projects-visual img.uq-img-visible {
+      opacity: 0;
+      z-index: 0;
+    }
+
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(1) .uq-projects-link:hover) .uq-projects-visual img[data-img="0"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(1) .uq-projects-link:focus-visible) .uq-projects-visual img[data-img="0"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(2) .uq-projects-link:hover) .uq-projects-visual img[data-img="1"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(2) .uq-projects-link:focus-visible) .uq-projects-visual img[data-img="1"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(3) .uq-projects-link:hover) .uq-projects-visual img[data-img="2"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(3) .uq-projects-link:focus-visible) .uq-projects-visual img[data-img="2"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(4) .uq-projects-link:hover) .uq-projects-visual img[data-img="3"],
+    .uq-projects-grid:has(.uq-projects-list li:nth-child(4) .uq-projects-link:focus-visible) .uq-projects-visual img[data-img="3"] {
+      opacity: 1;
+      z-index: 1;
+    }
+
+    /* Join Community — Uniqohr footer-group */
     .uq-join {
-      background: #f7f7f7;
+      background: var(--canvas);
     }
 
     .uq-join-inner {
-      max-width: 1600px;
+      max-width: 1440px;
       margin: 0 auto;
-      padding: 70px 40px 40px;
+      padding: 0 40px 65px;
     }
 
-    @media (max-width: 749px) {
-      .uq-join-inner { padding: 40px 20px; }
+    @media (max-width: 768px) {
+      .uq-join-inner { padding: 0 20px 65px; }
     }
 
     .uq-join-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 16px;
     }
 
-    @media (max-width: 749px) {
-      .uq-join-row {
-        grid-template-columns: 1fr;
-        gap: 24px;
-      }
+    .uq-join-copy,
+    .uq-join-form-wrap {
+      flex: 1 1 280px;
+      min-width: 0;
     }
 
     .uq-join-title {
-      margin: 0 0 12px;
-      font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: clamp(2.25rem, 4vw, 3rem);
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      color: #2d3339;
-    }
-
-    .uq-join-sub {
       margin: 0;
       font-family: var(--uq-nav-font);
-      font-size: 15px;
+      font-size: 24px;
       font-weight: 400;
-      line-height: 1.5;
-      color: rgba(45, 51, 57, 0.65);
+      line-height: 40px;
+      color: #565c61;
+    }
+
+    .uq-join-title strong {
+      font-size: 40px;
+      font-weight: 400;
+      line-height: 40px;
+      color: #0e1319;
+    }
+
+    @media (max-width: 749px) {
+      .uq-join-title {
+        font-size: 20px;
+        line-height: 30px;
+        text-align: center;
+      }
+
+      .uq-join-title strong {
+        font-size: 32px;
+        line-height: 1.1;
+      }
     }
 
     .uq-join-form-wrap {
@@ -1036,23 +1213,28 @@
       display: flex;
       align-items: stretch;
       width: 100%;
+      background: transparent;
+      border: none;
     }
 
     .uq-join-input {
       flex: 1;
       min-width: 0;
-      border: 1px solid #dfdfdf;
+      border: none;
       border-radius: 0;
       background: #fff;
-      padding: 16px 20px;
-      font-size: 16px;
+      padding: 16px 28px;
+      font-size: 14px;
       font-family: var(--uq-nav-font);
       color: #333;
       outline: none;
+      height: 60px;
+      line-height: 22.4px;
     }
 
     .uq-join-input:focus {
-      border-color: #2d3339;
+      outline: 1px solid #2d3339;
+      outline-offset: -1px;
     }
 
     .uq-join-input::placeholder {
@@ -1061,35 +1243,37 @@
 
     .uq-join-submit {
       flex-shrink: 0;
-      width: 56px;
-      background: #2d3339;
-      color: #f9f8f5;
+      width: 65px;
+      height: 60px;
+      margin-left: 12px;
+      background: #2d333a;
+      color: #fff;
       border: none;
       border-radius: 0;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.2s;
+      transition: background 0.2s;
     }
 
-    .uq-join-submit:hover { opacity: 0.85; }
+    .uq-join-submit:hover { background: #b0b4b7; }
 
     .uq-join-submit svg {
-      width: 24px;
-      height: 24px;
+      width: 32px;
+      height: 32px;
       display: block;
     }
 
-    /* Footer — Uniqohr */
+    /* Footer — Uniqohr (matches uniqohr.com/pages/about footer-group) */
     .uq-footer {
-      background: var(--footer-bg);
-      color: var(--uq-cream);
+      background: #2d3339;
+      color: #f9f8f5;
       font-family: var(--uq-nav-font);
     }
 
     .uq-footer-main {
-      max-width: 1600px;
+      max-width: 1440px;
       margin: 0 auto;
       padding: 0 40px;
     }
@@ -1101,49 +1285,55 @@
     .uq-footer-top {
       display: flex;
       align-items: flex-start;
-      justify-content: space-between;
-      gap: 48px;
-      padding: 48px 0 24px;
+      gap: 0;
     }
 
     @media (max-width: 989px) {
       .uq-footer-top {
         flex-direction: column;
-        gap: 32px;
-        padding: 40px 0 20px;
       }
     }
 
     .uq-footer-brand-col {
-      flex: 0 0 auto;
-      padding-top: 9px;
+      flex: 1 1 50%;
+      min-width: 0;
+      padding-top: 20px;
+    }
+
+    @media (max-width: 989px) {
+      .uq-footer-brand-col { padding-top: 0; }
     }
 
     .uq-footer-brand {
       display: inline-flex;
       align-items: center;
+      padding-top: 20px;
       text-decoration: none;
       max-width: 230px;
     }
 
-    .uq-footer-brand .uq-brand-logo {
-      width: var(--uq-logo-width);
-      height: var(--uq-logo-height);
+    @media (max-width: 989px) {
+      .uq-footer-brand { padding-top: 20px; }
+    }
+
+    .uq-footer-logo {
+      max-width: 230px;
+      width: auto;
+      height: auto;
+      max-height: 29px;
+      display: block;
+      object-fit: contain;
       object-position: left center;
     }
 
-    .uq-footer-brand-text {
-      font-family: var(--uq-nav-font);
-      font-size: clamp(1.75rem, 3vw, 2rem);
-      font-weight: 500;
-      color: var(--uq-cream);
-      text-transform: lowercase;
-      line-height: 1.1;
+    .uq-footer-nav-col {
+      flex: 1 1 50%;
+      min-width: 0;
+      padding-top: 20px;
     }
 
-    .uq-footer-nav-col {
-      flex: 1 1 auto;
-      min-width: 0;
+    @media (max-width: 989px) {
+      .uq-footer-nav-col { padding-top: 0; }
     }
 
     .uq-footer-nav {
@@ -1157,37 +1347,35 @@
     @media (max-width: 989px) {
       .uq-footer-nav {
         justify-content: flex-start;
-        flex-wrap: wrap;
-        gap: 32px 48px;
+        flex-direction: column;
+        gap: 0;
+        padding-top: 15px;
       }
     }
 
     .uq-footer-col {
       flex: 1 1 0;
-      min-width: 140px;
-      max-width: 240px;
-      padding: 23px;
+      min-width: 0;
+      padding: 20px;
+      text-align: left;
     }
 
     @media (max-width: 989px) {
       .uq-footer-col {
-        flex: 1 1 160px;
-        max-width: none;
-        padding: 0;
+        flex: 1 1 100%;
+        padding: 10px 0 0;
       }
     }
 
     .uq-footer-col h4 {
-      font-size: 2rem;
+      font-family: 'Archivo', sans-serif;
+      font-size: 16px;
       font-weight: 700;
-      color: var(--uq-cream);
-      margin: 0 0 16px;
-      line-height: 1.2;
-      letter-spacing: -0.01em;
-    }
-
-    @media (max-width: 768px) {
-      .uq-footer-col h4 { font-size: 1.5rem; }
+      line-height: 17.6px;
+      padding-top: 11.2px;
+      margin: 0 0 12px;
+      color: #f9f8f5;
+      letter-spacing: 0;
     }
 
     .uq-footer-col ul {
@@ -1196,50 +1384,53 @@
       margin: 0;
     }
 
-    .uq-footer-col li { margin-bottom: 0; }
+    .uq-footer-col li { margin: 0 0 8px; }
+
+    .uq-footer-col li:last-child { margin-bottom: 0; }
 
     .uq-footer-col a {
-      display: inline-block;
-      font-size: 1rem;
+      display: inline;
+      font-family: var(--uq-nav-font);
+      font-size: 16px;
       font-weight: 400;
-      color: var(--uq-cream);
+      color: #f9f8f5;
       text-decoration: none;
-      padding: 6px 0;
-      line-height: 1.6;
-      transition: opacity 0.2s;
+      line-height: 25.6px;
     }
 
-    .uq-footer-col a:hover { opacity: 0.7; }
+    .uq-footer-col a:hover { text-decoration: underline; }
 
     .uq-footer-divider {
-      max-width: 1600px;
+      max-width: 1440px;
       margin: 0 auto;
-      padding: 0 40px;
+      padding: 16px 40px;
     }
 
     @media (max-width: 768px) {
-      .uq-footer-divider { padding: 0 20px; }
+      .uq-footer-divider { padding: 16px 20px; }
     }
 
     .uq-footer-divider-line {
       display: block;
       height: 1px;
-      background: #fff;
+      background: #f9f8f5;
       border: 0;
     }
 
     .uq-footer-utilities {
-      max-width: 1600px;
+      max-width: 1440px;
       margin: 0 auto;
       padding: 20px 40px 48px;
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
+      justify-items: stretch;
       gap: 24px;
       color: rgba(249, 248, 245, 0.6);
+      font-family: var(--uq-nav-font);
       font-size: 12px;
       font-weight: 400;
-      line-height: 1.5;
+      line-height: 19.2px;
     }
 
     @media (max-width: 749px) {
@@ -1254,6 +1445,7 @@
     .uq-footer-copy {
       color: rgba(249, 248, 245, 0.6);
       font-size: 12px;
+      line-height: 19.2px;
       justify-self: start;
     }
 
@@ -1267,27 +1459,38 @@
       transition: color 0.2s;
     }
 
-    .uq-footer-copy a:hover { color: var(--uq-cream); }
+    .uq-footer-copy a:hover { color: #f9f8f5; }
 
     .uq-footer-policies {
       font-size: 12px;
+      line-height: 19.2px;
       color: rgba(249, 248, 245, 0.6);
       text-align: center;
+      justify-self: center;
     }
 
-    .uq-footer-policies a {
+    .uq-footer-policies button {
+      appearance: none;
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      font-size: 12px;
+      line-height: 19.2px;
       color: rgba(249, 248, 245, 0.6);
-      text-decoration: none;
+      cursor: pointer;
       transition: color 0.2s;
     }
 
-    .uq-footer-policies a:hover { color: var(--uq-cream); }
+    .uq-footer-policies button:hover { color: #f9f8f5; }
 
     .uq-footer-socials {
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 16px;
+      justify-self: end;
+      gap: 11.2px;
       flex-wrap: wrap;
     }
 
@@ -1296,20 +1499,18 @@
     }
 
     .uq-footer-socials a {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      display: block;
       color: rgba(249, 248, 245, 0.6);
       text-decoration: none;
       transition: color 0.2s;
       line-height: 0;
     }
 
-    .uq-footer-socials a:hover { color: var(--uq-cream); }
+    .uq-footer-socials a:hover { color: #f9f8f5; }
 
     .uq-footer-socials svg {
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       display: block;
     }
 
@@ -1329,7 +1530,6 @@
     .uq-social-section {
       padding: 40px 24px;
       background: var(--canvas);
-      border-top: 1px solid var(--hairline);
       text-align: center;
     }
 
@@ -1382,42 +1582,59 @@
 <body>
   <!-- Announcement Bar -->
   <div class="uq-announcement">
-    Advanced orders begin 07.01.2026
+    Verified Carbon Neutral Business &mdash; Powered by EcoStance
   </div>
 
   <!-- Header -->
   <header class="uq-header">
     <div class="uq-header-inner">
-      <button type="button" class="uq-nav-menu-btn" aria-label="Menu">
-        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M1 3.5H13" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"></path>
-          <path d="M1 10.5H13" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"></path>
-        </svg>
-      </button>
-      <a href="#top" class="uq-nav-brand">
-        ${brandLogo || `<span class="uq-nav-brand-text">${brandName}</span>`}
-      </a>
-      <nav aria-label="Main">
+      <div class="uq-header-left">
+        <button type="button" class="uq-nav-menu-btn" id="uqNavMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="uqMobileNav">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 3.5H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            <path d="M1 10.5H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+          </svg>
+        </button>
+        <a href="#top" class="uq-nav-brand" aria-label="${companyLabel} - Home">
+          ${brandLogo}
+        </a>
+      </div>
+      <nav class="uq-header-center" aria-label="Main">
         <ul class="uq-nav-links">
-          <li><a href="#gallery">Shop</a></li>
-          <li><a href="#technology">Technology</a></li>
-          <li><a href="#gallery">Journal</a></li>
           <li><a href="#about" class="uq-nav-active">About</a></li>
+          <li><a href="#technology">Passports</a></li>
+          <li><a href="#chain">Certificates</a></li>
+          <li><a href="#gallery">Projects</a></li>
         </ul>
       </nav>
-      <div class="uq-nav-actions">
-        <button type="button" aria-label="Search" class="uq-nav-icon">
-          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-            <circle cx="9" cy="9" r="4.75" stroke="currentColor" stroke-width="1.25"></circle>
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="m12.5 12.5 3.25 3.25"></path>
-          </svg>
-        </button>
-        <button type="button" aria-label="Account" class="uq-nav-icon uq-nav-icon--account">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 17" fill="none">
-            <path stroke="currentColor" stroke-linejoin="round" stroke-width="1.25" d="M10.375 3.813a3.063 3.063 0 1 1-6.125 0 3.063 3.063 0 0 1 6.125 0ZM7.313 9.5c-3.667 0-6.24 2.691-6.563 6.125h13.125C13.552 12.191 10.979 9.5 7.312 9.5Z"></path>
-          </svg>
-        </button>
+      <div class="uq-header-right">
+        <div class="uq-nav-actions">
+          <button type="button" aria-label="Search" class="uq-nav-icon">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+              <circle cx="9" cy="9" r="4.75" stroke="currentColor" stroke-width="1.5"></circle>
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m12.5 12.5 3.25 3.25"></path>
+            </svg>
+          </button>
+          <button type="button" aria-label="Account" class="uq-nav-icon uq-nav-icon--account">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 17" fill="none" aria-hidden="true">
+              <path stroke="currentColor" stroke-linejoin="round" stroke-width="1.5" d="M10.375 3.813a3.063 3.063 0 1 1-6.125 0 3.063 3.063 0 0 1 6.125 0ZM7.313 9.5c-3.667 0-6.24 2.691-6.563 6.125h13.125C13.552 12.191 10.979 9.5 7.312 9.5Z"></path>
+            </svg>
+          </button>
+          <button type="button" aria-label="Cart" class="uq-nav-icon">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.392 6.875h13.216v8.016c0 .567-.224 1.112-.624 1.513-.4.402-.941.627-1.506.627H5.522a2.13 2.13 0 0 1-1.506-.627 2.15 2.15 0 0 1-.624-1.513zM8.818 2.969h2.333c.618 0 1.211.247 1.649.686a2.35 2.35 0 0 1 .683 1.658v1.562H6.486V5.313c0-.622.246-1.218.683-1.658a2.33 2.33 0 0 1 1.65-.686"></path>
+            </svg>
+          </button>
+        </div>
       </div>
+    </div>
+    <div class="uq-mobile-nav" id="uqMobileNav">
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#technology">Passports</a></li>
+        <li><a href="#chain">Certificates</a></li>
+        <li><a href="#gallery">Projects</a></li>
+      </ul>
     </div>
   </header>
 
@@ -1426,7 +1643,7 @@
     <img src="${img('eco-hero.jpg')}" alt="Aerial view of misty boreal forest at dawn" class="uq-hero-img" />
     <div class="uq-hero-overlay"></div>
     <div class="uq-hero-content">
-      <h1 class="uq-hero-title">${dynamic?.title && dynamic.title !== '' ? dynamic.title : 'Carbon,<br/>accounted for.'}</h1>
+      <h1 class="uq-hero-title" style="text-transform: uppercase;">${dynamic?.title && dynamic.title !== '' ? dynamic.title : 'Carbon,<br/>Accounted For.'}</h1>
       ${dynamic?.description && dynamic.description !== '' ? `<p class="uq-hero-desc">${dynamic.description}</p>` : `<p class="uq-hero-desc">Three decades of environmental expertise.<br/>One verified system.</p>`}
     </div>
   </section>
@@ -1434,18 +1651,20 @@
   <!-- Built from the Ground Up -->
   <section class="uq-about" id="about">
     <div class="uq-about-inner">
-      <h2 class="uq-about-title">Built from the Ground Up</h2>
       <div class="uq-about-grid">
-        <div class="uq-about-text">
-          ${dynamic?.aboutUs && dynamic.aboutUs !== '' ? `<p>${dynamic.aboutUs}</p>` : `
-          <p>For more than 30 years, the Ecostance team has worked at the source of environmental accounting — developing carbon measurement frameworks, building transparent supply chains, and helping establish the standards that now define responsible offsetting.</p>
-          <p>Long before net zero became a category, we were exploring how natural sequestration and engineered removal could work together to deliver verifiable climate outcomes. The concept was proven. The industry wasn't ready.</p>
-          <p class="uq-about-highlight">Today, it is.</p>
-          <p>Ecostance brings together decades of measurement, verification and retirement expertise to create a new generation of carbon accounting. Every credit is tracked from source project to retired certificate, guided by a simple belief: <strong>Impact is proven, not claimed.</strong></p>
-          `}
-          <a href="#technology" class="uq-about-link">Learn about the technology &rarr;</a>
+        <div class="uq-about-copy">
+          <h2 class="uq-about-title">Built from the Ground Up</h2>
+          <div class="uq-about-text">
+            ${dynamic?.aboutUs && dynamic.aboutUs !== '' ? `<p>${dynamic.aboutUs}</p>` : `
+            <p>For more than 30 years, the Ecostance team has worked at the source of environmental accounting — developing carbon measurement frameworks, building transparent supply chains, and helping establish the standards that now define responsible offsetting.</p>
+            <p>Long before net zero became a category, we were exploring how natural sequestration and engineered removal could work together to deliver verifiable climate outcomes. The concept was proven. The industry wasn't ready.</p>
+            <p class="uq-about-highlight">Today, it is.</p>
+            <p>Ecostance brings together decades of measurement, verification and retirement expertise to create a new generation of carbon accounting. Every credit is tracked from source project to retired certificate, guided by a simple belief: <strong>Impact is proven, not claimed.</strong></p>
+            `}
+            <a href="#technology" class="uq-about-link">Learn About the technology</a>
+          </div>
         </div>
-        <div>
+        <div class="uq-about-media">
           <img src="${img('eco-founder.jpg')}" alt="Ecostance field team documenting a reforestation site" loading="lazy" class="uq-about-img" />
         </div>
       </div>
@@ -1456,7 +1675,7 @@
   <section class="uq-verified" id="technology">
     <div class="uq-verified-inner">
       <div class="uq-verified-top">
-        <div>
+        <div class="uq-verified-intro">
           <h2 class="uq-verified-title">Digital Product<br/>Passports</h2>
           <p class="uq-verified-sub">Transparency built into every product.</p>
         </div>
@@ -1464,7 +1683,7 @@
           <p>Verified product data begins long before a garment is sold. It starts at the source.</p>
           <p>Every published passport brings together material specifications, environmental reporting, and supply chain records in one place — creating a transparent record that can be independently verified, not simply claimed. Scan the QR code on any product below to open its full digital passport.</p>
           <p>We believe accountability matters more than marketing. That's why we document progress openly, continue working toward higher-integrity product data, and avoid making claims that cannot be verified. Because trust should be earned through evidence.</p>
-          <a href="#dpp-passports" class="uq-verified-cta">Access the passports &rarr;</a>
+          <a href="#dpp-passports" class="uq-verified-cta">Access the passports</a>
         </div>
       </div>
       ${publishedDppPages.length ? `
@@ -1478,14 +1697,16 @@
                   <img src="${item.image}" alt="${item.alt}" loading="lazy" />
                 </div>
                 <div class="uq-dpp-card-divider" aria-hidden="true"></div>
-                <div class="uq-dpp-card-meta">
-                  <div class="uq-dpp-card-qr">
-                    <img src="${item.qrUrl}" alt="" width="56" height="56" loading="lazy" />
+                <div class="uq-dpp-card-meta" style="flex-direction: column; justify-content: center; align-items: stretch; gap: 8px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+                    <div class="uq-dpp-card-qr">
+                      <img src="${item.qrUrl}" alt="" width="56" height="56" loading="lazy" />
+                    </div>
+                    <div class="uq-dpp-card-text">
+                      <p class="uq-dpp-card-title">DIGITAL PASSPORT</p>
+                    </div>
                   </div>
-                  <div class="uq-dpp-card-text">
-                    <p class="uq-dpp-card-title">${item.title}</p>
-                    <p class="uq-dpp-card-desc">${item.text}</p>
-                  </div>
+                  <div class="uq-dpp-card-product-name" style="font-size: 13px; font-weight: 400; color: #565c61;">${item.title}</div>
                 </div>
               </a>
             </div>`).join('')}
@@ -1508,32 +1729,36 @@
   <!-- Chain of Custody -->
   <section class="uq-chain" id="chain">
     <div class="uq-chain-inner">
-      <p class="eyebrow">Chain of Custody</p>
-      <h2 class="uq-chain-title">Carbon Offset Chain of Custody Certificates</h2>
-      <p class="uq-chain-subtitle">Every offset we retire is issued a unique certificate that eliminates double counting.<br/>Click any project to see the full record.</p>
-      <ol class="uq-chain-list">
-        <div class="uq-chain-line" aria-hidden="true"></div>
-        ${displayChain.map((c) => `
-        <li class="uq-chain-item">
-          <span class="uq-chain-diamond" aria-hidden="true"></span>
-          <div class="uq-chain-card">
-            <div class="uq-chain-content">
-              <a href="${c.url}" class="uq-chain-cert-tag" ${c.url !== '#' ? 'target="_blank" rel="noopener noreferrer"' : ''}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>
-                Certificate &ndash; ${c.id}
-              </a>
-              <p class="uq-chain-date">${c.date}</p>
-              <p class="uq-chain-qty">Carbon Offset Quantity: <strong>${c.tons}</strong></p>
-              <h3 class="uq-chain-project">${c.title}</h3>
-              <p class="uq-chain-desc">${c.description}</p>
-            </div>
-            ${c.image ? `
-            <div class="uq-chain-img-wrap">
-              <img src="${c.image}" alt="${c.alt}" loading="lazy" class="uq-chain-img" />
-            </div>` : ''}
-          </div>
-        </li>`).join('')}
-      </ol>
+      <div class="uq-chain-header">
+        <p class="eyebrow">Chain of Custody</p>
+        <h2 class="uq-chain-title">Carbon Offset Chain of Custody Certificates</h2>
+        <p class="uq-chain-subtitle">Every offset we retire is issued a unique certificate that eliminates double counting. Click any project to see the full record.</p>
+      </div>
+      <div class="uq-chain-list-wrap">
+        <ol class="uq-chain-list">
+          <div class="uq-chain-line" aria-hidden="true"></div>
+          ${displayChain.map((c) => `
+          <li class="uq-chain-item">
+            <span class="uq-chain-diamond" aria-hidden="true"></span>
+            <a href="${c.url}" class="uq-chain-card" ${c.url !== '#' ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+              <div>
+                <div class="uq-chain-cert-tag">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m14 20 2 2 4-4"/></svg>
+                  Certificate &middot; ${c.id}
+                </div>
+                <p class="uq-chain-date">${c.date}</p>
+                <p class="uq-chain-qty">Carbon Offset Quantity: <span>${c.tons} Tons</span></p>
+                <h3 class="uq-chain-project">${c.title}</h3>
+                <p class="uq-chain-desc">${c.description}</p>
+              </div>
+              ${c.image ? `
+              <div class="uq-chain-img-wrap">
+                <img src="${c.image}" alt="${c.alt}" loading="lazy" class="uq-chain-img" />
+              </div>` : ''}
+            </a>
+          </li>`).join('')}
+        </ol>
+      </div>
     </div>
   </section>
 
@@ -1560,8 +1785,7 @@
     <div class="uq-join-inner">
       <div class="uq-join-row">
         <div class="uq-join-copy">
-          <h2 class="uq-join-title">Join the Community</h2>
-          <p class="uq-join-sub">Get updates, offers and invites</p>
+          <p class="uq-join-title"><strong>Join the Community</strong><br/>Get updates, offers and invites</p>
         </div>
         <div class="uq-join-form-wrap">
           <form class="uq-join-form" onsubmit="event.preventDefault()">
@@ -1594,8 +1818,8 @@
     <div class="uq-footer-main">
       <div class="uq-footer-top">
         <div class="uq-footer-brand-col">
-          <a href="#top" class="uq-footer-brand">
-            ${brandLogo || `<span class="uq-footer-brand-text">${brandName}</span>`}
+          <a href="https://www.uniqohr.com/" class="uq-footer-brand">
+            ${footerLogo}
           </a>
         </div>
         <div class="uq-footer-nav-col">
@@ -1603,27 +1827,27 @@
             <div class="uq-footer-col">
               <h4>Our Story</h4>
               <ul>
-                <li><a href="#about">About Us</a></li>
-                <li><a href="#technology">Technology</a></li>
-                <li><a href="#gallery">Journal</a></li>
+                <li><a href="https://www.uniqohr.com/pages/about">About Us</a></li>
+                <li><a href="https://www.uniqohr.com/pages/technology">Technology</a></li>
+                <li><a href="https://www.uniqohr.com/pages/journal">Journal</a></li>
               </ul>
             </div>
             <div class="uq-footer-col">
               <h4>Support</h4>
               <ul>
-                <li><a href="#faq">FAQ</a></li>
-                <li><a href="${dynamic?.contactPageURL || '#contact'}">Contact</a></li>
-                <li><a href="#fit-guide">Fit Guide</a></li>
-                <li><a href="#garment-care">Garment Care</a></li>
+                <li><a href="https://www.uniqohr.com/pages/faq">FAQ</a></li>
+                <li><a href="https://www.uniqohr.com/pages/contact">Contact</a></li>
+                <li><a href="https://www.uniqohr.com/pages/fit-guide">Fit Guide</a></li>
+                <li><a href="https://www.uniqohr.com/pages/garment-care">Garment Care</a></li>
               </ul>
             </div>
             <div class="uq-footer-col">
               <h4>Shop</h4>
               <ul>
-                <li><a href="#gallery">Bestsellers</a></li>
-                <li><a href="#gallery">Men</a></li>
-                <li><a href="#gallery">Women</a></li>
-                <li><a href="#gallery">Accessories</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all">Bestsellers</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all">Men</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all">Women</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all">Accessories</a></li>
               </ul>
             </div>
           </div>
@@ -1635,10 +1859,10 @@
     </div>
     <div class="uq-footer-utilities">
       <div class="uq-footer-copy">
-        &copy; ${new Date().getFullYear()} <a href="#top">${companyLabel}</a>
+        <span>&copy; ${new Date().getFullYear()} <a href="${uiUrl || 'https://ecostance.com'}">EcoStance</a></span>
       </div>
       <div class="uq-footer-policies">
-        <a href="#terms">Terms and Policies</a>
+        <button type="button" class="uq-footer-policy-btn" onclick="window.open('https://www.uniqohr.com/policies/privacy-policy','_blank')">Terms and Policies</button>
       </div>
       <div class="uq-footer-socials">
         ${dynamic?.showFacebook && dynamic?.facebook ? `
@@ -1681,31 +1905,103 @@
   </footer>
 
   <script>
-    (function() {
-      function bindHover(listId, imageSelector, linkSelector) {
-        var items = document.querySelectorAll(listId + ' ' + linkSelector);
-        var images = document.querySelectorAll(imageSelector);
-        if (!items.length || !images.length) return;
-        items.forEach(function(item) {
-          function activate() {
-            var idx = item.getAttribute('data-index');
-            items.forEach(function(el) { el.classList.remove('uq-active'); });
-            item.classList.add('uq-active');
-            images.forEach(function(img) {
-              if (img.getAttribute('data-img') === idx) {
-                img.classList.remove('uq-img-hidden');
-                img.classList.add('uq-img-visible');
-              } else {
-                img.classList.remove('uq-img-visible');
-                img.classList.add('uq-img-hidden');
-              }
-            });
+    window.initUniqhorProjectHover = function() {
+      var list = document.getElementById('uq-project-list');
+      if (!list || list.dataset.hoverBound === 'true') return;
+      var items = list.querySelectorAll('.uq-projects-link');
+      var images = document.querySelectorAll('.uq-projects-visual img');
+      if (!items.length || !images.length) return;
+      list.dataset.hoverBound = 'true';
+
+      function activate(link) {
+        var idx = link.getAttribute('data-index');
+        items.forEach(function(el) { el.classList.remove('uq-active'); });
+        link.classList.add('uq-active');
+        images.forEach(function(img) {
+          if (img.getAttribute('data-img') === idx) {
+            img.classList.remove('uq-img-hidden');
+            img.classList.add('uq-img-visible');
+          } else {
+            img.classList.remove('uq-img-visible');
+            img.classList.add('uq-img-hidden');
           }
-          item.addEventListener('mouseenter', activate);
-          item.addEventListener('focus', activate);
         });
       }
-      bindHover('#uq-project-list', '.uq-projects-visual img', '.uq-projects-link');
+
+      items.forEach(function(item) {
+        item.addEventListener('mouseenter', function() { activate(item); });
+        item.addEventListener('focus', function() { activate(item); });
+      });
+    };
+
+    window.initUniqhorProjectHover();
+
+      var menuBtn = document.getElementById('uqNavMenuBtn');
+      var mobileNav = document.getElementById('uqMobileNav');
+      if (menuBtn && mobileNav) {
+        menuBtn.addEventListener('click', function() {
+          var isOpen = mobileNav.classList.toggle('is-open');
+          menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+      }
+
+      // Active navigation link highlighting on click and scroll (Scroll Spy)
+      var navLinks = document.querySelectorAll('.uq-nav-links a');
+      var sections = document.querySelectorAll('section[id]');
+      
+      navLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          var targetId = link.getAttribute('href');
+          if (targetId && targetId.startsWith('#')) {
+            var targetSection = document.getElementById(targetId.substring(1));
+            if (targetSection) {
+              e.preventDefault();
+              targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+          navLinks.forEach(function(el) { el.classList.remove('uq-nav-active'); });
+          link.classList.add('uq-nav-active');
+        });
+      });
+
+      var mobileLinks = document.querySelectorAll('.uq-mobile-nav a');
+      mobileLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          var targetId = link.getAttribute('href');
+          if (targetId && targetId.startsWith('#')) {
+            var targetSection = document.getElementById(targetId.substring(1));
+            if (targetSection) {
+              e.preventDefault();
+              targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+          if (mobileNav) mobileNav.classList.remove('is-open');
+          if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      window.addEventListener('scroll', function() {
+        var scrollPos = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
+        var activeSectionId = null;
+        
+        sections.forEach(function(section) {
+          var offsetTop = section.offsetTop - 120;
+          var offsetHeight = section.offsetHeight;
+          if (scrollPos >= offsetTop && scrollPos < offsetTop + offsetHeight) {
+            activeSectionId = '#' + section.getAttribute('id');
+          }
+        });
+
+        if (activeSectionId) {
+          navLinks.forEach(function(el) {
+            if (el.getAttribute('href') === activeSectionId) {
+              el.classList.add('uq-nav-active');
+            } else {
+              el.classList.remove('uq-nav-active');
+            }
+          });
+        }
+      });
 
       document.querySelectorAll('.uq-gallery-scroll').forEach(function(slider) {
         slider.addEventListener('wheel', function(e) {
@@ -1715,7 +2011,6 @@
           slider.scrollLeft += e.deltaY;
         }, { passive: false });
       });
-    })();
   </script>
 </body>
 </html>

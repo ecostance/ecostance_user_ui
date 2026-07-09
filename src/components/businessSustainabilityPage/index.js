@@ -24,6 +24,23 @@ import { useToasts } from "react-toast-notifications";
 import { Spinner } from "react-bootstrap";
 import { returnPhoneDetails } from "src/helpers/returnPhoneDetails";
 
+// Full-document templates (uniqhor) include their own <html>, <style>, and <script>.
+// Render in an iframe so scripts run and styles stay isolated. Use a fixed viewport
+// height — auto-resizing via scrollHeight + min-height: 100% causes runaway page height.
+const UniqhorTemplateFrame = ({ html, fillViewport = false }) => (
+  <iframe
+    title="Sustainability Page"
+    srcDoc={html}
+    style={{
+      width: "100%",
+      border: "none",
+      display: "block",
+      height: fillViewport ? "100%" : "80vh",
+      minHeight: fillViewport ? undefined : 560,
+    }}
+  />
+);
+
 const evaluateCertSide = (val) => {
   return val % 2 === 0;
 };
@@ -139,10 +156,15 @@ const Cancel = ({
   }, [])
 
   useEffect(() => {
+    const theme = main
+      ? userSettings?.published?.themeSelected
+      : sustainData?.themeSelected;
+    if (theme !== 'uniqhor') return;
+
     const handleMouseHover = (e) => {
       const item = e.currentTarget;
-      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
-      const images = document.querySelectorAll('.uq-method-visual img');
+      const items = document.querySelectorAll('#uq-project-list .uq-projects-link');
+      const images = document.querySelectorAll('.uq-projects-visual img');
       if (!items.length || !images.length) return;
 
       const idx = item.getAttribute('data-index');
@@ -160,25 +182,35 @@ const Cancel = ({
     };
 
     const attachListeners = () => {
-      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      const items = document.querySelectorAll('#uq-project-list .uq-projects-link');
       items.forEach((item) => {
         item.addEventListener('mouseenter', handleMouseHover);
         item.addEventListener('focus', handleMouseHover);
       });
     };
 
-    attachListeners();
-    const timer = setTimeout(attachListeners, 500);
+    const timer = window.setTimeout(attachListeners, 0);
+    const retryTimer = window.setTimeout(attachListeners, 500);
 
     return () => {
-      clearTimeout(timer);
-      const items = document.querySelectorAll('#uq-method-list .uq-method-item');
+      window.clearTimeout(timer);
+      window.clearTimeout(retryTimer);
+      const items = document.querySelectorAll('#uq-project-list .uq-projects-link');
       items.forEach((item) => {
         item.removeEventListener('mouseenter', handleMouseHover);
         item.removeEventListener('focus', handleMouseHover);
       });
     };
-  });
+  }, [
+    main,
+    userSettings?.published?.themeSelected,
+    sustainData?.themeSelected,
+    products,
+    dppProducts,
+    ghgValues,
+    treesData,
+    supportProj,
+  ]);
 
   const filteredProductData = async () => {
     const response = await getAllBusinessOrders(1);
@@ -500,18 +532,35 @@ width="125"
 
   const Render = () => {
     if (main) {
+      const theme = userSettings?.published?.themeSelected;
+      const html = returnCorrectTemplate(mapTemplate[theme]);
+      if (theme === "uniqhor") {
+        return (
+          <div style={{ height: "100vh", overflow: "hidden" }}>
+            <UniqhorTemplateFrame html={html} fillViewport />
+          </div>
+        );
+      }
       return (
-        <>
-          <div
-            dangerouslySetInnerHTML={{
-              __html: `${returnCorrectTemplate(
-                mapTemplate[userSettings?.published?.themeSelected]
-              )}`,
-            }}
-          />
-        </>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: html,
+          }}
+        />
       );
     } else {
+      const theme = sustainData?.themeSelected;
+      const html = returnCorrectTemplate(mapTemplate[theme], "local");
+      const templateView =
+        theme === "uniqhor" ? (
+          <UniqhorTemplateFrame html={html} />
+        ) : (
+          <div
+            dangerouslySetInnerHTML={{
+              __html: html,
+            }}
+          />
+        );
       return (
         <>
           <div
@@ -523,14 +572,7 @@ width="125"
           >
             <button className="preview--button">PREVIEW MODE</button>
           </div>
-          <div
-            dangerouslySetInnerHTML={{
-              __html: `${returnCorrectTemplate(
-                mapTemplate[sustainData?.themeSelected],
-                "local"
-              )}`,
-            }}
-          />
+          {templateView}
           <div
             className="sustainability--page-button-holder"
             style={{

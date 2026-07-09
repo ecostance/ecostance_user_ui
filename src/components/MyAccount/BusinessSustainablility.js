@@ -2045,6 +2045,7 @@ const BusinessSustainability = ({
                                                     imageURL={sustainData?.imageURL}
                                                     image={image}
                                                     setImage={setImage}
+                                                    themeSelected={themeSelected}
                                                 />
                                             </div>
                                         </div>
