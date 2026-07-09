@@ -1,4 +1,4 @@
-﻿export const uniqhorTemplate = (dynamic) => {
+export const uniqhorTemplate = (dynamic) => {
   const uiUrl = dynamic?.UI_URL || '';
   const brandName = (dynamic?.companyName || 'uniqohr').toLowerCase();
   const certCount = dynamic?.certData?.length || 0;
@@ -709,6 +709,10 @@
     .uq-dpp-card:hover {
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
       transform: translateY(-2px);
+    }
+
+    .uq-dpp-card:hover .uq-dpp-card-title {
+      text-decoration: underline;
     }
 
     .uq-dpp-card-image {
@@ -1596,10 +1600,10 @@
       </div>
       <nav class="uq-header-center" aria-label="Main">
         <ul class="uq-nav-links">
-          <li><a href="#gallery">Shop</a></li>
-          <li><a href="#technology">Technology</a></li>
-          <li><a href="#gallery">Journal</a></li>
-          <li><a href="#about" class="uq-nav-active" aria-current="page">About</a></li>
+          <li><a href="#about" class="uq-nav-active">About</a></li>
+          <li><a href="#technology">Passports</a></li>
+          <li><a href="#chain">Certificates</a></li>
+          <li><a href="#gallery">Projects</a></li>
         </ul>
       </nav>
       <div class="uq-header-right">
@@ -1625,10 +1629,10 @@
     </div>
     <div class="uq-mobile-nav" id="uqMobileNav">
       <ul>
-        <li><a href="#gallery">Shop</a></li>
-        <li><a href="#technology">Technology</a></li>
-        <li><a href="#gallery">Journal</a></li>
         <li><a href="#about">About</a></li>
+        <li><a href="#technology">Passports</a></li>
+        <li><a href="#chain">Certificates</a></li>
+        <li><a href="#gallery">Projects</a></li>
       </ul>
     </div>
   </header>
@@ -1697,8 +1701,7 @@
                     <img src="${item.qrUrl}" alt="" width="56" height="56" loading="lazy" />
                   </div>
                   <div class="uq-dpp-card-text">
-                    <p class="uq-dpp-card-title">${item.title}</p>
-                    <p class="uq-dpp-card-desc">${item.text}</p>
+                    <p class="uq-dpp-card-title">Digital Product Passport</p>
                   </div>
                 </div>
               </a>
@@ -1937,6 +1940,48 @@
           menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         });
       }
+
+      // Active navigation link highlighting on click and scroll (Scroll Spy)
+      var navLinks = document.querySelectorAll('.uq-nav-links a');
+      var sections = document.querySelectorAll('section[id]');
+      
+      navLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          navLinks.forEach(function(el) { el.classList.remove('uq-nav-active'); });
+          link.classList.add('uq-nav-active');
+        });
+      });
+
+      var mobileLinks = document.querySelectorAll('.uq-mobile-nav a');
+      mobileLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          if (mobileNav) mobileNav.classList.remove('is-open');
+          if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      window.addEventListener('scroll', function() {
+        var scrollPos = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
+        var activeSectionId = null;
+        
+        sections.forEach(function(section) {
+          var offsetTop = section.offsetTop - 120;
+          var offsetHeight = section.offsetHeight;
+          if (scrollPos >= offsetTop && scrollPos < offsetTop + offsetHeight) {
+            activeSectionId = '#' + section.getAttribute('id');
+          }
+        });
+
+        if (activeSectionId) {
+          navLinks.forEach(function(el) {
+            if (el.getAttribute('href') === activeSectionId) {
+              el.classList.add('uq-nav-active');
+            } else {
+              el.classList.remove('uq-nav-active');
+            }
+          });
+        }
+      });
 
       document.querySelectorAll('.uq-gallery-scroll').forEach(function(slider) {
         slider.addEventListener('wheel', function(e) {
