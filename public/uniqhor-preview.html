@@ -626,6 +626,7 @@
       display: flex;
       flex-direction: column;
       height: auto;
+      aspect-ratio: 456 / 646;
       background: #fff;
       border: 1px solid var(--hairline);
       text-decoration: none;
@@ -644,9 +645,9 @@
     }
 
     .uq-dpp-card-image {
-      flex: none;
+      flex: 2 1 0;
+      min-height: 0;
       width: 100%;
-      aspect-ratio: 456 / 646;
       overflow: hidden;
       background: var(--canvas-alt);
     }
@@ -665,7 +666,8 @@
     }
 
     .uq-dpp-card-meta {
-      flex: none;
+      flex: 1 1 0;
+      min-height: 0;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -1588,7 +1590,7 @@
     <div class="uq-hero-overlay"></div>
     <div class="uq-hero-content">
       <h1 class="uq-hero-title" style="text-transform: uppercase;">Carbon,<br/>Accounted For.</h1>
-      <p class="uq-hero-desc">We are reducing our greenhouse gas emissions everyday by wasting less, buying green, saving energy and by being conscientious consumers. But we can make only limited lifestyle changes. For our remaining emissions, we are buying carbon offsets to have a zero emission footprint. Each carbon offset we purchase goes into certified projects like planting new trees, reforestation, methane sequestration, ocean cleanup, and other such initiatives that help combat climate change today. We decided not to wait and do something today.</p>
+      <p class="uq-hero-desc">Three decades of environmental expertise. Every tonne measured, retired and verifiable.</p>
     </div>
   </section>
 
