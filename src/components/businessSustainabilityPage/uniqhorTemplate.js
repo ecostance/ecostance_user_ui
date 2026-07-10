@@ -425,10 +425,10 @@ export const uniqhorTemplate = (dynamic) => {
       margin-top: 24px;
       max-width: 100%;
       font-family: 'Archivo', 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 1.5rem;
-      font-weight: 300;
-      line-height: 1.1;
-      color: rgba(255,255,255,0.9);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.95);
     }
 
     @media (min-width: 768px) {
@@ -597,10 +597,13 @@ export const uniqhorTemplate = (dynamic) => {
     .uq-verified-sub {
       margin: 0;
       font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 20px;
-      color: #565c61;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1.3;
+      color: #2c333a;
+      text-decoration: none;
     }
 
     .uq-verified-body {
@@ -681,24 +684,21 @@ export const uniqhorTemplate = (dynamic) => {
     .uq-verified-strip-item {
       flex-shrink: 0;
       scroll-snap-align: start;
-      width: 80vw;
-      max-width: 280px;
+      width: min(75vw, 456px);
     }
 
     @media (min-width: 640px) {
-      .uq-verified-strip-item { width: 45vw; max-width: 300px; }
+      .uq-verified-strip-item { width: min(48vw, 456px); }
     }
 
     @media (min-width: 768px) {
-      .uq-verified-strip-item { width: calc((100% - 2.25rem) / 4); max-width: 320px; min-width: 200px; }
-      .uq-verified-strip-track { width: 100%; }
+      .uq-verified-strip-item { width: 456px; }
     }
 
     .uq-dpp-card {
       display: flex;
       flex-direction: column;
-      height: 100%;
-      min-height: 320px;
+      height: auto;
       background: #fff;
       border: 1px solid var(--hairline);
       text-decoration: none;
@@ -712,12 +712,14 @@ export const uniqhorTemplate = (dynamic) => {
     }
 
     .uq-dpp-card:hover .uq-dpp-card-title {
-      text-decoration: underline;
+      opacity: 0.7;
+      text-decoration: none;
     }
 
     .uq-dpp-card-image {
-      flex: 2;
-      min-height: 0;
+      flex: none;
+      width: 100%;
+      aspect-ratio: 456 / 646;
       overflow: hidden;
       background: var(--canvas-alt);
     }
@@ -736,12 +738,11 @@ export const uniqhorTemplate = (dynamic) => {
     }
 
     .uq-dpp-card-meta {
-      flex: 1;
+      flex: none;
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 12px 14px;
-      min-height: 0;
     }
 
     .uq-dpp-card-qr {
@@ -765,12 +766,28 @@ export const uniqhorTemplate = (dynamic) => {
 
     .uq-dpp-card-title {
       font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
-      font-size: 16px;
-      font-weight: bold;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       line-height: 1.3;
-      color: #0e1319;
+      color: #2c333a;
+      text-decoration: underline;
+      text-underline-offset: 3px;
       margin: 0;
       text-align: right;
+      transition: opacity 0.2s;
+    }
+
+    .uq-dpp-card-product-name {
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1.3;
+      color: #2c333a;
+      text-decoration: none;
     }
 
     .uq-dpp-card-desc {
@@ -1644,7 +1661,7 @@ export const uniqhorTemplate = (dynamic) => {
     <div class="uq-hero-overlay"></div>
     <div class="uq-hero-content">
       <h1 class="uq-hero-title" style="text-transform: uppercase;">${dynamic?.title && dynamic.title !== '' ? dynamic.title : 'Carbon,<br/>Accounted For.'}</h1>
-      ${dynamic?.description && dynamic.description !== '' ? `<p class="uq-hero-desc">${dynamic.description}</p>` : `<p class="uq-hero-desc">Three decades of environmental expertise.<br/>One verified system.</p>`}
+      <p class="uq-hero-desc">We are reducing our greenhouse gas emissions everyday by wasting less, buying green, saving energy and by being conscientious consumers. But we can make only limited lifestyle changes. For our remaining emissions, we are buying carbon offsets to have a zero emission footprint. Each carbon offset we purchase goes into certified projects like planting new trees, reforestation, methane sequestration, ocean cleanup, and other such initiatives that help combat climate change today. We decided not to wait and do something today.</p>
     </div>
   </section>
 
@@ -1680,9 +1697,13 @@ export const uniqhorTemplate = (dynamic) => {
           <p class="uq-verified-sub">Transparency built into every product.</p>
         </div>
         <div class="uq-verified-body">
+          ${dynamic?.description && dynamic.description !== '' && dynamic.description !== 'undefined'
+            ? `<p>${dynamic.description}</p>`
+            : `
           <p>Verified product data begins long before a garment is sold. It starts at the source.</p>
           <p>Every published passport brings together material specifications, environmental reporting, and supply chain records in one place — creating a transparent record that can be independently verified, not simply claimed. Scan the QR code on any product below to open its full digital passport.</p>
           <p>We believe accountability matters more than marketing. That's why we document progress openly, continue working toward higher-integrity product data, and avoid making claims that cannot be verified. Because trust should be earned through evidence.</p>
+          `}
           <a href="#dpp-passports" class="uq-verified-cta">Access the passports</a>
         </div>
       </div>
@@ -1706,7 +1727,7 @@ export const uniqhorTemplate = (dynamic) => {
                       <p class="uq-dpp-card-title">DIGITAL PASSPORT</p>
                     </div>
                   </div>
-                  <div class="uq-dpp-card-product-name" style="font-size: 13px; font-weight: 400; color: #565c61;">${item.title}</div>
+                  <div class="uq-dpp-card-product-name">${item.title}</div>
                 </div>
               </a>
             </div>`).join('')}
