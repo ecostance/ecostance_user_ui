@@ -12,6 +12,7 @@ import { addOrder } from "src/redux/actions/orderActions";
 import { useToasts } from "react-toast-notifications";
 import { getOrderPdf } from "src/apiClient/orders";
 import { getAllOrders } from "src/apiClient/orders";
+import { getOrderByCheckoutSession } from "src/apiClient/orders";
 import {
   deleteAllFromCart,
   removeExpressItemAddedToCart,
@@ -145,7 +146,10 @@ const NewSuccess = ({
     try {
       // Wait for the auth cookie before calling, otherwise the request 401s
       // and the seller/company info block renders empty.
-      await waitForJWTToken(5000);
+      const jwtReady = await waitForJWTToken(5000);
+      // Guests never get a token here; calling anyway 401s, which signs them
+      // out and redirects away from their receipt.
+      if (!jwtReady) return;
       const res = await getCompanyAddress();
       setCompanyAddress(res?.data?.data || {});
     } catch (err) {
@@ -162,6 +166,9 @@ const NewSuccess = ({
     localStorage.removeItem("BusinessOrderSelection");
     localStorage.removeItem("modulepurchase");
     localStorage.removeItem("checkoutCartBackup"); // Clean up cart backup
+    // Guest (dynamic pricing) buyers have no JWT yet — these endpoints require
+    // one, and a 401 would sign them out and bounce them to the login page.
+    if (!getCookie("JWTToken")) return;
     ordersData();
     const intervalId = setInterval(() => {
       const orderId = orderData?.order?.data?._id;
@@ -284,6 +291,79 @@ const NewSuccess = ({
     }
   };
 
+  // The Stripe webhook creates the guest order server-side, which can land a
+  // moment after the buyer is redirected here. Poll until it exists.
+  const waitForWebhookOrder = async (sessionId, timeoutMs = 20000) => {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      try {
+        const response = await getOrderByCheckoutSession(sessionId);
+        if (response?.data) {
+          return { data: response.data, user: response.user };
+        }
+      } catch (err) {
+        console.log("Error fetching order by checkout session", err);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+    console.log("Webhook order not available within timeout for", sessionId);
+    return null;
+  };
+
+  // Fallback receipt built from the checkout we just completed. Field names here
+  // must match what the receipt below reads (addressLine1/pincode/phone), not the
+  // checkout form's own names (streetAddressOne/mailcode).
+  const buildLocalOrderFallback = (guestEmailFromData) => {
+    const rawModuleOrder = localStorage.getItem("moduleOrderData");
+    if (!rawModuleOrder) return null;
+
+    try {
+      const parsed = JSON.parse(rawModuleOrder);
+      // `products` holds the full order payload built at checkout time.
+      const orderPayload = parsed?.products || {};
+      const address = parsed?.address || orderPayload?.address || {};
+
+      return {
+        data: {
+          orderNumber: "",
+          products: Array.isArray(orderPayload?.products)
+            ? orderPayload.products
+            : [],
+          orderTotal: parsed?.total || orderPayload?.total || 0,
+          subTotal: parsed?.total || orderPayload?.total || 0,
+          currency: orderPayload?.currency || "USD",
+          currencySymbol: orderPayload?.currencySymbol || "$",
+          billingAddress: {
+            firstName: address.firstName || "",
+            lastName: address.lastName || "",
+            companyName: address.companyName || "",
+            addressLine1: address.addressLine1 || address.streetAddressOne || "",
+            addressLine2: address.addressLine2 || address.streetAddressTwo || "",
+            city: address.city || "",
+            state: address.state || "",
+            country: address.country || "",
+            pincode: address.pincode || address.mailcode || "",
+            phone: address.phone || address.phoneInfo || {},
+          },
+          paymentStatus: "success",
+          paymentMethod: "card",
+          paymentLogs: [
+            {
+              customer_email: guestEmailFromData,
+              payment_method_types: ["card"],
+            },
+          ],
+          createdAt: new Date().toISOString(),
+          isModulePurchase: true,
+        },
+        user: { email: guestEmailFromData },
+      };
+    } catch (parseError) {
+      console.error("Error building local guest order:", parseError);
+      return null;
+    }
+  };
+
   const handleModuleOrder = async () => {
     console.log("Handling module order...");
 
@@ -297,44 +377,43 @@ const NewSuccess = ({
       const isGuestFlow = !hasJWTToken && dynamicPricingData;
 
       if (isGuestFlow) {
-        console.log("Guest checkout detected - webhook will handle order creation");
+        console.log("Guest checkout detected - webhook creates the order");
         setIsGuestCheckout(true);
 
-        // Parse the dynamic pricing data for display
+        let guestEmailFromData = "";
         try {
           const parsedDynamicData = JSON.parse(dynamicPricingData);
-          const guestEmailFromData = parsedDynamicData?.guestEmail || parsedDynamicData?.buyerInfo?.email;
+          guestEmailFromData =
+            parsedDynamicData?.guestEmail ||
+            parsedDynamicData?.buyerInfo?.email ||
+            "";
           setGuestEmail(guestEmailFromData);
-
-          // Build order display from localStorage data for guest checkout
-          const moduleOrderData = localStorage.getItem("moduleOrderData");
-          if (moduleOrderData) {
-            const parsedOrderData = JSON.parse(moduleOrderData);
-            console.log("Guest module order data:", parsedOrderData);
-
-            // Create display order object from local data
-            const guestOrderDisplay = {
-              data: {
-                orderNumber: "Pending",
-                products: parsedOrderData.products || [],
-                orderTotal: parsedOrderData.total || 0,
-                subTotal: parsedOrderData.total || 0,
-                currency: parsedOrderData.data?.currency || "USD",
-                currencySymbol: parsedOrderData.data?.currencySymbol || "$",
-                billingAddress: parsedOrderData.address || {},
-                paymentStatus: "success",
-                paymentLogs: [{ customer_email: guestEmailFromData, payment_method_types: ["card"] }],
-                createdAt: new Date().toISOString(),
-                isModulePurchase: true
-              },
-              user: { email: guestEmailFromData }
-            };
-
-            setOrder(guestOrderDisplay);
-            addOrder(true, guestOrderDisplay);
-          }
         } catch (parseError) {
           console.error("Error parsing guest checkout data:", parseError);
+        }
+
+        // The Stripe webhook creates the real order (with order number, billing
+        // address and products). Poll for it instead of rendering a placeholder.
+        // Read the query off the URL: on this statically-optimized page
+        // Router.query can still be empty during the first effect.
+        const sessionId =
+          Router.query.session_id ||
+          new URLSearchParams(window.location.search).get("session_id");
+        const webhookOrder = sessionId
+          ? await waitForWebhookOrder(sessionId)
+          : null;
+
+        if (webhookOrder) {
+          setOrder(webhookOrder);
+          addOrder(true, webhookOrder);
+        } else {
+          // Webhook has not landed yet - show what we know from the checkout we
+          // just completed rather than an empty receipt.
+          const localOrder = buildLocalOrderFallback(guestEmailFromData);
+          if (localOrder) {
+            setOrder(localOrder);
+            addOrder(true, localOrder);
+          }
         }
 
         // Clean up localStorage
@@ -362,15 +441,28 @@ const NewSuccess = ({
       if (moduleOrderData) {
         const parsedOrderData = JSON.parse(moduleOrderData);
         console.log("Module order data parsed successfully:", parsedOrderData);
-        
+
+        // Checkout stores the order payload it built under `products` (see
+        // returnAPIProductsForOrder in components/Stripe/stripe.js); the module
+        // fields sit alongside it. Address there is already in API shape.
+        const orderPayload = parsedOrderData.products || {};
+        const payloadProducts = Array.isArray(orderPayload.products)
+          ? orderPayload.products
+          : [];
+        const payloadAddress = orderPayload.address || parsedOrderData.address || {};
+        const payloadCurrency = orderPayload.currency || "USD";
+        const payloadTotal =
+          parsedOrderData.total ?? orderPayload.total ?? 0;
+        const buyerEmail = parsedOrderData.user?.email || userData?.user?.email;
+
         // Create the order in the backend via API
         console.log("Creating module order in backend via API...");
         try {
           // Format products array to match API requirements
-          const formattedProducts = parsedOrderData.data.products.map(product => ({
+          const formattedProducts = payloadProducts.map((product) => ({
             product: product.product || product._id,
             price: product.price?.toString() || "0.00",
-            currency: parsedOrderData.data.currency?.toLowerCase() || "usd",
+            currency: payloadCurrency.toLowerCase(),
             quantity: 1, // Default one only for module orders
             startupCost: product.startupCost || 0,
             additionalQuantity: product.additionalQuantity || 0,
@@ -378,24 +470,25 @@ const NewSuccess = ({
             name: product.name || product.product?.name || "Module Product"
           }));
 
-          // Format address to match API requirements
+          // Format address to match API requirements. Fall back to the checkout
+          // form's own field names in case only that copy was stored.
           const formattedAddress = {
-            firstName: parsedOrderData.data.billingAddress?.firstName || "",
-            lastName: parsedOrderData.data.billingAddress?.lastName || "",
+            firstName: payloadAddress.firstName || "",
+            lastName: payloadAddress.lastName || "",
             phone: {
-              number: parsedOrderData.data.billingAddress?.phone?.number || parsedOrderData.data.billingAddress?.phone || "",
-              countryCode: parsedOrderData.data.billingAddress?.phone?.countryCode || parsedOrderData.data.billingAddress?.countryCode || "",
-              numericCode: parsedOrderData.data.billingAddress?.phone?.numericCode || ""
+              number: payloadAddress.phone?.number || payloadAddress.phoneInfo?.number || "",
+              countryCode: payloadAddress.phone?.countryCode || payloadAddress.countryCode || "",
+              numericCode: `${payloadAddress.phone?.numericCode || payloadAddress.phoneInfo?.numericCode || ""}`
             },
-            addressLine1: parsedOrderData.data.billingAddress?.addressLine1 || "",
-            addressLine2: parsedOrderData.data.billingAddress?.addressLine2 || "",
-            city: parsedOrderData.data.billingAddress?.city || "",
-            state: parsedOrderData.data.billingAddress?.state || "",
-            country: parsedOrderData.data.billingAddress?.country || "",
-            pincode: parsedOrderData.data.billingAddress?.pincode || "",
-            countryCode: parsedOrderData.data.billingAddress?.countryCode || "",
-            stateCode: parsedOrderData.data.billingAddress?.stateCode || "",
-            companyName: parsedOrderData.data.billingAddress?.companyName || ""
+            addressLine1: payloadAddress.addressLine1 || payloadAddress.streetAddressOne || "",
+            addressLine2: payloadAddress.addressLine2 || payloadAddress.streetAddressTwo || "",
+            city: payloadAddress.city || "",
+            state: payloadAddress.state || "",
+            country: payloadAddress.country || "",
+            pincode: payloadAddress.pincode || payloadAddress.mailcode || "",
+            countryCode: payloadAddress.countryCode || "",
+            stateCode: payloadAddress.stateCode || "",
+            companyName: payloadAddress.companyName || ""
           };
 
           // Create mock payment log entry for module orders
@@ -405,8 +498,8 @@ const NewSuccess = ({
             adaptive_pricing: { enabled: true },
             after_expiration: null,
             allow_promotion_codes: null,
-            amount_subtotal: Math.round(parsedOrderData.data.orderTotal * 100),
-            amount_total: Math.round(parsedOrderData.data.orderTotal * 100),
+            amount_subtotal: Math.round(payloadTotal * 100),
+            amount_total: Math.round(payloadTotal * 100),
             automatic_tax: { enabled: false, liability: null, provider: null, status: null },
             billing_address_collection: null,
             cancel_url: process.env.NEXT_PUBLIC_UI_URL + "/checkout/cancel?session_id={CHECKOUT_SESSION_ID}",
@@ -416,7 +509,7 @@ const NewSuccess = ({
             consent: null,
             consent_collection: null,
             created: Math.floor(Date.now() / 1000),
-            currency: parsedOrderData.data.currency?.toLowerCase() || "usd",
+            currency: payloadCurrency.toLowerCase(),
             currency_conversion: null,
             custom_fields: [],
             custom_text: { after_submit: null, shipping_address: null, submit: null, terms_of_service_acceptance: null },
@@ -424,13 +517,13 @@ const NewSuccess = ({
             customer_creation: "always",
             customer_details: {
               address: null,
-              email: parsedOrderData.user.email,
+              email: buyerEmail,
               name: null,
               phone: null,
               tax_exempt: "none",
               tax_ids: null
             },
-            customer_email: parsedOrderData.user.email,
+            customer_email: buyerEmail,
             discounts: [],
             expires_at: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
             invoice: null,
@@ -468,17 +561,17 @@ const NewSuccess = ({
 
           const orderResponse = await saveStripeCheckout({
             isModulePurchase: true,
-            period: parsedOrderData.data.period || 12,
+            period: parsedOrderData.period || 12,
             products: formattedProducts,
             address: formattedAddress,
-            total: parsedOrderData.data.orderTotal,
+            total: payloadTotal,
             paymentLogs: [mockPaymentLog],
             paymentStatus: "success",
             paymentMethod: "card",
             type: "regular",
             origin: "desktop",
-            currency: parsedOrderData.data.currency || "USD",
-            currencySymbol: parsedOrderData.data.currencySymbol || "$",
+            currency: payloadCurrency,
+            currencySymbol: orderPayload.currencySymbol || "$",
             timezone: new Date().getTimezoneOffset(),
             timeAbbrevation: new Date()
               .toLocaleDateString([], { day: "2-digit", timeZoneName: "long" })
@@ -491,14 +584,11 @@ const NewSuccess = ({
           });
           
           console.log("Module order created successfully via API:", orderResponse);
-          
-          // Update the order data with the response from API
-          const updatedOrderData = {
-            ...parsedOrderData,
-            ...orderResponse,
-            slug: orderResponse?.slug || parsedOrderData.slug
-          };
-          
+
+          // Render the order the API actually created (order number, billing
+          // address, products), not the local checkout payload.
+          const updatedOrderData = orderResponse;
+
           // Set the updated order data
           setOrder(updatedOrderData);
           console.log("Updated order state set successfully");
@@ -520,10 +610,14 @@ const NewSuccess = ({
           
         } catch (apiError) {
           console.error("Error creating module order via API:", apiError);
-          // Fallback to using localStorage data if API fails
+          // Fallback: show the checkout we just completed rather than an empty
+          // receipt. Must be the receipt's shape, not the raw stored payload.
           console.log("Falling back to localStorage data due to API error");
-          setOrder(parsedOrderData);
-          addOrder(true, parsedOrderData);
+          const localOrder = buildLocalOrderFallback(buyerEmail);
+          if (localOrder) {
+            setOrder(localOrder);
+            addOrder(true, localOrder);
+          }
         }
         
         // Clean up localStorage
@@ -755,7 +849,25 @@ const NewSuccess = ({
   const calculateTotalProductCount = (productQuantity = 0) =>
     (totalProductCount += Number(productQuantity));
 
-  const getFullName = (fName, lName) => [fName, lName].join(" ");
+  const getFullName = (fName, lName) => [fName, lName].filter(Boolean).join(" ");
+
+  // Renders "" (not "+undefined undefined") when the order carries no phone.
+  const getFormattedPhone = (phone) => {
+    if (!phone) return "";
+    if (typeof phone === "string") return phone;
+    const { numericCode, number } = phone;
+    if (!number) return "";
+    return numericCode ? `+${numericCode} ${number}` : `${number}`;
+  };
+
+  const formatAmount = (amount, currency) =>
+    formatCurrency(Number(amount || 0).toFixed(2), currency);
+
+  // Renders "" (not "Invalid Date") until the order carries a timestamp.
+  const getFormattedDateTime = (date) => {
+    if (!date || isNaN(new Date(date).getTime())) return "";
+    return `${getFormattedDate(date)}, ${getFormattedTime(date)}`;
+  };
 
   const getFormattedAddress1 = (address = "") => address.split(",").join(", ");
 
@@ -874,12 +986,14 @@ const NewSuccess = ({
                     >
                       Order By: {localStorage.getItem("email")}
                     </p>
-                    <p className="order__success__billing-address">
-                      {getFormattedAddress1(
-                        order?.data?.billingAddress?.addressLine1
-                      )}
-                      ,
-                    </p>
+                    {order?.data?.billingAddress?.addressLine1 && (
+                      <p className="order__success__billing-address">
+                        {getFormattedAddress1(
+                          order?.data?.billingAddress?.addressLine1
+                        )}
+                        ,
+                      </p>
+                    )}
                     <p className="order__success__billing-address">
                       {getFormattedBillingAddress({
                         companyName: order?.data?.billingAddress?.companyName,
@@ -890,15 +1004,18 @@ const NewSuccess = ({
                       })}
                     </p>
                     <p className="order__success__billing-address">
-                      Contact: {order?.data?.paymentLogs[0]?.customer_email}
+                      Contact:{" "}
+                      {order?.data?.paymentLogs?.[0]?.customer_email ||
+                        order?.data?.buyerEmail ||
+                        order?.user?.email ||
+                        ""}
                     </p>
-                    <p className="order__success__billing-address">
-                      Phone:{" "}
-                      {"+" +
-                        order?.data?.billingAddress?.phone?.numericCode +
-                        " " +
-                        order?.data?.billingAddress?.phone?.number}
-                    </p>
+                    {getFormattedPhone(order?.data?.billingAddress?.phone) && (
+                      <p className="order__success__billing-address">
+                        Phone:{" "}
+                        {getFormattedPhone(order?.data?.billingAddress?.phone)}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="order__success-order-detail-pdf-container">
@@ -981,8 +1098,7 @@ const NewSuccess = ({
                       <p>
                         Date & Time:
                         <span className="order__success-container-left-values-mb">
-                          {getFormattedDate(order?.data?.createdAt)},{" "}
-                          {getFormattedTime(order?.data?.createdAt)}
+                          {getFormattedDateTime(order?.data?.createdAt)}
                         </span>
                       </p>
                       <p>
@@ -990,7 +1106,7 @@ const NewSuccess = ({
                         <span className="order__success-container-left-values-mb">
                           {order?.data?.paymentLogs?.[0]?.payment_method_types?.[0]
                             ? returnFirstLetterCapitalized(
-                                order?.data?.paymentLogs[0]
+                                order?.data?.paymentLogs?.[0]
                                   ?.payment_method_types[0]
                               )
                             : order?.data?.paymentMethod
@@ -1004,7 +1120,7 @@ const NewSuccess = ({
                       <p>
                         Payment type:
                         <span className="order__success-container-left-values-mb">
-                          {order?.data?.paymentLogs[0]?.mode === "subscription"
+                          {order?.data?.paymentLogs?.[0]?.mode === "subscription"
                             ? "Monthly Subscription"
                             : "One Time Payment"}
                         </span>
@@ -1014,8 +1130,7 @@ const NewSuccess = ({
                           <p>
                             Start date:
                             <span className="order__success-container-left-values-mb">
-                              {getFormattedDate(order?.data?.createdAt)},{" "}
-                              {getFormattedTime(order?.data?.createdAt)}
+                              {getFormattedDateTime(order?.data?.createdAt)}
                             </span>
                           </p>
                           <p>
@@ -1032,7 +1147,7 @@ const NewSuccess = ({
                               {order?.data?.currencySymbol}
                               {formatCurrency(
                                 (
-                                  order?.data?.paymentLogs[0]?.amount_total /
+                                  order?.data?.paymentLogs?.[0]?.amount_total /
                                   100
                                 ).toFixed(2),
                                 order?.data?.currency
@@ -1046,13 +1161,12 @@ const NewSuccess = ({
                     </div>
                     <div className="order__success-container-right-values">
                       <p>
-                        {getFormattedDate(order?.data?.createdAt)},{" "}
-                        {getFormattedTime(order?.data?.createdAt)}
+                        {getFormattedDateTime(order?.data?.createdAt)}
                       </p>
                       <p>
                         {order?.data?.paymentLogs?.[0]?.payment_method_types?.[0]
                           ? returnFirstLetterCapitalized(
-                              order?.data?.paymentLogs[0]
+                              order?.data?.paymentLogs?.[0]
                                 ?.payment_method_types[0]
                             )
                           : order?.data?.paymentMethod
@@ -1063,15 +1177,14 @@ const NewSuccess = ({
                           : ""}{" "} */}
                       </p>
                       <p>
-                        {order?.data?.paymentLogs[0]?.mode === "subscription"
+                        {order?.data?.paymentLogs?.[0]?.mode === "subscription"
                           ? "Monthly Subscription"
                           : "One Time Payment"}
                       </p>
                       {order?.data?.paymentMode === "subscription" ? (
                         <>
                           <p>
-                            {getFormattedDate(order?.data?.createdAt)},{" "}
-                            {getFormattedTime(order?.data?.createdAt)}
+                            {getFormattedDateTime(order?.data?.createdAt)}
                           </p>
                           <p>
                             {returnOneYearForwardDate(order?.data?.createdAt)},{" "}
@@ -1082,7 +1195,7 @@ const NewSuccess = ({
                             {order?.data?.currencySymbol}
                             {formatCurrency(
                               (
-                                order?.data?.paymentLogs[0]?.amount_total / 100
+                                order?.data?.paymentLogs?.[0]?.amount_total / 100
                               ).toFixed(2),
                               order?.data?.currency
                             )}
@@ -1169,10 +1282,7 @@ const NewSuccess = ({
                     <p className="order__success__cart-total">
                       {order?.data?.currency}{" "}
                       {currency || order?.data?.currencySymbol}
-                      {formatCurrency(
-                        order?.data?.subTotal.toFixed(2),
-                        order?.data?.currency
-                      )}
+                      {formatAmount(order?.data?.subTotal, order?.data?.currency)}
                     </p>
                   </div>
                 </div>
@@ -1220,8 +1330,8 @@ const NewSuccess = ({
                     <p>
                       {order?.data?.currency}{" "}
                       {currency || order?.data?.currencySymbol}
-                      {formatCurrency(
-                        order?.data?.orderTotal.toFixed(2),
+                      {formatAmount(
+                        order?.data?.orderTotal,
                         order?.data?.currency
                       )}
                     </p>

@@ -2,9 +2,80 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+// Stripe rejects metadata values longer than 500 characters.
+const STRIPE_METADATA_VALUE_LIMIT = 500;
+
+/**
+ * The checkout form stores the address under its own field names
+ * (streetAddressOne / mailcode / phoneInfo). Translate it to the shape the
+ * order APIs and the order-success page read (addressLine1 / pincode / phone).
+ */
+const normalizeBillingAddress = (address) => {
+  if (!address || typeof address !== "object") return null;
+
+  const phone = typeof address.phone === "object" ? address.phone : {};
+  const phoneInfo =
+    typeof address.phoneInfo === "object" ? address.phoneInfo : {};
+
+  const normalized = {
+    firstName: address.firstName || "",
+    lastName: address.lastName || "",
+    email: address.email || "",
+    companyName: address.companyName || "",
+    addressLine1: address.addressLine1 || address.streetAddressOne || "",
+    addressLine2: address.addressLine2 || address.streetAddressTwo || "",
+    city: address.city || "",
+    state: address.state || "",
+    country: address.country || "",
+    pincode: address.pincode || address.mailcode || "",
+    countryCode: address.countryCode || "",
+    stateCode: address.stateCode || "",
+    phone: {
+      number: phone.number || phoneInfo.number || "",
+      countryCode: phone.countryCode || phoneInfo.countryCode || "",
+      numericCode: `${phone.numericCode || phoneInfo.numericCode || ""}`,
+    },
+  };
+
+  const hasContent = normalized.addressLine1 || normalized.city;
+  return hasContent ? normalized : null;
+};
+
+/**
+ * Serialize the address for Stripe metadata so the `checkout.session.completed`
+ * webhook can persist it. Guest (dynamic pricing) checkouts have no session on
+ * the API side, so metadata is the only channel that survives the redirect.
+ */
+const serializeBillingAddress = (address) => {
+  const normalized = normalizeBillingAddress(address);
+  if (!normalized) return null;
+
+  let serialized = JSON.stringify(normalized);
+  if (serialized.length > STRIPE_METADATA_VALUE_LIMIT) {
+    serialized = JSON.stringify({ ...normalized, addressLine2: "" });
+  }
+  if (serialized.length > STRIPE_METADATA_VALUE_LIMIT) {
+    console.warn(
+      "Billing address too large for Stripe metadata; sending trimmed address",
+    );
+    serialized = JSON.stringify({
+      firstName: normalized.firstName,
+      lastName: normalized.lastName,
+      addressLine1: normalized.addressLine1,
+      city: normalized.city,
+      state: normalized.state,
+      country: normalized.country,
+      pincode: normalized.pincode,
+      phone: normalized.phone,
+    });
+  }
+  return serialized.length > STRIPE_METADATA_VALUE_LIMIT ? null : serialized;
+};
+
 const Handler = async (req, res) => {
   try {
-    const { paymentMode, email, customerEmail, items, metadata } = req.body;
+    const { paymentMode, email, customerEmail, items, metadata, address } =
+      req.body;
 
     // Use customerEmail if provided, otherwise fall back to email
     const resolvedEmail = customerEmail || email;
@@ -23,6 +94,17 @@ const Handler = async (req, res) => {
       inferredOrigin ||
       "https://ecostance.com";
 
+    // The address collected on our checkout page is the only address in the
+    // flow — Stripe is not asked to collect one — so it has to ride along in
+    // metadata for the webhook to store it on the order.
+    const serializedBillingAddress = serializeBillingAddress(address);
+    const baseMetadata = {
+      ...(metadata || {}),
+      ...(serializedBillingAddress
+        ? { billingAddress: serializedBillingAddress }
+        : {}),
+    };
+
     // Base checkout session payload
     const incomingDiscounts = req?.body?.discounts;
     const checkoutSessionPayload = {
@@ -34,7 +116,7 @@ const Handler = async (req, res) => {
       customer_email: resolvedEmail,
       success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/checkout/cancel?session_id={CHECKOUT_SESSION_ID}`,
-      metadata: metadata || {},
+      metadata: baseMetadata,
     };
 
     // Handle different payment modes
@@ -52,7 +134,7 @@ const Handler = async (req, res) => {
           paymentType: "subscription",
           totalInstallments: "12",
           cancelAfterTimestamp: cancelAt.toString(), // Store for webhook to use
-          ...metadata,
+          ...baseMetadata,
         },
       };
 
@@ -84,7 +166,7 @@ const Handler = async (req, res) => {
       checkoutSessionPayload.metadata = {
         paymentType: "module",
         requiresSubscriptionSetup: "true",
-        ...metadata,
+        ...baseMetadata,
       };
       checkoutSessionPayload.success_url = `${baseUrl}/checkout/success?moduleOrder=true&session_id={CHECKOUT_SESSION_ID}`;
 
@@ -97,7 +179,7 @@ const Handler = async (req, res) => {
       // Add metadata for one-time payments
       checkoutSessionPayload.metadata = {
         paymentType: "one-time",
-        ...metadata,
+        ...baseMetadata,
       };
 
       console.log("Creating one-time payment checkout session");
