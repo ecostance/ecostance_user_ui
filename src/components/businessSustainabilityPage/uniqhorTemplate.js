@@ -1,4 +1,4 @@
-export const uniqhorTemplate = (dynamic) => {
+﻿export const uniqhorTemplate = (dynamic) => {
   const uiUrl = dynamic?.UI_URL || '';
   const brandName = (dynamic?.companyName || 'uniqohr').toLowerCase();
   const certCount = dynamic?.certData?.length || 0;
@@ -14,7 +14,7 @@ export const uniqhorTemplate = (dynamic) => {
       const image = pub?.productImages?.[0] || p?.productImages?.[0] || img('eco-wind2.jpg');
       const title = pub?.formalName || pub?.name || p?.name || 'Digital Product Passport';
       const text = pub?.shortDescription || pub?.Category || 'View digital product passport';
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=72x72&data=${encodeURIComponent(pageUrl)}`;
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=96x96&data=${encodeURIComponent(pageUrl)}`;
       return { pageUrl, image, title, text, qrUrl, alt: title };
     });
 
@@ -743,14 +743,15 @@ export const uniqhorTemplate = (dynamic) => {
       min-height: 0;
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 28px;
     }
 
     .uq-dpp-card-qr {
       flex-shrink: 0;
-      width: 56px;
-      height: 56px;
+      width: 72px;
+      height: 72px;
       background: #fff;
     }
 
@@ -762,8 +763,12 @@ export const uniqhorTemplate = (dynamic) => {
     }
 
     .uq-dpp-card-text {
-      flex: 1;
+      flex: 0 1 auto;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
 
     .uq-dpp-card-title {
@@ -777,7 +782,6 @@ export const uniqhorTemplate = (dynamic) => {
       text-decoration: underline;
       text-underline-offset: 3px;
       margin: 0;
-      text-align: right;
       transition: opacity 0.2s;
     }
 
@@ -788,8 +792,9 @@ export const uniqhorTemplate = (dynamic) => {
       letter-spacing: 0.08em;
       text-transform: uppercase;
       line-height: 1.3;
-      color: #2c333a;
+      color: #565c61;
       text-decoration: none;
+      margin: 4px 0 0;
     }
 
     .uq-dpp-card-desc {
@@ -1659,7 +1664,7 @@ export const uniqhorTemplate = (dynamic) => {
 
   <!-- Hero -->
   <section class="uq-hero" id="top">
-    <img src="${img('eco-hero.jpg')}" alt="Aerial view of misty boreal forest at dawn" class="uq-hero-img" />
+    <img src="${img('eco-meadow.jpg')}" alt="Sunlit alpine valley with evergreen forest and snow-capped peaks" class="uq-hero-img" />
     <div class="uq-hero-overlay"></div>
     <div class="uq-hero-content">
       <h1 class="uq-hero-title" style="text-transform: uppercase;">${dynamic?.title && dynamic.title !== '' ? dynamic.title : 'Carbon,<br/>Accounted For.'}</h1>
@@ -1720,16 +1725,14 @@ export const uniqhorTemplate = (dynamic) => {
                   <img src="${item.image}" alt="${item.alt}" loading="lazy" />
                 </div>
                 <div class="uq-dpp-card-divider" aria-hidden="true"></div>
-                <div class="uq-dpp-card-meta" style="flex-direction: column; justify-content: center; align-items: stretch; gap: 8px;">
-                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
-                    <div class="uq-dpp-card-qr">
-                      <img src="${item.qrUrl}" alt="" width="56" height="56" loading="lazy" />
-                    </div>
-                    <div class="uq-dpp-card-text">
-                      <p class="uq-dpp-card-title">DIGITAL PASSPORT</p>
-                    </div>
+                <div class="uq-dpp-card-meta">
+                  <div class="uq-dpp-card-qr">
+                    <img src="${item.qrUrl}" alt="" width="72" height="72" loading="lazy" />
                   </div>
-                  <div class="uq-dpp-card-product-name">${item.title}</div>
+                  <div class="uq-dpp-card-text">
+                    <p class="uq-dpp-card-title">DIGITAL PASSPORT</p>
+                    <p class="uq-dpp-card-product-name">${item.title}</p>
+                  </div>
                 </div>
               </a>
             </div>`).join('')}
@@ -1746,7 +1749,7 @@ export const uniqhorTemplate = (dynamic) => {
       <p class="uq-quote-text">&ldquo;Being early in systemic change can be indistinguishable from being wrong — but timing does not invalidate principle.&rdquo;</p>
       <p class="uq-quote-author">Elena Marsh, Founder</p>
     </div>
-    <img src="${img('eco-hero.jpg')}" alt="Aerial view of protected forest at dawn" loading="lazy" class="uq-quote-banner" />
+    <img src="${img('eco-hero.jpg')}" alt="Aerial view of misty boreal forest at dawn" loading="lazy" class="uq-quote-banner" />
   </section>
 
   <!-- Chain of Custody -->

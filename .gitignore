@@ -141,6 +141,11 @@ dist
 # QA report
 QA_REPORT.md
 
+# Local AI / editor tooling (skills, agents, opencode)
+.cursor/
+.opencode/
+opencode.json
+
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
