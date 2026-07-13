@@ -745,7 +745,8 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      padding: 16px 28px;
+      padding: 20px 52px;
+      box-sizing: border-box;
     }
 
     .uq-dpp-card-qr {
@@ -868,14 +869,15 @@
 
     /* Chain of Custody — matches uniqo-style-showcase.lovable.app */
     .uq-chain {
-      --chain-ink: oklch(15% 0.005 240);
-      --chain-ink-soft: oklch(28% 0.005 240);
+      --chain-ink: #0e1319;
+      --chain-ink-soft: #3d4349;
       --chain-canvas: #ffffff;
       --chain-canvas-alt: var(--canvas);
-      --chain-hairline: oklch(86% 0.003 240);
-      --chain-muted: oklch(45% 0.005 240);
+      --chain-hairline: #c8c8c8;
+      --chain-muted: #565c61;
       background: var(--canvas);
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      color: var(--chain-ink);
     }
 
     .uq-chain-inner {
@@ -904,7 +906,7 @@
       margin-top: 12px;
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       font-size: 1.875rem;
-      font-weight: 300;
+      font-weight: 400;
       letter-spacing: -0.025em;
       line-height: 1.05;
       color: var(--chain-ink);
@@ -1019,7 +1021,7 @@
       margin-top: 20px;
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       font-size: 1.5rem;
-      font-weight: 300;
+      font-weight: 400;
       letter-spacing: -0.025em;
       line-height: 1.2;
       color: var(--chain-ink);
@@ -1049,6 +1051,7 @@
       aspect-ratio: 1;
       overflow: hidden;
       background: var(--chain-canvas);
+      border-radius: 0;
     }
 
     @media (min-width: 768px) {
@@ -1059,6 +1062,10 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
+      display: block;
+      transform: scale(1);
+      transform-origin: center center;
       transition: transform 0.7s ease-out;
     }
 

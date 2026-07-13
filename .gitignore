@@ -149,3 +149,6 @@ opencode.json
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Local utility scripts
+scripts/clean-chain-thumb.py

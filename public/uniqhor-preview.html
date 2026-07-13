@@ -672,7 +672,8 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      padding: 16px 28px;
+      padding: 20px 52px;
+      box-sizing: border-box;
     }
 
     .uq-dpp-card-qr {
@@ -795,14 +796,15 @@
 
     /* Chain of Custody — matches uniqo-style-showcase.lovable.app */
     .uq-chain {
-      --chain-ink: oklch(15% 0.005 240);
-      --chain-ink-soft: oklch(28% 0.005 240);
+      --chain-ink: #0e1319;
+      --chain-ink-soft: #3d4349;
       --chain-canvas: #ffffff;
       --chain-canvas-alt: var(--canvas);
-      --chain-hairline: oklch(86% 0.003 240);
-      --chain-muted: oklch(45% 0.005 240);
+      --chain-hairline: #c8c8c8;
+      --chain-muted: #565c61;
       background: var(--canvas);
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      color: var(--chain-ink);
     }
 
     .uq-chain-inner {
@@ -831,7 +833,7 @@
       margin-top: 12px;
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       font-size: 1.875rem;
-      font-weight: 300;
+      font-weight: 400;
       letter-spacing: -0.025em;
       line-height: 1.05;
       color: var(--chain-ink);
@@ -946,7 +948,7 @@
       margin-top: 20px;
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       font-size: 1.5rem;
-      font-weight: 300;
+      font-weight: 400;
       letter-spacing: -0.025em;
       line-height: 1.2;
       color: var(--chain-ink);
@@ -976,6 +978,7 @@
       aspect-ratio: 1;
       overflow: hidden;
       background: var(--chain-canvas);
+      border-radius: 0;
     }
 
     @media (min-width: 768px) {
@@ -986,6 +989,10 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
+      display: block;
+      transform: scale(1);
+      transform-origin: center center;
       transition: transform 0.7s ease-out;
     }
 
@@ -1738,6 +1745,25 @@
           
           <li class="uq-chain-item">
             <span class="uq-chain-diamond" aria-hidden="true"></span>
+            <a href="https://example.com/cert/100000002042" class="uq-chain-card" target="_blank" rel="noopener noreferrer">
+              <div>
+                <div class="uq-chain-cert-tag">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m14 20 2 2 4-4"/></svg>
+                  Certificate &middot; 100000002042
+                </div>
+                <p class="uq-chain-date">2026-07-03</p>
+                <p class="uq-chain-qty">Carbon Offset Quantity: <span>1 Tons</span></p>
+                <h3 class="uq-chain-project">KARIBA REDD+</h3>
+                <p class="uq-chain-desc">Community-led forest protection avoiding deforestation and supporting local livelihoods across the Zambezi valley.</p>
+              </div>
+              
+              <div class="uq-chain-img-wrap">
+                <img src="https://ecostance-ebc.s3.amazonaws.com/new-thumb-8.png" alt="KARIBA REDD+" loading="lazy" class="uq-chain-img" />
+              </div>
+            </a>
+          </li>
+          <li class="uq-chain-item">
+            <span class="uq-chain-diamond" aria-hidden="true"></span>
             <a href="https://example.com/cert/100000002043" class="uq-chain-card" target="_blank" rel="noopener noreferrer">
               <div>
                 <div class="uq-chain-cert-tag">
@@ -1868,7 +1894,7 @@
             <a href="#chain" class="uq-projects-link uq-active" data-index="1" tabindex="0">Shop Projects<sup>4</sup></a>
           </li>
           <li>
-            <a href="#chain" class="uq-projects-link " data-index="2" tabindex="0">Registry Certified<sup>6</sup></a>
+            <a href="#chain" class="uq-projects-link " data-index="2" tabindex="0">Registry Certified<sup>7</sup></a>
           </li>
           <li>
             <a href="#chain" class="uq-projects-link " data-index="3" tabindex="0">Renewable Energy<sup>3</sup></a>

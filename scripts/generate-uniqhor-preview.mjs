@@ -33,6 +33,17 @@ const sampleDynamic = {
   showSocial: false,
   certData: [
     {
+      originNumber: '100000002042',
+      createdAt: '2026-07-03T10:00:00.000Z',
+      quantity: 1,
+      product: {
+        name: 'KARIBA REDD+',
+        shortDescription: 'Community-led forest protection avoiding deforestation and supporting local livelihoods across the Zambezi valley.',
+        thumbImage: ['https://ecostance-ebc.s3.amazonaws.com/new-thumb-8.png'],
+      },
+      certificate: { certificateURL: 'https://example.com/cert/100000002042' },
+    },
+    {
       originNumber: '100000002043',
       createdAt: '2026-07-01T10:00:00.000Z',
       quantity: 1,
