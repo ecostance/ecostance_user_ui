@@ -662,11 +662,55 @@
       }
     }
 
+    /* Scroll affordance: minimal black → on hover when more content exists */
+    .uq-verified-strip-wrap::after {
+      content: '';
+      position: absolute;
+      right: 24px;
+      top: calc(35px + 38%);
+      width: 22px;
+      height: 14px;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 14' fill='none'%3E%3Cpath d='M1 7h16M13 2l6 5-6 5' stroke='%23fff' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+
+    @media (min-width: 768px) {
+      .uq-verified-strip-wrap::after { top: calc(48px + 38%); right: 32px; }
+    }
+
+    .uq-verified-strip-wrap.has-more:hover::after {
+      opacity: 1;
+    }
+
     .uq-verified-strip {
       overflow-x: auto;
       scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
+      cursor: grab;
+    }
+
+    .uq-verified-strip a {
+      cursor: grab;
+    }
+
+    .uq-verified-strip.is-dragging {
+      scroll-snap-type: none;
+      scroll-behavior: auto;
+    }
+
+    .uq-verified-strip.is-dragging,
+    .uq-verified-strip.is-dragging a {
+      cursor: grabbing;
+      user-select: none;
+    }
+
+    .uq-verified-strip.is-dragging a {
+      pointer-events: none;
     }
 
     .uq-verified-strip::-webkit-scrollbar { display: none; }
@@ -2037,12 +2081,87 @@
       });
 
       document.querySelectorAll('.uq-gallery-scroll').forEach(function(slider) {
+        var wrap = slider.closest('.uq-verified-strip-wrap');
+        var dragging = false;
+        var moved = false;
+        var startX = 0;
+        var startScroll = 0;
+        var lastX = 0;
+        var lastTime = 0;
+        var velocity = 0;
+        var momentumId = 0;
+
+        function updateScrollHint() {
+          if (!wrap) return;
+          wrap.classList.toggle(
+            'has-more',
+            slider.scrollLeft + slider.clientWidth < slider.scrollWidth - 2
+          );
+        }
+
+        function stopMomentum() {
+          if (momentumId) cancelAnimationFrame(momentumId);
+          momentumId = 0;
+        }
+
+        function glide() {
+          if (Math.abs(velocity) < 0.15) {
+            momentumId = 0;
+            return;
+          }
+          slider.scrollLeft -= velocity;
+          velocity *= 0.92;
+          momentumId = requestAnimationFrame(glide);
+        }
+
         slider.addEventListener('wheel', function(e) {
           if (!e.shiftKey) return;
           if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
           e.preventDefault();
+          stopMomentum();
           slider.scrollLeft += e.deltaY;
         }, { passive: false });
+
+        slider.addEventListener('mousedown', function(e) {
+          if (e.button !== 0) return;
+          stopMomentum();
+          dragging = true;
+          moved = false;
+          startX = lastX = e.clientX;
+          startScroll = slider.scrollLeft;
+          lastTime = performance.now();
+          velocity = 0;
+          slider.classList.add('is-dragging');
+        });
+
+        window.addEventListener('mousemove', function(e) {
+          if (!dragging) return;
+          var now = performance.now();
+          var dx = e.clientX - startX;
+          if (Math.abs(dx) > 4) moved = true;
+          var dt = now - lastTime || 16;
+          velocity = (e.clientX - lastX) / dt * 16;
+          lastX = e.clientX;
+          lastTime = now;
+          slider.scrollLeft = startScroll - dx;
+        });
+
+        window.addEventListener('mouseup', function() {
+          if (!dragging) return;
+          dragging = false;
+          slider.classList.remove('is-dragging');
+          if (moved && Math.abs(velocity) > 0.5) glide();
+        });
+
+        slider.addEventListener('click', function(e) {
+          if (!moved) return;
+          e.preventDefault();
+          e.stopPropagation();
+        }, true);
+
+        slider.addEventListener('scroll', updateScrollHint, { passive: true });
+        window.addEventListener('resize', updateScrollHint);
+        updateScrollHint();
       });
   </script>
 </body>
