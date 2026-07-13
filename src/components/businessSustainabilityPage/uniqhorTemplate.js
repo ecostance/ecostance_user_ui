@@ -1069,6 +1069,7 @@
       letter-spacing: -0.025em;
       line-height: 1.2;
       color: var(--chain-ink);
+      text-transform: uppercase;
     }
 
     @media (min-width: 768px) {
