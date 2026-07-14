@@ -18,11 +18,42 @@
       return { pageUrl, image, title, text, qrUrl, alt: title };
     });
 
+  const offsetTons = (() => {
+    const fromDynamic = Number(dynamic?.totalOffset);
+    if (Number.isFinite(fromDynamic) && fromDynamic > 0) return Math.round(fromDynamic);
+    return (dynamic?.certData || []).reduce((sum, c) => sum + (Number(c?.quantity) || 0), 0);
+  })();
+
+  // Carbon-neutrality proof pillars (left hover → right image; keep 4 items for CSS nth-child rules)
   const projectCollections = [
-    { title: 'Nature-Based Removal', count: dynamic?.totalProjects || 12, img: img('eco-sapling.jpg'), alt: 'Sapling planted at reforestation site' },
-    { title: 'Shop Projects', count: dynamic?.dppProducts?.length || 8, img: img('eco-wind2.jpg'), alt: 'Wind farm at golden hour' },
-    { title: 'Registry Certified', count: certCount || 5, img: img('eco-ocean.jpg'), alt: 'Verified digital carbon certificate' },
-    { title: 'Renewable Energy', count: 3, img: img('eco-hero.jpg'), alt: 'Renewable energy landscape' },
+    {
+      title: 'Digital Passports',
+      count: publishedDppPages.length,
+      img: publishedDppPages[0]?.image || img('eco-product-wool.jpg'),
+      alt: publishedDppPages[0]?.alt || 'Uniqohr digital product passport',
+      href: '#technology',
+    },
+    {
+      title: 'Offsets Retired',
+      count: offsetTons,
+      img: img('eco-sapling.jpg'),
+      alt: 'Nature-based carbon removal project',
+      href: '#chain',
+    },
+    {
+      title: 'Registry Certificates',
+      count: certCount,
+      img: img('eco-ocean.jpg'),
+      alt: 'Verified digital carbon certificate',
+      href: '#chain',
+    },
+    {
+      title: 'Projects Supported',
+      count: Number(dynamic?.totalProjects) || 0,
+      img: img('eco-hero.jpg'),
+      alt: 'Supported climate project landscape',
+      href: '#chain',
+    },
   ];
 
   const formatChainDescription = (text) => {
@@ -629,6 +660,7 @@
       display: inline-flex;
       align-items: center;
       margin-top: 25px;
+      margin-bottom: 64px;
       background: #0e1319;
       color: #fff;
       padding: 21px 45px;
@@ -695,7 +727,7 @@
     }
 
     .uq-verified-strip a {
-      cursor: grab;
+      cursor: pointer;
     }
 
     .uq-verified-strip.is-dragging {
@@ -1496,7 +1528,7 @@
     .uq-footer-utilities {
       max-width: 1440px;
       margin: 0 auto;
-      padding: 20px 40px 48px;
+      padding: 20px 40px 16px;
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
@@ -1511,7 +1543,7 @@
 
     @media (max-width: 749px) {
       .uq-footer-utilities {
-        padding: 20px 20px 40px;
+        padding: 20px 20px 12px;
         grid-template-columns: 1fr;
         text-align: center;
         justify-items: center;
@@ -1545,6 +1577,15 @@
       justify-self: center;
     }
 
+    .uq-footer-policies a {
+      color: rgba(249, 248, 245, 0.6);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+
+    .uq-footer-policies a:hover { color: #f9f8f5; }
+
     .uq-footer-policies button {
       appearance: none;
       background: none;
@@ -1560,6 +1601,34 @@
     }
 
     .uq-footer-policies button:hover { color: #f9f8f5; }
+
+    .uq-footer-powered {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 40px 40px;
+      font-family: var(--uq-nav-font);
+      font-size: 12px;
+      line-height: 19.2px;
+      color: rgba(249, 248, 245, 0.45);
+    }
+
+    .uq-footer-powered a {
+      color: rgba(249, 248, 245, 0.45);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .uq-footer-powered a:hover { color: #f9f8f5; }
+
+    .uq-footer-powered-heart {
+      color: #e35d6a;
+      font-size: 11px;
+      line-height: 1;
+    }
 
     .uq-footer-socials {
       display: flex;
@@ -1716,7 +1785,7 @@
 
   <!-- Hero -->
   <section class="uq-hero" id="top">
-    <img src="${img('eco-meadow.jpg')}" alt="Sunlit alpine valley with evergreen forest and snow-capped peaks" class="uq-hero-img" />
+    <img src="${img('eco-adventure.jpg')}" alt="Mountaineers on a rocky alpine ridgeline with snow-capped peaks" class="uq-hero-img" />
     <div class="uq-hero-overlay"></div>
     <div class="uq-hero-content">
       <h1 class="uq-hero-title" style="text-transform: uppercase;">${dynamic?.title && dynamic.title !== '' ? dynamic.title : 'Carbon,<br/>Accounted For.'}</h1>
@@ -1741,7 +1810,7 @@
           </div>
         </div>
         <div class="uq-about-media">
-          <img src="${img('eco-founder.jpg')}" alt="Ecostance field team documenting a reforestation site" loading="lazy" class="uq-about-img" />
+          <img src="${img('eco-product-wool.jpg')}" alt="Uniqohr technical merino knit with signature blue seam" loading="lazy" class="uq-about-img" />
         </div>
       </div>
     </div>
@@ -1801,7 +1870,7 @@
       <p class="uq-quote-text">&ldquo;Being early in systemic change can be indistinguishable from being wrong — but timing does not invalidate principle.&rdquo;</p>
       <p class="uq-quote-author">Elena Marsh, Founder</p>
     </div>
-    <img src="${img('eco-hero.jpg')}" alt="Aerial view of misty boreal forest at dawn" loading="lazy" class="uq-quote-banner" />
+    <img src="${img('eco-meadow.jpg')}" alt="Sunlit alpine valley with evergreen forest and snow-capped peaks" loading="lazy" class="uq-quote-banner" />
   </section>
 
   <!-- Chain of Custody -->
@@ -1847,12 +1916,12 @@
         <ul class="uq-projects-list" id="uq-project-list">
           ${projectCollections.map((item, i) => `
           <li>
-            <a href="#chain" class="uq-projects-link ${i === 1 ? 'uq-active' : ''}" data-index="${i}" tabindex="0">${item.title}<sup>${item.count}</sup></a>
+            <a href="${item.href}" class="uq-projects-link ${i === 0 ? 'uq-active' : ''}" data-index="${i}" tabindex="0">${item.title}<sup>${item.count}</sup></a>
           </li>`).join('')}
         </ul>
         <div class="uq-projects-visual">
           ${projectCollections.map((item, i) => `
-          <img src="${item.img}" alt="${item.alt}" loading="lazy" class="${i === 1 ? 'uq-img-visible' : 'uq-img-hidden'}" data-img="${i}" />`).join('')}
+          <img src="${item.img}" alt="${item.alt}" loading="lazy" class="${i === 0 ? 'uq-img-visible' : 'uq-img-hidden'}" data-img="${i}" />`).join('')}
         </div>
       </div>
     </div>
@@ -1896,7 +1965,7 @@
     <div class="uq-footer-main">
       <div class="uq-footer-top">
         <div class="uq-footer-brand-col">
-          <a href="https://www.uniqohr.com/" class="uq-footer-brand">
+          <a href="https://www.uniqohr.com/" class="uq-footer-brand" target="_blank" rel="noopener noreferrer">
             ${footerLogo}
           </a>
         </div>
@@ -1905,27 +1974,27 @@
             <div class="uq-footer-col">
               <h4>Our Story</h4>
               <ul>
-                <li><a href="https://www.uniqohr.com/pages/about">About Us</a></li>
-                <li><a href="https://www.uniqohr.com/pages/technology">Technology</a></li>
-                <li><a href="https://www.uniqohr.com/pages/journal">Journal</a></li>
+                <li><a href="https://www.uniqohr.com/pages/about" target="_blank" rel="noopener noreferrer">About Us</a></li>
+                <li><a href="https://www.uniqohr.com/pages/technology" target="_blank" rel="noopener noreferrer">Technology</a></li>
+                <li><a href="https://www.uniqohr.com/pages/journal" target="_blank" rel="noopener noreferrer">Journal</a></li>
               </ul>
             </div>
             <div class="uq-footer-col">
               <h4>Support</h4>
               <ul>
-                <li><a href="https://www.uniqohr.com/pages/faq">FAQ</a></li>
-                <li><a href="https://www.uniqohr.com/pages/contact">Contact</a></li>
-                <li><a href="https://www.uniqohr.com/pages/fit-guide">Fit Guide</a></li>
-                <li><a href="https://www.uniqohr.com/pages/garment-care">Garment Care</a></li>
+                <li><a href="https://www.uniqohr.com/pages/faq" target="_blank" rel="noopener noreferrer">FAQ</a></li>
+                <li><a href="https://www.uniqohr.com/pages/contact" target="_blank" rel="noopener noreferrer">Contact</a></li>
+                <li><a href="https://www.uniqohr.com/pages/fit-guide" target="_blank" rel="noopener noreferrer">Fit Guide</a></li>
+                <li><a href="https://www.uniqohr.com/pages/garment-care" target="_blank" rel="noopener noreferrer">Garment Care</a></li>
               </ul>
             </div>
             <div class="uq-footer-col">
               <h4>Shop</h4>
               <ul>
-                <li><a href="https://www.uniqohr.com/collections/all">Bestsellers</a></li>
-                <li><a href="https://www.uniqohr.com/collections/all">Men</a></li>
-                <li><a href="https://www.uniqohr.com/collections/all">Women</a></li>
-                <li><a href="https://www.uniqohr.com/collections/all">Accessories</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all" target="_blank" rel="noopener noreferrer">Bestsellers</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all" target="_blank" rel="noopener noreferrer">Men</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all" target="_blank" rel="noopener noreferrer">Women</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all" target="_blank" rel="noopener noreferrer">Accessories</a></li>
               </ul>
             </div>
           </div>
@@ -1937,7 +2006,7 @@
     </div>
     <div class="uq-footer-utilities">
       <div class="uq-footer-copy">
-        <span>&copy; ${new Date().getFullYear()} <a href="${uiUrl || 'https://ecostance.com'}">EcoStance</a></span>
+        <span>&copy; ${new Date().getFullYear()} ${companyLabel}</span>
       </div>
       <div class="uq-footer-policies">
         <button type="button" class="uq-footer-policy-btn" onclick="window.open('https://www.uniqohr.com/policies/privacy-policy','_blank')">Terms and Policies</button>
@@ -1979,6 +2048,11 @@
           <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.273 2.8 10.8 7.822l4.418-5.022h1.768l-5.4 6.142 5.686 7.336h-3.132l-4.4-5.693-5.032 5.693H2.4l5.786-6.57L2.8 2.8h3.473Zm-.815 1.35H4.332l8.818 11.7h1.126L6.458 4.15Z"/></svg>
         </a>`}
       </div>
+    </div>
+    <div class="uq-footer-powered">
+      <span>Powered By</span>
+      <span class="uq-footer-powered-heart" aria-hidden="true">&#10084;&#65039;</span>
+      <a href="${uiUrl || 'https://ecostance.com'}" target="_blank" rel="noopener noreferrer">ECOSTANCE</a>
     </div>
   </footer>
 
@@ -2132,19 +2206,21 @@
           startScroll = slider.scrollLeft;
           lastTime = performance.now();
           velocity = 0;
-          slider.classList.add('is-dragging');
         });
 
         window.addEventListener('mousemove', function(e) {
           if (!dragging) return;
           var now = performance.now();
           var dx = e.clientX - startX;
-          if (Math.abs(dx) > 4) moved = true;
+          if (Math.abs(dx) > 4) {
+            moved = true;
+            slider.classList.add('is-dragging');
+          }
           var dt = now - lastTime || 16;
           velocity = (e.clientX - lastX) / dt * 16;
           lastX = e.clientX;
           lastTime = now;
-          slider.scrollLeft = startScroll - dx;
+          if (moved) slider.scrollLeft = startScroll - dx;
         });
 
         window.addEventListener('mouseup', function() {
