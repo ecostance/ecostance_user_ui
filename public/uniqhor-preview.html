@@ -668,6 +668,8 @@
     }
 
     .uq-dpp-card {
+      --uq-dpp-ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --uq-dpp-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       flex-direction: column;
       height: auto;
@@ -676,20 +678,20 @@
       border: 1px solid var(--hairline);
       text-decoration: none;
       color: inherit;
-      transition: box-shadow 0.2s, transform 0.2s;
+      isolation: isolate;
+      transition:
+        box-shadow 0.55s var(--uq-dpp-ease),
+        transform 0.55s var(--uq-dpp-ease),
+        border-color 0.55s var(--uq-dpp-ease);
     }
 
-    .uq-dpp-card:hover {
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-      transform: translateY(-2px);
-    }
-
-    .uq-dpp-card:hover .uq-dpp-card-title {
-      opacity: 0.7;
-      text-decoration: none;
+    .uq-dpp-card:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 3px;
     }
 
     .uq-dpp-card-image {
+      position: relative;
       flex: 2 1 0;
       min-height: 0;
       width: 100%;
@@ -697,17 +699,42 @@
       background: var(--canvas-alt);
     }
 
+    .uq-dpp-card-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(20, 24, 28, 0) 45%,
+        rgba(20, 24, 28, 0.28) 100%
+      );
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s var(--uq-dpp-ease);
+      z-index: 1;
+    }
+
     .uq-dpp-card-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
       display: block;
+      transform: scale(1) translate3d(0, 0, 0);
+      transform-origin: center center;
+      transition: transform 0.9s var(--uq-dpp-ease-out), filter 0.7s var(--uq-dpp-ease);
+      will-change: transform;
     }
 
     .uq-dpp-card-divider {
       flex-shrink: 0;
       height: 1px;
       background: var(--hairline);
+      transform: scaleX(1);
+      transform-origin: center;
+      transition:
+        background 0.5s var(--uq-dpp-ease),
+        transform 0.55s var(--uq-dpp-ease);
     }
 
     .uq-dpp-card-meta {
@@ -719,6 +746,8 @@
       gap: 16px;
       padding: 20px 52px;
       box-sizing: border-box;
+      transform: translate3d(0, 0, 0);
+      transition: transform 0.55s var(--uq-dpp-ease);
     }
 
     .uq-dpp-card-qr {
@@ -726,6 +755,11 @@
       width: 72px;
       height: 72px;
       background: #fff;
+      box-shadow: 0 0 0 0 rgba(44, 51, 58, 0);
+      transform: scale(1) translate3d(0, 0, 0);
+      transition:
+        transform 0.55s var(--uq-dpp-ease) 0.04s,
+        box-shadow 0.55s var(--uq-dpp-ease) 0.04s;
     }
 
     .uq-dpp-card-qr img {
@@ -742,6 +776,8 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
+      transform: translate3d(0, 0, 0);
+      transition: transform 0.55s var(--uq-dpp-ease) 0.08s;
     }
 
     .uq-dpp-card-title {
@@ -755,7 +791,7 @@
       text-decoration: underline;
       text-underline-offset: 3px;
       margin: 0;
-      transition: opacity 0.2s;
+      transition: opacity 0.45s var(--uq-dpp-ease) 0.08s, color 0.45s var(--uq-dpp-ease);
     }
 
     .uq-dpp-card-product-name {
@@ -768,6 +804,96 @@
       color: #565c61;
       text-decoration: none;
       margin: 4px 0 0;
+      transition:
+        color 0.45s var(--uq-dpp-ease) 0.1s,
+        letter-spacing 0.55s var(--uq-dpp-ease) 0.1s,
+        transform 0.55s var(--uq-dpp-ease) 0.1s;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .uq-dpp-card:hover {
+        box-shadow:
+          0 4px 12px rgba(0, 0, 0, 0.04),
+          0 22px 48px rgba(0, 0, 0, 0.12);
+        transform: translate3d(0, -8px, 0);
+        border-color: rgba(44, 51, 58, 0.28);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-image::after {
+        opacity: 1;
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-image img {
+        transform: scale(1.1) translate3d(0, -2.5%, 0);
+        filter: brightness(1.03) contrast(1.02);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-divider {
+        background: rgba(44, 51, 58, 0.42);
+        transform: scaleX(0.92);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-meta {
+        transform: translate3d(0, -2px, 0);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-qr {
+        transform: scale(1.06) translate3d(0, -1px, 0);
+        box-shadow: 0 0 0 1px rgba(44, 51, 58, 0.14);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-text {
+        transform: translate3d(0, -1px, 0);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-title {
+        opacity: 0.72;
+        text-decoration: none;
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-product-name {
+        color: #2c333a;
+        letter-spacing: 0.11em;
+        transform: translate3d(0, -1px, 0);
+      }
+
+      .uq-dpp-card:active {
+        transform: translate3d(0, -3px, 0);
+        transition-duration: 0.18s;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uq-dpp-card,
+      .uq-dpp-card-image img,
+      .uq-dpp-card-image::after,
+      .uq-dpp-card-qr,
+      .uq-dpp-card-text,
+      .uq-dpp-card-title,
+      .uq-dpp-card-product-name,
+      .uq-dpp-card-divider,
+      .uq-dpp-card-meta {
+        transition: none !important;
+      }
+
+      .uq-dpp-card:hover,
+      .uq-dpp-card:active {
+        transform: none;
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-image img,
+      .uq-dpp-card:hover .uq-dpp-card-qr,
+      .uq-dpp-card:hover .uq-dpp-card-text,
+      .uq-dpp-card:hover .uq-dpp-card-meta,
+      .uq-dpp-card:hover .uq-dpp-card-product-name,
+      .uq-dpp-card:hover .uq-dpp-card-divider {
+        transform: none;
+        filter: none;
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-product-name {
+        letter-spacing: 0.08em;
+      }
     }
 
     .uq-dpp-card-desc {
@@ -1521,9 +1647,17 @@
     .uq-footer-powered a:hover { color: #f9f8f5; }
 
     .uq-footer-powered-heart {
-      color: #e35d6a;
-      font-size: 11px;
-      line-height: 1;
+      display: inline-flex;
+      width: 11px;
+      height: 11px;
+      color: inherit;
+      flex-shrink: 0;
+    }
+
+    .uq-footer-powered-heart svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .uq-footer-socials {
@@ -1984,10 +2118,10 @@
           </li>
         </ul>
         <div class="uq-projects-visual">
-          <img src="./assets/images/sustainability/eco-product-wool.jpg" alt="Uniqohr digital product passport" loading="lazy" class="uq-img-visible" data-img="0" />
-          <img src="./assets/images/sustainability/eco-sapling.jpg" alt="Nature-based carbon removal project" loading="lazy" class="uq-img-hidden" data-img="1" />
-          <img src="./assets/images/sustainability/eco-ocean.jpg" alt="Verified digital carbon certificate" loading="lazy" class="uq-img-hidden" data-img="2" />
-          <img src="./assets/images/sustainability/eco-hero.jpg" alt="Supported climate project landscape" loading="lazy" class="uq-img-hidden" data-img="3" />
+          <img src="./assets/images/sustainability/pillar-digital-passport.jpg" alt="Digital product passport scanned on a merino garment" loading="lazy" class="uq-img-visible" data-img="0" />
+          <img src="./assets/images/sustainability/pillar-offsets-retired.jpg" alt="Hands planting a sapling for nature-based carbon removal" loading="lazy" class="uq-img-hidden" data-img="1" />
+          <img src="./assets/images/sustainability/pillar-registry-certificate.jpg" alt="Official carbon registry certificate with embossed seal" loading="lazy" class="uq-img-hidden" data-img="2" />
+          <img src="./assets/images/sustainability/pillar-projects-supported.jpg" alt="Solar farm climate project in desert landscape" loading="lazy" class="uq-img-hidden" data-img="3" />
         </div>
       </div>
     </div>
@@ -2097,7 +2231,7 @@
     </div>
     <div class="uq-footer-powered">
       <span>Powered By</span>
-      <span class="uq-footer-powered-heart" aria-hidden="true">&#10084;&#65039;</span>
+      <span class="uq-footer-powered-heart" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 14.25S1.5 10.2 1.5 5.9C1.5 3.4 3.35 1.75 5.55 1.75c1.25 0 2.2.6 2.45 1.45C8.25 2.35 9.2 1.75 10.45 1.75 12.65 1.75 14.5 3.4 14.5 5.9c0 4.3-6.5 8.35-6.5 8.35z"/></svg></span>
       <a href="https://ecostance.com" target="_blank" rel="noopener noreferrer">ECOSTANCE</a>
     </div>
   </footer>
