@@ -30,28 +30,28 @@
       title: 'Digital Passports',
       count: publishedDppPages.length,
       img: img('pillar-digital-passport.jpg'),
-      alt: 'Digital product passport scanned on a merino garment',
+      alt: 'Digital product passport for uniqohr mens long sleeve on phone',
       href: '#technology',
     },
     {
-      title: 'Offsets Retired',
+      title: 'Offsets Purchased',
       count: offsetTons,
       img: img('pillar-offsets-retired.jpg'),
-      alt: 'Hands planting a sapling for nature-based carbon removal',
+      alt: 'Ecostance offsets purchased dashboard with project purchases',
       href: '#chain',
     },
     {
       title: 'Registry Certificates',
       count: certCount,
       img: img('pillar-registry-certificate.jpg'),
-      alt: 'Official carbon registry certificate with embossed seal',
+      alt: 'Ecostance sustainability certificate presented to uniqohr Ottawa Canada',
       href: '#chain',
     },
     {
       title: 'Projects Supported',
       count: Number(dynamic?.totalProjects) || 0,
       img: img('pillar-projects-supported.jpg'),
-      alt: 'Solar farm climate project in desert landscape',
+      alt: 'Ecostance certified projects: Nitrous Gas Removal, Piedra Wind Farm, Solar Cooker CORSIA, KARIBA REDD+',
       href: '#chain',
     },
 
@@ -1920,7 +1920,7 @@
 
   <!-- Hero -->
   <section class="uq-hero" id="top">
-    <img src="${img('eco-adventure.jpg')}" alt="Mountaineers on a rocky alpine ridgeline with snow-capped peaks" class="uq-hero-img" />
+    <img src="${img('eco-adventure.jpg')}" alt="Mountain bikers descending a rocky alpine trail with snow-capped peaks" class="uq-hero-img" />
     <div class="uq-hero-overlay"></div>
     <div class="uq-hero-content">
       <h1 class="uq-hero-title" style="text-transform: uppercase;">${dynamic?.title && dynamic.title !== '' ? dynamic.title : 'Carbon,<br/>Accounted For.'}</h1>
@@ -1945,7 +1945,7 @@
           </div>
         </div>
         <div class="uq-about-media">
-          <img src="${img('eco-product-wool.jpg')}" alt="Uniqohr technical merino knit with signature blue seam" loading="lazy" class="uq-about-img" />
+          <img src="${img('eco-product-wool.jpg')}" alt="Uniqohr black technical jacket with signature blue seam" loading="lazy" class="uq-about-img" />
         </div>
       </div>
     </div>
@@ -2005,7 +2005,7 @@
       <p class="uq-quote-text">&ldquo;Being early in systemic change can be indistinguishable from being wrong — but timing does not invalidate principle.&rdquo;</p>
       <p class="uq-quote-author">Elena Marsh, Founder</p>
     </div>
-    <img src="${img('eco-meadow.jpg')}" alt="Sunlit alpine valley with evergreen forest and snow-capped peaks" loading="lazy" class="uq-quote-banner" />
+    <img src="${img('eco-meadow.jpg')}" alt="Flock of sheep grazing in a green mountain valley" loading="lazy" class="uq-quote-banner" />
   </section>
 
   <!-- Chain of Custody -->
