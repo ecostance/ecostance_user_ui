@@ -79,6 +79,19 @@ export const getOrderPdf = async (orderId, lastOrder) => {
   }
 };
 
+/**
+ * Fetch the order the Stripe webhook created for a checkout session.
+ * Public endpoint: guest (dynamic pricing) buyers have no JWT on the success
+ * page. Returns null while the webhook has not created the order yet (404).
+ */
+export const getOrderByCheckoutSession = async (sessionId) => {
+  const response = await request.get(`/v1/orders/session/${sessionId}`);
+  // The shared client resolves every status, so a "not created yet" 404 shows
+  // up here as a non-200 rather than a throw.
+  if (response?.status !== 200 || !response?.data?.success) return null;
+  return response.data;
+};
+
 export const getAllOrders = async (page, token) => {
   if (getCookie("JWTToken") || token) {
     return await request.get(`/v1/customer-orders?page=${page}&cert={true}`, {

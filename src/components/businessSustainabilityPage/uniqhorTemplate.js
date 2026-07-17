@@ -1,4 +1,4 @@
-export const uniqhorTemplate = (dynamic) => {
+﻿export const uniqhorTemplate = (dynamic) => {
   const uiUrl = dynamic?.UI_URL || '';
   const brandName = (dynamic?.companyName || 'uniqohr').toLowerCase();
   const certCount = dynamic?.certData?.length || 0;
@@ -14,15 +14,47 @@ export const uniqhorTemplate = (dynamic) => {
       const image = pub?.productImages?.[0] || p?.productImages?.[0] || img('eco-wind2.jpg');
       const title = pub?.formalName || pub?.name || p?.name || 'Digital Product Passport';
       const text = pub?.shortDescription || pub?.Category || 'View digital product passport';
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=72x72&data=${encodeURIComponent(pageUrl)}`;
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=96x96&data=${encodeURIComponent(pageUrl)}`;
       return { pageUrl, image, title, text, qrUrl, alt: title };
     });
 
+  const offsetTons = (() => {
+    const fromDynamic = Number(dynamic?.totalOffset);
+    if (Number.isFinite(fromDynamic) && fromDynamic > 0) return Math.round(fromDynamic);
+    return (dynamic?.certData || []).reduce((sum, c) => sum + (Number(c?.quantity) || 0), 0);
+  })();
+
+  // Carbon-neutrality proof pillars (left hover → right image; keep 4 items for CSS nth-child rules)
   const projectCollections = [
-    { title: 'Nature-Based Removal', count: dynamic?.totalProjects || 12, img: img('eco-sapling.jpg'), alt: 'Sapling planted at reforestation site' },
-    { title: 'Shop Projects', count: dynamic?.dppProducts?.length || 8, img: img('eco-wind2.jpg'), alt: 'Wind farm at golden hour' },
-    { title: 'Registry Certified', count: certCount || 5, img: img('eco-ocean.jpg'), alt: 'Verified digital carbon certificate' },
-    { title: 'Renewable Energy', count: 3, img: img('eco-hero.jpg'), alt: 'Renewable energy landscape' },
+    {
+      title: 'Digital Passports',
+      count: publishedDppPages.length,
+      img: img('pillar-digital-passport.jpg'),
+      alt: 'Digital product passport for uniqohr mens long sleeve on phone',
+      href: '#technology',
+    },
+    {
+      title: 'Offsets Purchased',
+      count: offsetTons,
+      img: img('pillar-offsets-retired.jpg'),
+      alt: 'Ecostance offsets purchased dashboard with project purchases',
+      href: '#chain',
+    },
+    {
+      title: 'Registry Certificates',
+      count: certCount,
+      img: img('pillar-registry-certificate.jpg'),
+      alt: 'Ecostance sustainability certificate presented to uniqohr Ottawa Canada',
+      href: '#chain',
+    },
+    {
+      title: 'Projects Supported',
+      count: Number(dynamic?.totalProjects) || 0,
+      img: img('pillar-projects-supported.jpg'),
+      alt: 'Ecostance certified projects: Nitrous Gas Removal, Piedra Wind Farm, Solar Cooker CORSIA, KARIBA REDD+',
+      href: '#chain',
+    },
+
   ];
 
   const formatChainDescription = (text) => {
@@ -425,10 +457,10 @@ export const uniqhorTemplate = (dynamic) => {
       margin-top: 24px;
       max-width: 100%;
       font-family: 'Archivo', 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
-      font-size: 1.5rem;
-      font-weight: 300;
-      line-height: 1.1;
-      color: rgba(255,255,255,0.9);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.95);
     }
 
     @media (min-width: 768px) {
@@ -597,10 +629,13 @@ export const uniqhorTemplate = (dynamic) => {
     .uq-verified-sub {
       margin: 0;
       font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 20px;
-      color: #565c61;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1.3;
+      color: #2c333a;
+      text-decoration: none;
     }
 
     .uq-verified-body {
@@ -626,6 +661,7 @@ export const uniqhorTemplate = (dynamic) => {
       display: inline-flex;
       align-items: center;
       margin-top: 25px;
+      margin-bottom: 64px;
       background: #0e1319;
       color: #fff;
       padding: 21px 45px;
@@ -659,11 +695,55 @@ export const uniqhorTemplate = (dynamic) => {
       }
     }
 
+    /* Scroll affordance: minimal black → on hover when more content exists */
+    .uq-verified-strip-wrap::after {
+      content: '';
+      position: absolute;
+      right: 24px;
+      top: calc(35px + 38%);
+      width: 22px;
+      height: 14px;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 14' fill='none'%3E%3Cpath d='M1 7h16M13 2l6 5-6 5' stroke='%23fff' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+
+    @media (min-width: 768px) {
+      .uq-verified-strip-wrap::after { top: calc(48px + 38%); right: 32px; }
+    }
+
+    .uq-verified-strip-wrap.has-more:hover::after {
+      opacity: 1;
+    }
+
     .uq-verified-strip {
       overflow-x: auto;
       scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
+      cursor: grab;
+    }
+
+    .uq-verified-strip a {
+      cursor: pointer;
+    }
+
+    .uq-verified-strip.is-dragging {
+      scroll-snap-type: none;
+      scroll-behavior: auto;
+    }
+
+    .uq-verified-strip.is-dragging,
+    .uq-verified-strip.is-dragging a {
+      cursor: grabbing;
+      user-select: none;
+    }
+
+    .uq-verified-strip.is-dragging a {
+      pointer-events: none;
     }
 
     .uq-verified-strip::-webkit-scrollbar { display: none; }
@@ -681,74 +761,110 @@ export const uniqhorTemplate = (dynamic) => {
     .uq-verified-strip-item {
       flex-shrink: 0;
       scroll-snap-align: start;
-      width: 80vw;
-      max-width: 280px;
+      width: min(75vw, 456px);
     }
 
     @media (min-width: 640px) {
-      .uq-verified-strip-item { width: 45vw; max-width: 300px; }
+      .uq-verified-strip-item { width: min(48vw, 456px); }
     }
 
     @media (min-width: 768px) {
-      .uq-verified-strip-item { width: calc((100% - 2.25rem) / 4); max-width: 320px; min-width: 200px; }
-      .uq-verified-strip-track { width: 100%; }
+      .uq-verified-strip-item { width: 456px; }
     }
 
     .uq-dpp-card {
+      --uq-dpp-ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --uq-dpp-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       flex-direction: column;
-      height: 100%;
-      min-height: 320px;
+      height: auto;
+      aspect-ratio: 456 / 646;
       background: #fff;
       border: 1px solid var(--hairline);
       text-decoration: none;
       color: inherit;
-      transition: box-shadow 0.2s, transform 0.2s;
+      isolation: isolate;
+      transition:
+        box-shadow 0.55s var(--uq-dpp-ease),
+        transform 0.55s var(--uq-dpp-ease),
+        border-color 0.55s var(--uq-dpp-ease);
     }
 
-    .uq-dpp-card:hover {
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-      transform: translateY(-2px);
-    }
-
-    .uq-dpp-card:hover .uq-dpp-card-title {
-      text-decoration: underline;
+    .uq-dpp-card:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 3px;
     }
 
     .uq-dpp-card-image {
-      flex: 2;
+      position: relative;
+      flex: 2 1 0;
       min-height: 0;
+      width: 100%;
       overflow: hidden;
       background: var(--canvas-alt);
+    }
+
+    .uq-dpp-card-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(20, 24, 28, 0) 45%,
+        rgba(20, 24, 28, 0.28) 100%
+      );
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s var(--uq-dpp-ease);
+      z-index: 1;
     }
 
     .uq-dpp-card-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
       display: block;
+      transform: scale(1) translate3d(0, 0, 0);
+      transform-origin: center center;
+      transition: transform 0.9s var(--uq-dpp-ease-out), filter 0.7s var(--uq-dpp-ease);
+      will-change: transform;
     }
 
     .uq-dpp-card-divider {
       flex-shrink: 0;
       height: 1px;
       background: var(--hairline);
+      transform: scaleX(1);
+      transform-origin: center;
+      transition:
+        background 0.5s var(--uq-dpp-ease),
+        transform 0.55s var(--uq-dpp-ease);
     }
 
     .uq-dpp-card-meta {
-      flex: 1;
+      flex: 1 1 0;
+      min-height: 0;
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      min-height: 0;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 52px;
+      box-sizing: border-box;
+      transform: translate3d(0, 0, 0);
+      transition: transform 0.55s var(--uq-dpp-ease);
     }
 
     .uq-dpp-card-qr {
       flex-shrink: 0;
-      width: 56px;
-      height: 56px;
+      width: 72px;
+      height: 72px;
       background: #fff;
+      box-shadow: 0 0 0 0 rgba(44, 51, 58, 0);
+      transform: scale(1) translate3d(0, 0, 0);
+      transition:
+        transform 0.55s var(--uq-dpp-ease) 0.04s,
+        box-shadow 0.55s var(--uq-dpp-ease) 0.04s;
     }
 
     .uq-dpp-card-qr img {
@@ -759,18 +875,130 @@ export const uniqhorTemplate = (dynamic) => {
     }
 
     .uq-dpp-card-text {
-      flex: 1;
+      flex: 0 1 auto;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transform: translate3d(0, 0, 0);
+      transition: transform 0.55s var(--uq-dpp-ease) 0.08s;
     }
 
     .uq-dpp-card-title {
       font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
-      font-size: 16px;
-      font-weight: bold;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       line-height: 1.3;
-      color: #0e1319;
+      color: #2c333a;
+      text-decoration: underline;
+      text-underline-offset: 3px;
       margin: 0;
-      text-align: right;
+      transition: opacity 0.45s var(--uq-dpp-ease) 0.08s, color 0.45s var(--uq-dpp-ease);
+    }
+
+    .uq-dpp-card-product-name {
+      font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1.3;
+      color: #565c61;
+      text-decoration: none;
+      margin: 4px 0 0;
+      transition:
+        color 0.45s var(--uq-dpp-ease) 0.1s,
+        letter-spacing 0.55s var(--uq-dpp-ease) 0.1s,
+        transform 0.55s var(--uq-dpp-ease) 0.1s;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .uq-dpp-card:hover {
+        box-shadow:
+          0 4px 12px rgba(0, 0, 0, 0.04),
+          0 22px 48px rgba(0, 0, 0, 0.12);
+        transform: translate3d(0, -8px, 0);
+        border-color: rgba(44, 51, 58, 0.28);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-image::after {
+        opacity: 1;
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-image img {
+        transform: scale(1.1) translate3d(0, -2.5%, 0);
+        filter: brightness(1.03) contrast(1.02);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-divider {
+        background: rgba(44, 51, 58, 0.42);
+        transform: scaleX(0.92);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-meta {
+        transform: translate3d(0, -2px, 0);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-qr {
+        transform: scale(1.06) translate3d(0, -1px, 0);
+        box-shadow: 0 0 0 1px rgba(44, 51, 58, 0.14);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-text {
+        transform: translate3d(0, -1px, 0);
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-title {
+        opacity: 0.72;
+        text-decoration: none;
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-product-name {
+        color: #2c333a;
+        letter-spacing: 0.11em;
+        transform: translate3d(0, -1px, 0);
+      }
+
+      .uq-dpp-card:active {
+        transform: translate3d(0, -3px, 0);
+        transition-duration: 0.18s;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uq-dpp-card,
+      .uq-dpp-card-image img,
+      .uq-dpp-card-image::after,
+      .uq-dpp-card-qr,
+      .uq-dpp-card-text,
+      .uq-dpp-card-title,
+      .uq-dpp-card-product-name,
+      .uq-dpp-card-divider,
+      .uq-dpp-card-meta {
+        transition: none !important;
+      }
+
+      .uq-dpp-card:hover,
+      .uq-dpp-card:active {
+        transform: none;
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-image img,
+      .uq-dpp-card:hover .uq-dpp-card-qr,
+      .uq-dpp-card:hover .uq-dpp-card-text,
+      .uq-dpp-card:hover .uq-dpp-card-meta,
+      .uq-dpp-card:hover .uq-dpp-card-product-name,
+      .uq-dpp-card:hover .uq-dpp-card-divider {
+        transform: none;
+        filter: none;
+      }
+
+      .uq-dpp-card:hover .uq-dpp-card-product-name {
+        letter-spacing: 0.08em;
+      }
     }
 
     .uq-dpp-card-desc {
@@ -844,14 +1072,15 @@ export const uniqhorTemplate = (dynamic) => {
 
     /* Chain of Custody — matches uniqo-style-showcase.lovable.app */
     .uq-chain {
-      --chain-ink: oklch(15% 0.005 240);
-      --chain-ink-soft: oklch(28% 0.005 240);
+      --chain-ink: #0e1319;
+      --chain-ink-soft: #3d4349;
       --chain-canvas: #ffffff;
       --chain-canvas-alt: var(--canvas);
-      --chain-hairline: oklch(86% 0.003 240);
-      --chain-muted: oklch(45% 0.005 240);
+      --chain-hairline: #c8c8c8;
+      --chain-muted: #565c61;
       background: var(--canvas);
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      color: var(--chain-ink);
     }
 
     .uq-chain-inner {
@@ -880,7 +1109,7 @@ export const uniqhorTemplate = (dynamic) => {
       margin-top: 12px;
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       font-size: 1.875rem;
-      font-weight: 300;
+      font-weight: 400;
       letter-spacing: -0.025em;
       line-height: 1.05;
       color: var(--chain-ink);
@@ -995,10 +1224,11 @@ export const uniqhorTemplate = (dynamic) => {
       margin-top: 20px;
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
       font-size: 1.5rem;
-      font-weight: 300;
+      font-weight: 400;
       letter-spacing: -0.025em;
       line-height: 1.2;
       color: var(--chain-ink);
+      text-transform: uppercase;
     }
 
     @media (min-width: 768px) {
@@ -1025,6 +1255,7 @@ export const uniqhorTemplate = (dynamic) => {
       aspect-ratio: 1;
       overflow: hidden;
       background: var(--chain-canvas);
+      border-radius: 0;
     }
 
     @media (min-width: 768px) {
@@ -1035,6 +1266,10 @@ export const uniqhorTemplate = (dynamic) => {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
+      display: block;
+      transform: scale(1);
+      transform-origin: center center;
       transition: transform 0.7s ease-out;
     }
 
@@ -1420,7 +1655,7 @@ export const uniqhorTemplate = (dynamic) => {
     .uq-footer-utilities {
       max-width: 1440px;
       margin: 0 auto;
-      padding: 20px 40px 48px;
+      padding: 20px 40px 16px;
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
@@ -1435,7 +1670,7 @@ export const uniqhorTemplate = (dynamic) => {
 
     @media (max-width: 749px) {
       .uq-footer-utilities {
-        padding: 20px 20px 40px;
+        padding: 20px 20px 12px;
         grid-template-columns: 1fr;
         text-align: center;
         justify-items: center;
@@ -1469,6 +1704,15 @@ export const uniqhorTemplate = (dynamic) => {
       justify-self: center;
     }
 
+    .uq-footer-policies a {
+      color: rgba(249, 248, 245, 0.6);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+
+    .uq-footer-policies a:hover { color: #f9f8f5; }
+
     .uq-footer-policies button {
       appearance: none;
       background: none;
@@ -1484,6 +1728,42 @@ export const uniqhorTemplate = (dynamic) => {
     }
 
     .uq-footer-policies button:hover { color: #f9f8f5; }
+
+    .uq-footer-powered {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 40px 40px;
+      font-family: var(--uq-nav-font);
+      font-size: 12px;
+      line-height: 19.2px;
+      color: rgba(249, 248, 245, 0.45);
+    }
+
+    .uq-footer-powered a {
+      color: rgba(249, 248, 245, 0.45);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .uq-footer-powered a:hover { color: #f9f8f5; }
+
+    .uq-footer-powered-heart {
+      display: inline-flex;
+      width: 11px;
+      height: 11px;
+      color: inherit;
+      flex-shrink: 0;
+    }
+
+    .uq-footer-powered-heart svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
 
     .uq-footer-socials {
       display: flex;
@@ -1640,11 +1920,11 @@ export const uniqhorTemplate = (dynamic) => {
 
   <!-- Hero -->
   <section class="uq-hero" id="top">
-    <img src="${img('eco-hero.jpg')}" alt="Aerial view of misty boreal forest at dawn" class="uq-hero-img" />
+    <img src="${img('eco-adventure.jpg')}" alt="Mountain bikers descending a rocky alpine trail with snow-capped peaks" class="uq-hero-img" />
     <div class="uq-hero-overlay"></div>
     <div class="uq-hero-content">
       <h1 class="uq-hero-title" style="text-transform: uppercase;">${dynamic?.title && dynamic.title !== '' ? dynamic.title : 'Carbon,<br/>Accounted For.'}</h1>
-      ${dynamic?.description && dynamic.description !== '' ? `<p class="uq-hero-desc">${dynamic.description}</p>` : `<p class="uq-hero-desc">Three decades of environmental expertise.<br/>One verified system.</p>`}
+      <p class="uq-hero-desc">Three decades of environmental expertise. Every tonne measured, retired and verifiable.</p>
     </div>
   </section>
 
@@ -1665,7 +1945,7 @@ export const uniqhorTemplate = (dynamic) => {
           </div>
         </div>
         <div class="uq-about-media">
-          <img src="${img('eco-founder.jpg')}" alt="Ecostance field team documenting a reforestation site" loading="lazy" class="uq-about-img" />
+          <img src="${img('eco-product-wool.jpg')}" alt="Uniqohr black technical jacket with signature blue seam" loading="lazy" class="uq-about-img" />
         </div>
       </div>
     </div>
@@ -1680,9 +1960,13 @@ export const uniqhorTemplate = (dynamic) => {
           <p class="uq-verified-sub">Transparency built into every product.</p>
         </div>
         <div class="uq-verified-body">
+          ${dynamic?.description && dynamic.description !== '' && dynamic.description !== 'undefined'
+            ? `<p>${dynamic.description}</p>`
+            : `
           <p>Verified product data begins long before a garment is sold. It starts at the source.</p>
           <p>Every published passport brings together material specifications, environmental reporting, and supply chain records in one place — creating a transparent record that can be independently verified, not simply claimed. Scan the QR code on any product below to open its full digital passport.</p>
           <p>We believe accountability matters more than marketing. That's why we document progress openly, continue working toward higher-integrity product data, and avoid making claims that cannot be verified. Because trust should be earned through evidence.</p>
+          `}
           <a href="#dpp-passports" class="uq-verified-cta">Access the passports</a>
         </div>
       </div>
@@ -1697,16 +1981,14 @@ export const uniqhorTemplate = (dynamic) => {
                   <img src="${item.image}" alt="${item.alt}" loading="lazy" />
                 </div>
                 <div class="uq-dpp-card-divider" aria-hidden="true"></div>
-                <div class="uq-dpp-card-meta" style="flex-direction: column; justify-content: center; align-items: stretch; gap: 8px;">
-                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
-                    <div class="uq-dpp-card-qr">
-                      <img src="${item.qrUrl}" alt="" width="56" height="56" loading="lazy" />
-                    </div>
-                    <div class="uq-dpp-card-text">
-                      <p class="uq-dpp-card-title">DIGITAL PASSPORT</p>
-                    </div>
+                <div class="uq-dpp-card-meta">
+                  <div class="uq-dpp-card-qr">
+                    <img src="${item.qrUrl}" alt="" width="72" height="72" loading="lazy" />
                   </div>
-                  <div class="uq-dpp-card-product-name" style="font-size: 13px; font-weight: 400; color: #565c61;">${item.title}</div>
+                  <div class="uq-dpp-card-text">
+                    <p class="uq-dpp-card-title">DIGITAL PASSPORT</p>
+                    <p class="uq-dpp-card-product-name">${item.title}</p>
+                  </div>
                 </div>
               </a>
             </div>`).join('')}
@@ -1723,7 +2005,7 @@ export const uniqhorTemplate = (dynamic) => {
       <p class="uq-quote-text">&ldquo;Being early in systemic change can be indistinguishable from being wrong — but timing does not invalidate principle.&rdquo;</p>
       <p class="uq-quote-author">Elena Marsh, Founder</p>
     </div>
-    <img src="${img('eco-hero.jpg')}" alt="Aerial view of protected forest at dawn" loading="lazy" class="uq-quote-banner" />
+    <img src="${img('eco-meadow.jpg')}" alt="Flock of sheep grazing in a green mountain valley" loading="lazy" class="uq-quote-banner" />
   </section>
 
   <!-- Chain of Custody -->
@@ -1769,12 +2051,12 @@ export const uniqhorTemplate = (dynamic) => {
         <ul class="uq-projects-list" id="uq-project-list">
           ${projectCollections.map((item, i) => `
           <li>
-            <a href="#chain" class="uq-projects-link ${i === 1 ? 'uq-active' : ''}" data-index="${i}" tabindex="0">${item.title}<sup>${item.count}</sup></a>
+            <a href="${item.href}" class="uq-projects-link ${i === 0 ? 'uq-active' : ''}" data-index="${i}" tabindex="0">${item.title}<sup>${item.count}</sup></a>
           </li>`).join('')}
         </ul>
         <div class="uq-projects-visual">
           ${projectCollections.map((item, i) => `
-          <img src="${item.img}" alt="${item.alt}" loading="lazy" class="${i === 1 ? 'uq-img-visible' : 'uq-img-hidden'}" data-img="${i}" />`).join('')}
+          <img src="${item.img}" alt="${item.alt}" loading="lazy" class="${i === 0 ? 'uq-img-visible' : 'uq-img-hidden'}" data-img="${i}" />`).join('')}
         </div>
       </div>
     </div>
@@ -1818,7 +2100,7 @@ export const uniqhorTemplate = (dynamic) => {
     <div class="uq-footer-main">
       <div class="uq-footer-top">
         <div class="uq-footer-brand-col">
-          <a href="https://www.uniqohr.com/" class="uq-footer-brand">
+          <a href="https://www.uniqohr.com/" class="uq-footer-brand" target="_blank" rel="noopener noreferrer">
             ${footerLogo}
           </a>
         </div>
@@ -1827,27 +2109,27 @@ export const uniqhorTemplate = (dynamic) => {
             <div class="uq-footer-col">
               <h4>Our Story</h4>
               <ul>
-                <li><a href="https://www.uniqohr.com/pages/about">About Us</a></li>
-                <li><a href="https://www.uniqohr.com/pages/technology">Technology</a></li>
-                <li><a href="https://www.uniqohr.com/pages/journal">Journal</a></li>
+                <li><a href="https://www.uniqohr.com/pages/about" target="_blank" rel="noopener noreferrer">About Us</a></li>
+                <li><a href="https://www.uniqohr.com/pages/technology" target="_blank" rel="noopener noreferrer">Technology</a></li>
+                <li><a href="https://www.uniqohr.com/pages/journal" target="_blank" rel="noopener noreferrer">Journal</a></li>
               </ul>
             </div>
             <div class="uq-footer-col">
               <h4>Support</h4>
               <ul>
-                <li><a href="https://www.uniqohr.com/pages/faq">FAQ</a></li>
-                <li><a href="https://www.uniqohr.com/pages/contact">Contact</a></li>
-                <li><a href="https://www.uniqohr.com/pages/fit-guide">Fit Guide</a></li>
-                <li><a href="https://www.uniqohr.com/pages/garment-care">Garment Care</a></li>
+                <li><a href="https://www.uniqohr.com/pages/faq" target="_blank" rel="noopener noreferrer">FAQ</a></li>
+                <li><a href="https://www.uniqohr.com/pages/contact" target="_blank" rel="noopener noreferrer">Contact</a></li>
+                <li><a href="https://www.uniqohr.com/pages/fit-guide" target="_blank" rel="noopener noreferrer">Fit Guide</a></li>
+                <li><a href="https://www.uniqohr.com/pages/garment-care" target="_blank" rel="noopener noreferrer">Garment Care</a></li>
               </ul>
             </div>
             <div class="uq-footer-col">
               <h4>Shop</h4>
               <ul>
-                <li><a href="https://www.uniqohr.com/collections/all">Bestsellers</a></li>
-                <li><a href="https://www.uniqohr.com/collections/all">Men</a></li>
-                <li><a href="https://www.uniqohr.com/collections/all">Women</a></li>
-                <li><a href="https://www.uniqohr.com/collections/all">Accessories</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all" target="_blank" rel="noopener noreferrer">Bestsellers</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all" target="_blank" rel="noopener noreferrer">Men</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all" target="_blank" rel="noopener noreferrer">Women</a></li>
+                <li><a href="https://www.uniqohr.com/collections/all" target="_blank" rel="noopener noreferrer">Accessories</a></li>
               </ul>
             </div>
           </div>
@@ -1859,7 +2141,7 @@ export const uniqhorTemplate = (dynamic) => {
     </div>
     <div class="uq-footer-utilities">
       <div class="uq-footer-copy">
-        <span>&copy; ${new Date().getFullYear()} <a href="${uiUrl || 'https://ecostance.com'}">EcoStance</a></span>
+        <span>&copy; ${new Date().getFullYear()} ${companyLabel}</span>
       </div>
       <div class="uq-footer-policies">
         <button type="button" class="uq-footer-policy-btn" onclick="window.open('https://www.uniqohr.com/policies/privacy-policy','_blank')">Terms and Policies</button>
@@ -1901,6 +2183,11 @@ export const uniqhorTemplate = (dynamic) => {
           <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.273 2.8 10.8 7.822l4.418-5.022h1.768l-5.4 6.142 5.686 7.336h-3.132l-4.4-5.693-5.032 5.693H2.4l5.786-6.57L2.8 2.8h3.473Zm-.815 1.35H4.332l8.818 11.7h1.126L6.458 4.15Z"/></svg>
         </a>`}
       </div>
+    </div>
+    <div class="uq-footer-powered">
+      <span>Powered By</span>
+      <span class="uq-footer-powered-heart" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 14.25S1.5 10.2 1.5 5.9C1.5 3.4 3.35 1.75 5.55 1.75c1.25 0 2.2.6 2.45 1.45C8.25 2.35 9.2 1.75 10.45 1.75 12.65 1.75 14.5 3.4 14.5 5.9c0 4.3-6.5 8.35-6.5 8.35z"/></svg></span>
+      <a href="${uiUrl || 'https://ecostance.com'}" target="_blank" rel="noopener noreferrer">ECOSTANCE</a>
     </div>
   </footer>
 
@@ -2004,12 +2291,89 @@ export const uniqhorTemplate = (dynamic) => {
       });
 
       document.querySelectorAll('.uq-gallery-scroll').forEach(function(slider) {
+        var wrap = slider.closest('.uq-verified-strip-wrap');
+        var dragging = false;
+        var moved = false;
+        var startX = 0;
+        var startScroll = 0;
+        var lastX = 0;
+        var lastTime = 0;
+        var velocity = 0;
+        var momentumId = 0;
+
+        function updateScrollHint() {
+          if (!wrap) return;
+          wrap.classList.toggle(
+            'has-more',
+            slider.scrollLeft + slider.clientWidth < slider.scrollWidth - 2
+          );
+        }
+
+        function stopMomentum() {
+          if (momentumId) cancelAnimationFrame(momentumId);
+          momentumId = 0;
+        }
+
+        function glide() {
+          if (Math.abs(velocity) < 0.15) {
+            momentumId = 0;
+            return;
+          }
+          slider.scrollLeft -= velocity;
+          velocity *= 0.92;
+          momentumId = requestAnimationFrame(glide);
+        }
+
         slider.addEventListener('wheel', function(e) {
           if (!e.shiftKey) return;
           if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
           e.preventDefault();
+          stopMomentum();
           slider.scrollLeft += e.deltaY;
         }, { passive: false });
+
+        slider.addEventListener('mousedown', function(e) {
+          if (e.button !== 0) return;
+          stopMomentum();
+          dragging = true;
+          moved = false;
+          startX = lastX = e.clientX;
+          startScroll = slider.scrollLeft;
+          lastTime = performance.now();
+          velocity = 0;
+        });
+
+        window.addEventListener('mousemove', function(e) {
+          if (!dragging) return;
+          var now = performance.now();
+          var dx = e.clientX - startX;
+          if (Math.abs(dx) > 4) {
+            moved = true;
+            slider.classList.add('is-dragging');
+          }
+          var dt = now - lastTime || 16;
+          velocity = (e.clientX - lastX) / dt * 16;
+          lastX = e.clientX;
+          lastTime = now;
+          if (moved) slider.scrollLeft = startScroll - dx;
+        });
+
+        window.addEventListener('mouseup', function() {
+          if (!dragging) return;
+          dragging = false;
+          slider.classList.remove('is-dragging');
+          if (moved && Math.abs(velocity) > 0.5) glide();
+        });
+
+        slider.addEventListener('click', function(e) {
+          if (!moved) return;
+          e.preventDefault();
+          e.stopPropagation();
+        }, true);
+
+        slider.addEventListener('scroll', updateScrollHint, { passive: true });
+        window.addEventListener('resize', updateScrollHint);
+        updateScrollHint();
       });
   </script>
 </body>

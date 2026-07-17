@@ -1635,7 +1635,12 @@ const CheckoutForm = ({
       return setShouldShowCarbonOffsetModel(true);
     }
 
-    // Check if this is a dynamic pricing guest checkout flow
+    // Check if this is a dynamic pricing guest checkout flow.
+    // NOTE: intentionally guest-only. For guests the Stripe webhook is the sole
+    // creator of the order/module purchase (see checkout success page), so it
+    // must receive isDynamicPricing/linkId/productIds. Logged-in buyers create
+    // their order via the success page instead, so broadening this flag to them
+    // would double-provision their modules.
     const isDynamicPricingGuestFlow =
       router.query.dynamicPricing === "true" &&
       router.query.linkId &&

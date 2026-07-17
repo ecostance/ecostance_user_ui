@@ -141,6 +141,26 @@ dist
 # QA report
 QA_REPORT.md
 
+# Local AI / editor tooling (skills, agents, opencode)
+.cursor/
+.agents/
+.commandcode/
+.opencode/
+opencode.json
+skills-lock.json
+
+# OmniRoute (local data, tooling, generated)
+.omniroute/
+.omnivscodeagent/
+omnirouteCloud/
+omnirouteSite/
+**/omniroute*
+**/*omniroute*
+
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Local utility scripts
+scripts/clean-chain-thumb.py
+
