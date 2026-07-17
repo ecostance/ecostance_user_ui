@@ -55,7 +55,13 @@ export async function getServerSideProps(context) {
 
     res?.data?.data?.userCertificates?.forEach((each) => {
       each.certificateNumber = each?.originNumber
-      each.quantity = each?.order?.products[0]?.quantity || 1
+      // Match this cert's line item — products[0] makes every cert show the first item's qty
+      const matched = each?.order?.products?.find(
+        (product) =>
+          (product?.certificate?.originNumber || product?.certificateNumber) ===
+          each?.originNumber
+      )
+      each.quantity = matched?.quantity || 1
       if (!uniqueProjectNameCheck[each?.product?.name]) {
         uniqueProjectNames.push(each?.product?.name)
         uniqueProjectNameCheck[each?.product?.name] = true
