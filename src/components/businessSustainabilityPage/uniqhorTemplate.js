@@ -51,7 +51,7 @@
       title: 'Projects Supported',
       count: Number(dynamic?.totalProjects) || 0,
       img: img('pillar-projects-supported.jpg'),
-      alt: 'Ecostance certified projects: Nitrous Gas Removal, Piedra Wind Farm, Solar Cooker CORSIA, KARIBA REDD+',
+      alt: 'Ecostance certified projects: Nitrous Gas Removal, Piedra Wind Farm, VALPARAISO REDD+, KARIBA REDD+',
       href: '#chain',
     },
 
@@ -1940,13 +1940,10 @@
     <div class="uq-about-inner">
       <div class="uq-about-grid">
         <div class="uq-about-copy">
-          <h2 class="uq-about-title">Built from the Ground Up</h2>
+          <h2 class="uq-about-title">Our Commitment to Sustainable Performance</h2>
           <div class="uq-about-text">
             ${dynamic?.aboutUs && dynamic.aboutUs !== '' ? `<p>${dynamic.aboutUs}</p>` : `
-            <p>For more than 30 years, the Ecostance team has worked at the source of environmental accounting — developing carbon measurement frameworks, building transparent supply chains, and helping establish the standards that now define responsible offsetting.</p>
-            <p>Long before net zero became a category, we were exploring how natural sequestration and engineered removal could work together to deliver verifiable climate outcomes. The concept was proven. The industry wasn't ready.</p>
-            <p class="uq-about-highlight">Today, it is.</p>
-            <p>Ecostance brings together decades of measurement, verification and retirement expertise to create a new generation of carbon accounting. Every credit is tracked from source project to retired certificate, guided by a simple belief: <strong>Impact is proven, not claimed.</strong></p>
+            <p>At Uniqohr, we believe athletes deserve apparel that performs at the highest level while respecting the planet. Our ethos is rooted in sustainability, responsibility, and innovation. Every garment we create begins with certified wool fibers sourced from trusted suppliers who share our values of ethical farming and environmental stewardship. We carefully manage our supply chain to ensure that raw materials meet rigorous sustainability standards, from animal welfare to land management practices. Beyond sourcing, we actively support global sustainability projects and invest in carbon offsets to balance our footprint, ensuring that every step we take contributes to a healthier planet. For us, sustainability is not a marketing claim—it is a practice embedded in our DNA. By combining natural performance fibers with responsible production, we empower athletes to perform with confidence, knowing their gear is aligned with values of integrity, durability, and respect for the environment.</p>
             `}
             <a href="#technology" class="uq-about-link">Learn About the technology</a>
           </div>
@@ -1963,16 +1960,14 @@
     <div class="uq-verified-inner">
       <div class="uq-verified-top">
         <div class="uq-verified-intro">
-          <h2 class="uq-verified-title">Digital Product<br/>Passports</h2>
+          <h2 class="uq-verified-title">Quality, Transparency, and Digital Product Passports</h2>
           <p class="uq-verified-sub">Transparency built into every product.</p>
         </div>
         <div class="uq-verified-body">
           ${dynamic?.description && dynamic.description !== '' && dynamic.description !== 'undefined'
             ? `<p>${dynamic.description}</p>`
             : `
-          <p>Verified product data begins long before a garment is sold. It starts at the source.</p>
-          <p>Every published passport brings together material specifications, environmental reporting, and supply chain records in one place — creating a transparent record that can be independently verified, not simply claimed. Scan the QR code on any product below to open its full digital passport.</p>
-          <p>We believe accountability matters more than marketing. That's why we document progress openly, continue working toward higher-integrity product data, and avoid making claims that cannot be verified. Because trust should be earned through evidence.</p>
+          <p>Maintaining quality across a global supply chain requires more than just rigorous standards—it demands transparency and accountability. At Uniqohr, we embrace traceability as a cornerstone of our operations, ensuring that every stage of production, from wool farms to finished garments, is documented and verifiable. To achieve this, we implement Digital Product Passports (DPPs), which provide athletes and consumers with clear, accessible information about the journey of their apparel. These passports detail the origin of fibers, certifications, carbon offset contributions, and sustainability practices embedded in each product. By integrating DPPs, we not only uphold quality but also empower our customers with knowledge, reinforcing trust in our brand. Transparency is more than compliance—it is our way of building a lasting relationship with athletes who demand performance and responsibility in equal measure. With traceability woven into every garment, Uniqohr ensures that sustainability and quality are not abstract promises but tangible realities you can see, verify, and wear with pride.</p>
           `}
           <a href="#dpp-passports" class="uq-verified-cta">Access the passports</a>
         </div>
