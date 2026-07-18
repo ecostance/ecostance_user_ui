@@ -72,8 +72,8 @@ const BusinessSustainability = ({
 }) => {
     const validationItemOnLength = {
         title: { min: 10, max: 50 },
-        description: { min: 10, max: 1000 },
-        aboutUs: { min: 10, max: 1000 },
+        description: { min: 10, max: 1500 },
+        aboutUs: { min: 10, max: 1500 },
         name: { min: 3, max: 100 },
     };
     const slugRegex = /^[A-Za-z0-9]*$/;
@@ -1926,7 +1926,7 @@ const BusinessSustainability = ({
                                                 <div className="sustainability--page-input-wrapper">
                                                     <textarea
                                                         onKeyDown={handleKeyDown}
-                                                        maxLength={1000}
+                                                        maxLength={1500}
                                                         style={{ resize: "none" }}
                                                         onChange={(e) => setDescription(e.target.value)}
                                                         value={description}
@@ -1948,9 +1948,9 @@ const BusinessSustainability = ({
                                                                 })}
                                                         </div>
                                                         <p
-                                                            className={`counter-text--sustainability ${description.length >= 1000 && `char-disallow`
+                                                            className={`counter-text--sustainability ${description.length >= 1500 && `char-disallow`
                                                                 }`}
-                                                        >{`${description.length}/ 1000`}</p>
+                                                        >{`${description.length}/ 1500`}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1964,7 +1964,7 @@ const BusinessSustainability = ({
                                             <div className="sustainability--page--error--textarea--wrapper">
                                                 <div className="sustainability--page-input-wrapper">
                                                     <textarea
-                                                        maxLength={1000}
+                                                        maxLength={1500}
                                                         disabled={editDisabled}
                                                         onKeyDown={handleKeyDown}
                                                         style={{ resize: "none" }}
@@ -1988,9 +1988,9 @@ const BusinessSustainability = ({
                                                                 })}
                                                         </div>
                                                         <p
-                                                            className={`counter-text--sustainability ${aboutUs.length >= 1000 && `char-disallow`
+                                                            className={`counter-text--sustainability ${aboutUs.length >= 1500 && `char-disallow`
                                                                 }`}
-                                                        >{`${aboutUs.length}/ 1000`}</p>
+                                                        >{`${aboutUs.length}/ 1500`}</p>
                                                     </div>
                                                 </div>
                                             </div>
