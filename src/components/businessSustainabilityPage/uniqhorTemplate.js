@@ -43,8 +43,8 @@
     {
       title: 'Registry Certificates',
       count: certCount,
-      img: img('pillar-registry-certificate.jpg'),
-      alt: 'Ecostance sustainability certificate presented to uniqohr Ottawa Canada',
+      img: img('pillar-registry-certificate-natural.jpg'),
+      alt: 'Ecostance sustainability certificate presented to Uniqohr Ottawa Canada',
       href: '#chain',
     },
     {
@@ -1357,6 +1357,13 @@
       transition: opacity 0.5s;
     }
 
+    /* Landscape certificate — keep natural proportions (no stretch/crop of seals) */
+    .uq-projects-visual img[data-img="2"] {
+      object-fit: contain;
+      object-position: center;
+      background: #fff;
+    }
+
     .uq-projects-visual img.uq-img-hidden { opacity: 0; z-index: 0; }
     .uq-projects-visual img.uq-img-visible { opacity: 1; z-index: 1; }
 
@@ -2002,8 +2009,8 @@
   <!-- Founder Quote -->
   <section class="uq-quote">
     <div class="uq-quote-inner">
-      <p class="uq-quote-text">&ldquo;Being early in systemic change can be indistinguishable from being wrong — but timing does not invalidate principle.&rdquo;</p>
-      <p class="uq-quote-author">Elena Marsh, Founder</p>
+      <p class="uq-quote-text">&ldquo;Sustainability is not a claim; it&rsquo;s a discipline — the same discipline that drives performance. When you commit to doing what&rsquo;s harder and better, you move faster toward a future that rewards precision, responsibility, and progress.&rdquo;</p>
+      <p class="uq-quote-author">Stuart Adams, Founder, Uniqohr</p>
     </div>
     <img src="${img('eco-meadow.jpg')}" alt="Flock of sheep grazing in a green mountain valley" loading="lazy" class="uq-quote-banner" />
   </section>
