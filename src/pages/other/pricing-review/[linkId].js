@@ -186,7 +186,7 @@ const PricingReview = () => {
 
       // Navigate to checkout page with module order parameters
       // Address will be collected on checkout page
-      const checkoutUrl = `/other/checkout?moduleOrder=true&express=true&dynamicPricing=true&linkId=${linkId}`;
+      const checkoutUrl = `/other/pricing/checkout?moduleOrder=true&express=true&dynamicPricing=true&linkId=${linkId}`;
       router.push(checkoutUrl);
 
     } catch (error) {
