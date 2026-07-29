@@ -2039,11 +2039,17 @@ const BusinessProduct = ({
             const scaledWidth = croppedWidth * scaleFactor;
             const scaledHeight = croppedHeight * scaleFactor;
 
-            // Define margins around the cropped QR code (increased left/right padding for 5px text-to-QR gap)
-            const leftPadding = 40 * scaleFactor;
-            const rightPadding = 40 * scaleFactor;
-            const topPadding = 40 * scaleFactor; // Space above top label
-            const bottomPadding = 35 * scaleFactor;
+            const fontFamily = "Work Sans, Arial, sans-serif";
+            const fontSize = 26 * scaleFactor; // +1pt vs prior 25 for clearer package print
+            const borderOffset = 3 * scaleFactor;
+            // Equal gap (a) text↔inner border and (b) text↔outer edge; bumped from prior ~5–8
+            const labelGap = 12 * scaleFactor;
+            const labelBand = fontSize + (2 * labelGap);
+
+            const leftPadding = labelBand;
+            const rightPadding = labelBand;
+            const topPadding = labelBand;
+            const bottomPadding = labelBand;
 
             combinedCanvas.width = scaledWidth + leftPadding + rightPadding;
             combinedCanvas.height = scaledHeight + topPadding + bottomPadding;
@@ -2085,47 +2091,65 @@ const BusinessProduct = ({
                 };
             });
 
-            const fontFamily = "Work Sans, Arial, sans-serif";
-            const fontSize = 25 * scaleFactor; // Optimized font size for better legibility on small product packages
-
-            // Draw a black border around the QR code, leaving a 3px margin so it does not touch the finder patterns
+            // Inner border around the QR; outer edge of the canvas is the perimeter (equal a/b gaps)
             ctx.strokeStyle = "#000000";
             ctx.lineWidth = 2 * scaleFactor;
-            ctx.strokeRect(leftPadding - (3 * scaleFactor), topPadding - (3 * scaleFactor), scaledWidth + (6 * scaleFactor), scaledHeight + (6 * scaleFactor));
+            ctx.strokeRect(
+                leftPadding - borderOffset,
+                topPadding - borderOffset,
+                scaledWidth + (2 * borderOffset),
+                scaledHeight + (2 * borderOffset)
+            );
 
-            // 1. Draw "Access DPP" centered above the QR code (same alignment as product name below)
+            const qrCenterX = leftPadding + scaledWidth / 2;
+            const qrCenterY = topPadding + scaledHeight / 2;
+            // Midpoint of the label channel so gap (a) to inner border equals gap (b) to outer edge
+            const topLabelY = (topPadding - borderOffset) / 2;
+            const bottomLabelY = topPadding + scaledHeight + borderOffset + (bottomPadding - borderOffset) / 2;
+            const leftLabelX = (leftPadding - borderOffset) / 2;
+            const rightLabelX = leftPadding + scaledWidth + borderOffset + (rightPadding - borderOffset) / 2;
+
+            // 1. Full DPP name centered above; shrink only if needed to stay within the square width
+            const topLabel = "Access Digital Product Passport (DPP)";
+            const maxTopWidth = scaledWidth + (2 * borderOffset);
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
+            let topFontSize = fontSize;
+            const topWidth = ctx.measureText(topLabel).width;
+            if (topWidth > maxTopWidth) {
+                topFontSize = Math.floor(fontSize * (maxTopWidth / topWidth));
+                ctx.font = `normal ${topFontSize}px ${fontFamily}`;
+            }
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
-            ctx.textBaseline = "bottom";
-            ctx.fillText("Access DPP", leftPadding + (scaledWidth / 2), topPadding - (8 * scaleFactor));
+            ctx.textBaseline = "middle";
+            ctx.fillText(topLabel, qrCenterX, topLabelY);
 
-            // 2. Draw "Access GHG Data" vertically on the left, centered like the business name on the right
+            // 2. "Access GHG Data" vertically on the left, centered in the side channel
             ctx.save();
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.translate(leftPadding - (21 * scaleFactor), topPadding + (scaledHeight / 2));
+            ctx.translate(leftLabelX, qrCenterY);
             ctx.rotate(-Math.PI / 2);
             ctx.fillText("Access GHG Data", 0, 0);
             ctx.restore();
 
-            // 3. Draw the product name at the bottom of the QR code (centered, 5px below bottom border)
+            // 3. Product name centered below, same equal a/b gaps as top
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
-            ctx.textBaseline = "top";
-            ctx.fillText(productName, leftPadding + (scaledWidth / 2), topPadding + scaledHeight + (8 * scaleFactor));
+            ctx.textBaseline = "middle";
+            ctx.fillText(productName, qrCenterX, bottomLabelY);
 
-            // 4. Draw the business name vertically on the right side of the border (with a 5px gap)
+            // 4. Business name vertically on the right, centered in the side channel
             const businessNameText = profileRelatedData?.name || (typeof window !== "undefined" && JSON.parse(localStorage.getItem("MyBusinessDetails") || "{}")?.name) || "EcoStance";
             ctx.save();
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.translate(leftPadding + scaledWidth + (21 * scaleFactor), topPadding + (scaledHeight / 2));
+            ctx.translate(rightLabelX, qrCenterY);
             ctx.rotate(-Math.PI / 2);
             ctx.fillText(businessNameText, 0, 0);
             ctx.restore();
