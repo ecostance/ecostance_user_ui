@@ -2042,7 +2042,7 @@ const BusinessProduct = ({
             // Define margins around the cropped QR code (increased left/right padding for 5px text-to-QR gap)
             const leftPadding = 40 * scaleFactor;
             const rightPadding = 40 * scaleFactor;
-            const topPadding = 40 * scaleFactor; // Increased top padding to add space above Traceable
+            const topPadding = 40 * scaleFactor; // Space above top label
             const bottomPadding = 35 * scaleFactor;
 
             combinedCanvas.width = scaledWidth + leftPadding + rightPadding;
@@ -2093,22 +2093,22 @@ const BusinessProduct = ({
             ctx.lineWidth = 2 * scaleFactor;
             ctx.strokeRect(leftPadding - (3 * scaleFactor), topPadding - (3 * scaleFactor), scaledWidth + (6 * scaleFactor), scaledHeight + (6 * scaleFactor));
 
-            // 1. Draw "Traceable" at the top-left edge of the QR code (aligned with left border and 5px above top border)
+            // 1. Draw "Access DPP" centered above the QR code (same alignment as product name below)
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
-            ctx.textAlign = "left";
+            ctx.textAlign = "center";
             ctx.textBaseline = "bottom";
-            ctx.fillText("Traceable", leftPadding - (3 * scaleFactor), topPadding - (8 * scaleFactor));
+            ctx.fillText("Access DPP", leftPadding + (scaledWidth / 2), topPadding - (8 * scaleFactor));
 
-            // 2. Draw "100%" vertically on the left side of the border (with a 5px gap)
+            // 2. Draw "Access GHG Data" vertically on the left, centered like the business name on the right
             ctx.save();
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.translate(leftPadding - (21 * scaleFactor), topPadding + (scaledHeight * 0.12));
+            ctx.translate(leftPadding - (21 * scaleFactor), topPadding + (scaledHeight / 2));
             ctx.rotate(-Math.PI / 2);
-            ctx.fillText("100%", 0, 0);
+            ctx.fillText("Access GHG Data", 0, 0);
             ctx.restore();
 
             // 3. Draw the product name at the bottom of the QR code (centered, 5px below bottom border)

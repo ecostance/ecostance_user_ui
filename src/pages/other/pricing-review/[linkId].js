@@ -302,7 +302,7 @@ const PricingReview = () => {
     };
   };
 
-  const downloadQuote = () => {
+  const downloadQuote = async () => {
     const totals = calculateTotals();
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -314,8 +314,19 @@ const PricingReview = () => {
     // Helper function to format currency
     const formatCurrency = (amount) => `$${(amount || 0).toFixed(2)}`;
 
+    // Helper function to load logo image
+    const loadImage = (src) => new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = src;
+    });
+
+    const logoImg = await loadImage("/assets/images/logo.png") || await loadImage("/assets/images/ecostance-qr-logo.png");
+
     // Helper function to add a horizontal line
-    const addLine = (y, color = [200, 200, 200], width = 0.5) => {
+    const addLine = (y, color = [220, 220, 220], width = 0.4) => {
       doc.setDrawColor(...color);
       doc.setLineWidth(width);
       doc.line(margin, y, pageWidth - margin, y);
@@ -323,160 +334,211 @@ const PricingReview = () => {
 
     // Helper function to check if we need a new page
     const checkNewPage = (neededSpace) => {
-      if (yPos + neededSpace > pageHeight - 30) {
+      if (yPos + neededSpace > pageHeight - 25) {
         doc.addPage();
-        yPos = margin;
+        yPos = 20;
         return true;
       }
       return false;
     };
 
-    // ===== PAGE 1: HEADER =====
-    doc.setFillColor(51, 51, 51);
-    doc.rect(0, 0, pageWidth, 40, "F");
+    // ===== HEADER SECTION (INVOICE STYLE) =====
+    // Top Left: Logo & Company Address
+    if (logoImg) {
+      try {
+        const imgW = logoImg.naturalWidth || logoImg.width || 100;
+        const imgH = logoImg.naturalHeight || logoImg.height || 100;
+        const aspect = imgW / imgH;
+        const maxH = 20;
+        const maxW = 24;
+        let logoH = maxH;
+        let logoW = logoH * aspect;
+        if (logoW > maxW) {
+          logoW = maxW;
+          logoH = logoW / aspect;
+        }
+        doc.addImage(logoImg, "PNG", margin, 8, logoW, logoH);
+      } catch (e) {
+        doc.setTextColor(46, 125, 50);
+        doc.setFontSize(16);
+        doc.setFont("helvetica", "bold");
+        doc.text("ECOSTANCE", margin, 20);
+      }
+    } else {
+      doc.setTextColor(46, 125, 50);
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text("ECOSTANCE", margin, 20);
+    }
+
+    doc.setTextColor(45, 51, 57);
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    doc.text("ECOSTANCE LLC", margin, 34);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(85, 85, 85);
+    doc.text("Attn: EcoStance Accounting", margin, 39);
+    doc.text("4737 N Ocean Dr. Suite 270,", margin, 44);
+    doc.text("Ft. Lauderdale, Florida, 33308, United States", margin, 49);
+    doc.text("Contact: service@ecostance.com", margin, 54);
+
+    // Top Right: Dark Title Banner & Prepared For
+    const bannerStartX = 115;
+    const bannerWidth = pageWidth - bannerStartX;
+    const bannerY = 14;
+    const bannerHeight = 16;
+
+    // Dark Title Banner (flush to right edge of paper)
+    doc.setFillColor(45, 51, 57);
+    doc.rect(bannerStartX, bannerY, bannerWidth, bannerHeight, "F");
 
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(28);
+    doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
-    doc.text("ECOSTANCE", margin, 22);
+    doc.text("Sales Quote", bannerStartX + 10, bannerY + 11);
 
-    doc.setFontSize(11);
+    // Prepared For / Sold To Block
+    const preparedForX = 120;
+    doc.setTextColor(45, 51, 57);
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    doc.text("Prepared For", preparedForX, 36);
+
     doc.setFont("helvetica", "normal");
-    doc.text("CUSTOM PRICING PROPOSAL", margin, 32);
-
-    // Quote reference on the right
-    doc.setFontSize(9);
-    doc.text(`Quote #: ${linkId?.substring(0, 25) || 'N/A'}`, pageWidth - margin, 18, { align: "right" });
-    doc.text(`Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`, pageWidth - margin, 26, { align: "right" });
-    if (linkExpiresAt) {
-      doc.text(`Valid Until: ${new Date(linkExpiresAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}`, pageWidth - margin, 34, { align: "right" });
-    }
-
-    yPos = 55;
-
-    // ===== CLIENT & QUOTE INFORMATION =====
-    doc.setFillColor(248, 248, 248);
-    doc.rect(margin, yPos, contentWidth, 45, "F");
-    doc.setDrawColor(220, 220, 220);
-    doc.rect(margin, yPos, contentWidth, 45, "S");
-
-    // Left side - Client Info
-    doc.setTextColor(100, 100, 100);
     doc.setFontSize(8);
-    doc.setFont("helvetica", "bold");
-    doc.text("PREPARED FOR", margin + 8, yPos + 10);
+    doc.setTextColor(60, 60, 60);
+    const rawName = pricingData?.userInfo?.name || 'Valued Client';
+    const displayName = rawName.length > 28 ? rawName.substring(0, 26) + '...' : rawName;
+    doc.text(displayName, preparedForX, 41);
 
-    doc.setTextColor(51, 51, 51);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text(pricingData.userInfo.name || 'N/A', margin + 8, yPos + 20);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(80, 80, 80);
-    doc.text(pricingData.userInfo.email || '', margin + 8, yPos + 28);
-    if (pricingData.userInfo.companyName) {
-      doc.text(pricingData.userInfo.companyName, margin + 8, yPos + 36);
+    let clientY = 46;
+    if (pricingData?.userInfo?.companyName) {
+      doc.text(pricingData.userInfo.companyName, preparedForX, clientY);
+      clientY += 5;
     }
-    if (pricingData.userInfo.role) {
+    doc.text(`Contact: ${pricingData?.userInfo?.email || 'N/A'}`, preparedForX, clientY);
+    clientY += 5;
+    if (pricingData?.userInfo?.role) {
       const roleLabel = pricingData.userInfo.role === "owner_partner" ? "Owner/Partner" : "Employee/Admin";
-      doc.text(`Role: ${roleLabel}`, margin + 8, yPos + (pricingData.userInfo.companyName ? 44 : 36));
+      doc.text(`Role: ${roleLabel}`, preparedForX, clientY);
     }
 
-    // Right side - Quote Summary Box
-    const summaryBoxX = pageWidth / 2 + 10;
-    doc.setFillColor(51, 51, 51);
-    doc.rect(summaryBoxX, yPos + 5, contentWidth / 2 - 15, 35, "F");
+    // ===== METADATA BAR =====
+    yPos = 65;
+    addLine(yPos, [220, 220, 220], 0.5);
+    yPos += 5;
 
-    doc.setTextColor(180, 180, 180);
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "bold");
-    doc.text("AMOUNT DUE TODAY", summaryBoxX + 8, yPos + 15);
-
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
-    doc.setFont("helvetica", "bold");
-    doc.text(formatCurrency(totals.payToday), summaryBoxX + 8, yPos + 30);
-
-    doc.setFontSize(9);
+    doc.setFontSize(7.5);
+    doc.setTextColor(85, 85, 85);
     doc.setFont("helvetica", "normal");
-    doc.text("USD", summaryBoxX + doc.getTextWidth(formatCurrency(totals.payToday)) + 12, yPos + 30);
 
-    yPos += 55;
+    // Left Column Metadata
+    doc.text(`Quote #: `, margin, yPos);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(45, 51, 57);
+    doc.text(`${linkId?.substring(0, 28) || 'N/A'}`, margin + 14, yPos);
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(85, 85, 85);
+    doc.text(`Email ID: `, margin, yPos + 5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(45, 51, 57);
+    doc.text(`${pricingData?.userInfo?.email || 'N/A'}`, margin + 14, yPos + 5);
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(85, 85, 85);
+    doc.text(`Status: `, margin, yPos + 10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(46, 125, 50);
+    doc.text(`${linkStatus ? linkStatus.toUpperCase() : 'ACTIVE'}`, margin + 14, yPos + 10);
+
+    // Right Column Metadata
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(85, 85, 85);
+    doc.text(`Date & Time: `, preparedForX, yPos);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(45, 51, 57);
+    doc.text(`${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}`, preparedForX + 20, yPos);
+
+    if (linkExpiresAt) {
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(85, 85, 85);
+      doc.text(`Valid Until: `, preparedForX, yPos + 5);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(45, 51, 57);
+      doc.text(`${new Date(linkExpiresAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}`, preparedForX + 20, yPos + 5);
+    }
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(85, 85, 85);
+    doc.text(`Payment Plan: `, preparedForX, yPos + 10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(45, 51, 57);
+    doc.text(`${totals.isFullPlan ? 'Full Payment' : '12-Month Plan'}`, preparedForX + 20, yPos + 10);
+
+    yPos += 18;
 
     // ===== SELECTED PAYMENT PLAN =====
-    doc.setTextColor(51, 51, 51);
-    doc.setFontSize(12);
+    doc.setTextColor(45, 51, 57);
+    doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
     doc.text("SELECTED PAYMENT PLAN", margin, yPos);
-    yPos += 8;
+    yPos += 5;
 
-    const planBoxColor = totals.isFullPlan ? [232, 245, 233] : [227, 242, 253];
-    const planBorderColor = totals.isFullPlan ? [200, 230, 201] : [187, 222, 251];
+    const planBoxColor = totals.isFullPlan ? [240, 249, 241] : [240, 247, 255];
+    const planBorderColor = totals.isFullPlan ? [46, 125, 50] : [21, 101, 192];
     doc.setFillColor(...planBoxColor);
     doc.setDrawColor(...planBorderColor);
-    doc.rect(margin, yPos, contentWidth, 25, "FD");
+    doc.setLineWidth(0.5);
+    doc.rect(margin, yPos, contentWidth, 20, "FD");
 
-    doc.setTextColor(51, 51, 51);
-    doc.setFontSize(11);
+    doc.setTextColor(45, 51, 57);
+    doc.setFontSize(9.5);
     doc.setFont("helvetica", "bold");
-    doc.text(totals.isFullPlan ? "Full Payment" : "12-Month Payment Plan", margin + 8, yPos + 10);
+    doc.text(totals.isFullPlan ? "Full Payment" : "12-Month Payment Plan", margin + 8, yPos + 8);
 
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(80, 80, 80);
     doc.text(
       totals.isFullPlan
         ? "Pay everything upfront including 12 months of recurring costs."
         : "Pay setup costs + 1st month today, then monthly recurring for 11 months.",
-      margin + 8, yPos + 18
+      margin + 8, yPos + 14
     );
 
-    yPos += 35;
+    yPos += 27;
 
-    // ===== MODULE DETAILS TABLE =====
-    doc.setTextColor(51, 51, 51);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("MODULE DETAILS", margin, yPos);
-    yPos += 8;
+    // ===== MODULE DETAILS TABLE (INVOICE GRID STYLE) =====
+    const drawTableHeader = (y) => {
+      doc.setFillColor(45, 51, 57);
+      doc.rect(margin, y, contentWidth, 9, "F");
 
-    // Table header
-    doc.setFillColor(51, 51, 51);
-    doc.rect(margin, yPos, contentWidth, 12, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(7.5);
+      doc.setFont("helvetica", "bold");
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "bold");
-
-    const cols = {
-      module: margin + 5,
-      setup: margin + 55,
-      maint: margin + 85,
-      perUser: margin + 115,
-      units: margin + 145,
-      addl: margin + 162,
-      subtotal: pageWidth - margin - 5
+      doc.text("Num", margin + 4, y + 6);
+      doc.text("Module Name", margin + 18, y + 6);
+      doc.text("Setup Fee", margin + 72, y + 6);
+      doc.text("Maint./Mo", margin + 96, y + 6);
+      doc.text("Per User/Mo", margin + 120, y + 6);
+      doc.text("Units", margin + 144, y + 6);
+      doc.text("Add'l", margin + 158, y + 6);
+      doc.text("Subtotal", pageWidth - margin - 4, y + 6, { align: "right" });
     };
 
-    doc.text("MODULE", cols.module, yPos + 8);
-    doc.text("SETUP FEE", cols.setup, yPos + 8);
-    doc.text("MAINT./MO", cols.maint, yPos + 8);
-    doc.text("PER USER/MO", cols.perUser, yPos + 8);
-    doc.text("UNITS", cols.units, yPos + 8);
-    doc.text("ADD'L", cols.addl, yPos + 8);
-    doc.text("SUBTOTAL", cols.subtotal, yPos + 8, { align: "right" });
-
-    yPos += 14;
+    drawTableHeader(yPos);
+    yPos += 9;
 
     // Table rows
-    doc.setTextColor(51, 51, 51);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
+    const tableStartX = margin;
+    const tableWidth = contentWidth;
+    const colXs = [margin + 14, margin + 68, margin + 92, margin + 116, margin + 140, margin + 154];
 
-    let moduleData = [];
-
-    pricingData.modules.forEach((module, index) => {
+    (pricingData?.modules || []).forEach((module, index) => {
       const additionalUsers = quantities[module.id] || 0;
       const pricing = pricingData.customPrices?.[module.id] || module.customPricing || {};
       const baseUnits = pricing.units || pricingData.minUnits || 5;
@@ -486,173 +548,190 @@ const PricingReview = () => {
       const additionalUsersCost = costPerUser * additionalUsers;
       const rowTotal = modulePrice + maintenancePrice + additionalUsersCost;
 
-      // Alternate row colors
-      if (index % 2 === 0) {
-        doc.setFillColor(250, 250, 250);
-        doc.rect(margin, yPos - 3, contentWidth, 14, "F");
+      if (checkNewPage(12)) {
+        drawTableHeader(yPos);
+        yPos += 9;
       }
 
-      // Module name
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(51, 51, 51);
-      const moduleName = module.name.length > 18 ? module.name.substring(0, 16) + "..." : module.name;
-      doc.text(moduleName, cols.module, yPos + 5);
+      const rowHeight = 9;
+
+      // Row background
+      if (index % 2 === 0) {
+        doc.setFillColor(252, 252, 252);
+        doc.rect(tableStartX, yPos, tableWidth, rowHeight, "F");
+      }
+
+      // Outer row border
+      doc.setDrawColor(229, 229, 229);
+      doc.setLineWidth(0.3);
+      doc.rect(tableStartX, yPos, tableWidth, rowHeight, "S");
+
+      // Column vertical divider lines
+      colXs.forEach((colX) => {
+        doc.line(colX, yPos, colX, yPos + rowHeight);
+      });
 
       // Values
+      doc.setFontSize(8);
+      doc.setTextColor(45, 51, 57);
+
+      // Num
+      doc.setFont("helvetica", "bold");
+      doc.text(String(index + 1), margin + 6, yPos + 6);
+
+      // Module Name
+      doc.text(module.name.length > 24 ? module.name.substring(0, 22) + "..." : module.name, margin + 18, yPos + 6);
+
+      // Prices
       doc.setFont("helvetica", "normal");
       doc.setTextColor(80, 80, 80);
-      doc.text(formatCurrency(modulePrice), cols.setup, yPos + 5);
-      doc.text(formatCurrency(maintenancePrice), cols.maint, yPos + 5);
-      doc.text(formatCurrency(costPerUser), cols.perUser, yPos + 5);
-      doc.text(String(baseUnits), cols.units, yPos + 5);
-      doc.text(additionalUsers > 0 ? String(additionalUsers) : "-", cols.addl, yPos + 5);
+      doc.text(formatCurrency(modulePrice), margin + 72, yPos + 6);
+      doc.text(formatCurrency(maintenancePrice), margin + 96, yPos + 6);
+      doc.text(formatCurrency(costPerUser), margin + 120, yPos + 6);
+      doc.text(String(baseUnits), margin + 144, yPos + 6);
+      doc.text(additionalUsers > 0 ? String(additionalUsers) : "-", margin + 158, yPos + 6);
 
       // Subtotal
       doc.setFont("helvetica", "bold");
-      doc.setTextColor(51, 51, 51);
-      doc.text(formatCurrency(rowTotal), cols.subtotal, yPos + 5, { align: "right" });
+      doc.setTextColor(45, 51, 57);
+      doc.text(formatCurrency(rowTotal), pageWidth - margin - 4, yPos + 6, { align: "right" });
 
-      moduleData.push({
-        name: module.name,
-        setupFee: modulePrice,
-        maintenance: maintenancePrice,
-        costPerUser: costPerUser,
-        units: baseUnits,
-        additionalUsers: additionalUsers,
-        subtotal: rowTotal
-      });
-
-      yPos += 14;
+      yPos += rowHeight;
     });
 
-    // Table bottom border
-    addLine(yPos - 2, [51, 51, 51], 1);
+    yPos += 8;
 
-    yPos += 10;
+    // ===== PRICING BREAKDOWN SECTION =====
+    checkNewPage(75);
 
-    // ===== PRICING BREAKDOWN =====
-    checkNewPage(120);
-
-    doc.setTextColor(51, 51, 51);
-    doc.setFontSize(12);
+    doc.setTextColor(45, 51, 57);
+    doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
     doc.text("PRICING BREAKDOWN", margin, yPos);
-    yPos += 10;
+    yPos += 7;
 
     const breakdownX = margin + 5;
     const breakdownValueX = pageWidth - margin - 5;
 
-    // One-Time Costs Section
-    doc.setFillColor(248, 248, 248);
-    doc.rect(margin, yPos, contentWidth, 8, "F");
+    // --- One-Time Costs ---
+    doc.setFillColor(245, 245, 245);
+    doc.rect(margin, yPos, contentWidth, 7, "F");
     doc.setTextColor(100, 100, 100);
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setFont("helvetica", "bold");
-    doc.text("ONE-TIME COSTS", breakdownX, yPos + 5.5);
-    yPos += 12;
+    doc.text("ONE-TIME COSTS", breakdownX, yPos + 5);
+    yPos += 11;
 
     doc.setTextColor(80, 80, 80);
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
 
     // Module Setup Fees
     doc.text(`Module Setup Fees (${pricingData.modules.length} modules)`, breakdownX, yPos);
     doc.text(formatCurrency(totals.totalModulePrice), breakdownValueX, yPos, { align: "right" });
-    yPos += 7;
+    yPos += 6;
 
     // One-Time Fee
     if (totals.oneTimeFee > 0) {
       doc.text("Additional One-Time Fee", breakdownX, yPos);
       doc.text(formatCurrency(totals.oneTimeFee), breakdownValueX, yPos, { align: "right" });
-      yPos += 7;
+      yPos += 6;
     }
 
     // One-time subtotal
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(51, 51, 51);
+    doc.setTextColor(45, 51, 57);
     doc.text("Total One-Time Costs", breakdownX, yPos);
     doc.text(formatCurrency(totals.oneTimeCosts), breakdownValueX, yPos, { align: "right" });
-    yPos += 12;
+    yPos += 10;
 
-    // Monthly Recurring Section
-    doc.setFillColor(248, 248, 248);
-    doc.rect(margin, yPos, contentWidth, 8, "F");
+    // --- Monthly Recurring Costs ---
+    checkNewPage(30);
+
+    doc.setFillColor(245, 245, 245);
+    doc.rect(margin, yPos, contentWidth, 7, "F");
     doc.setTextColor(100, 100, 100);
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setFont("helvetica", "bold");
-    doc.text("MONTHLY RECURRING COSTS", breakdownX, yPos + 5.5);
-    yPos += 12;
+    doc.text("MONTHLY RECURRING COSTS", breakdownX, yPos + 5);
+    yPos += 11;
 
     doc.setTextColor(80, 80, 80);
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
 
     // Monthly Maintenance
     doc.text(`Monthly Maintenance (${pricingData.modules.length} modules)`, breakdownX, yPos);
     doc.text(formatCurrency(totals.totalMonthlyMaintenance) + "/mo", breakdownValueX, yPos, { align: "right" });
-    yPos += 7;
+    yPos += 6;
 
     // Add'l Units Cost
     if (totals.totalMonthlyCost > 0) {
       doc.text("Add'l Units Cost", breakdownX, yPos);
       doc.text(formatCurrency(totals.totalMonthlyCost) + "/mo", breakdownValueX, yPos, { align: "right" });
-      yPos += 7;
+      yPos += 6;
     }
 
     // Monthly subtotal
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(51, 51, 51);
+    doc.setTextColor(45, 51, 57);
     doc.text("Total Monthly Recurring", breakdownX, yPos);
     doc.text(formatCurrency(totals.totalMonthlyRecurring) + "/mo", breakdownValueX, yPos, { align: "right" });
     yPos += 5;
 
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setTextColor(120, 120, 120);
     doc.text("(12 months = " + formatCurrency(totals.totalMonthlyRecurring * 12) + ")", breakdownValueX, yPos, { align: "right" });
-    yPos += 15;
+    yPos += 10;
 
-    // ===== PAYMENT SUMMARY =====
-    doc.setFillColor(248, 248, 248);
-    doc.rect(margin, yPos, contentWidth, 8, "F");
+    // --- Payment Summary ---
+    checkNewPage(35);
+
+    doc.setFillColor(245, 245, 245);
+    doc.rect(margin, yPos, contentWidth, 7, "F");
     doc.setTextColor(100, 100, 100);
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setFont("helvetica", "bold");
-    doc.text(totals.isFullPlan ? "FULL PAYMENT SUMMARY" : "12-MONTH PLAN SUMMARY", breakdownX, yPos + 5.5);
-    yPos += 12;
+    doc.text(totals.isFullPlan ? "FULL PAYMENT SUMMARY" : "12-MONTH PLAN SUMMARY", breakdownX, yPos + 5);
+    yPos += 11;
 
     doc.setTextColor(80, 80, 80);
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
 
     if (totals.isFullPlan) {
-      // Full Payment breakdown
       doc.text("One-Time Costs", breakdownX, yPos);
       doc.text(formatCurrency(totals.oneTimeCosts), breakdownValueX, yPos, { align: "right" });
-      yPos += 7;
+      yPos += 6;
 
       doc.text("12 Months Recurring (" + formatCurrency(totals.totalMonthlyRecurring) + " × 12)", breakdownX, yPos);
       doc.text(formatCurrency(totals.totalMonthlyRecurring * 12), breakdownValueX, yPos, { align: "right" });
-      yPos += 7;
+      yPos += 6;
 
-      addLine(yPos, [200, 200, 200]);
+      addLine(yPos, [220, 220, 220], 0.4);
       yPos += 5;
 
       doc.setFont("helvetica", "bold");
+      doc.setTextColor(45, 51, 57);
       doc.text("Subtotal", breakdownX, yPos);
       doc.text(formatCurrency(totals.grandTotal), breakdownValueX, yPos, { align: "right" });
       yPos += 8;
 
     } else {
-      // Monthly Plan breakdown
       doc.text("One-Time Costs (Due Today)", breakdownX, yPos);
       doc.text(formatCurrency(totals.oneTimeCosts), breakdownValueX, yPos, { align: "right" });
-      yPos += 7;
+      yPos += 6;
 
-      addLine(yPos, [200, 200, 200]);
+      doc.text("1st Month Recurring", breakdownX, yPos);
+      doc.text(formatCurrency(totals.totalMonthlyRecurring), breakdownValueX, yPos, { align: "right" });
+      yPos += 6;
+
+      addLine(yPos, [220, 220, 220], 0.4);
       yPos += 5;
 
       doc.setFont("helvetica", "bold");
+      doc.setTextColor(45, 51, 57);
       doc.text("Subtotal (Due Today)", breakdownX, yPos);
       doc.text(formatCurrency(totals.grandTotal), breakdownValueX, yPos, { align: "right" });
       yPos += 8;
@@ -667,162 +746,257 @@ const PricingReview = () => {
         : "Discount";
       doc.text(discountLabel, breakdownX, yPos);
       doc.text("-" + formatCurrency(totals.discountAmount), breakdownValueX, yPos, { align: "right" });
-      yPos += 10;
+      yPos += 8;
     }
 
-    // ===== FINAL TOTALS BOX =====
-    doc.setFillColor(51, 51, 51);
-    doc.rect(margin, yPos, contentWidth, totals.isFullPlan ? 25 : 45, "F");
+    yPos += 6;
 
-    doc.setTextColor(180, 180, 180);
+    // ===== SUMMARY & TOTALS SECTION (INVOICE STYLE 2-COLUMN) =====
+    checkNewPage(85);
+
+    const summaryLeftX = margin;
+    const summaryRightX = pageWidth / 2 + 5;
+    const summaryRightWidth = contentWidth / 2 - 5;
+    const summaryStartY = yPos;
+
+    // Left Column: Thank you note & Payment Info
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(45, 51, 57);
+    doc.text("Thank you for your business", summaryLeftX, summaryStartY + 5);
+
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    doc.text("Payment Info", summaryLeftX, summaryStartY + 16);
+
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(85, 85, 85);
+    doc.text("Payment Plan:", summaryLeftX, summaryStartY + 23);
+    doc.setTextColor(45, 51, 57);
+    doc.setFont("helvetica", "bold");
+    doc.text(totals.isFullPlan ? "Full Payment Upfront" : "12-Month Payment Plan", summaryLeftX + 22, summaryStartY + 23);
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(85, 85, 85);
+    doc.text("Payment Status:", summaryLeftX, summaryStartY + 29);
+    doc.setTextColor(45, 51, 57);
+    doc.setFont("helvetica", "bold");
+    doc.text("Active Proposal", summaryLeftX + 22, summaryStartY + 29);
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(85, 85, 85);
+    doc.text("Amount Due Today:", summaryLeftX, summaryStartY + 35);
+    doc.setTextColor(45, 51, 57);
+    doc.setFont("helvetica", "bold");
+    doc.text(`USD ${formatCurrency(totals.payToday)}`, summaryLeftX + 26, summaryStartY + 35);
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(85, 85, 85);
+    doc.setFontSize(7);
+    doc.text("Terms & Conditions: https://ecostance.com/terms", summaryLeftX, summaryStartY + 45);
+    doc.text("Privacy Policy: https://ecostance.com/privacy", summaryLeftX, summaryStartY + 50);
+
+    // Right Column: Invoice Totals Card
+    const totalsBoxHeight = 55;
+    doc.setFillColor(248, 249, 250);
+    doc.rect(summaryRightX, summaryStartY, summaryRightWidth, totalsBoxHeight, "F");
+    doc.setDrawColor(229, 229, 229);
+    doc.setLineWidth(0.4);
+    doc.rect(summaryRightX, summaryStartY, summaryRightWidth, totalsBoxHeight, "S");
+
+    let totalsY = summaryStartY + 8;
+    const totalsLabelX = summaryRightX + 6;
+    const totalsValueX = summaryRightX + summaryRightWidth - 6;
+
     doc.setFontSize(8);
-    doc.setFont("helvetica", "bold");
-    doc.text("AMOUNT DUE TODAY", breakdownX, yPos + 8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(80, 80, 80);
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.setFont("helvetica", "bold");
-    doc.text(formatCurrency(totals.payToday) + " USD", breakdownValueX, yPos + 10, { align: "right" });
+    // Sub Total line
+    doc.text("One-Time Setup Costs:", totalsLabelX, totalsY);
+    doc.text(`USD ${formatCurrency(totals.totalModulePrice)}`, totalsValueX, totalsY, { align: "right" });
+    totalsY += 6;
+
+    // Monthly Maintenance line
+    doc.text("Monthly Maintenance (12 mo):", totalsLabelX, totalsY);
+    doc.text(`USD ${formatCurrency(totals.totalMonthlyMaintenance * 12)}`, totalsValueX, totalsY, { align: "right" });
+    totalsY += 6;
+
+    if (totals.totalMonthlyCost > 0) {
+      doc.text("Add'l Units Monthly (12 mo):", totalsLabelX, totalsY);
+      doc.text(`USD ${formatCurrency(totals.totalMonthlyCost * 12)}`, totalsValueX, totalsY, { align: "right" });
+      totalsY += 6;
+    }
+
+    if (totals.oneTimeFee > 0) {
+      doc.text("Additional One-Time Fee:", totalsLabelX, totalsY);
+      doc.text(`USD ${formatCurrency(totals.oneTimeFee)}`, totalsValueX, totalsY, { align: "right" });
+      totalsY += 6;
+    }
 
     if (totals.discountAmount > 0) {
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(142, 255, 142);
-      doc.text("You save " + formatCurrency(totals.discountAmount), breakdownValueX, yPos + 18, { align: "right" });
-    }
-
-    if (!totals.isFullPlan && totals.monthlyAfter > 0) {
-      doc.setTextColor(180, 180, 180);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "bold");
-      doc.text("THEN MONTHLY (×12)", breakdownX, yPos + 28);
-
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(14);
-      doc.text(formatCurrency(totals.monthlyAfter) + "/mo", breakdownValueX, yPos + 30, { align: "right" });
-
-      doc.setTextColor(180, 180, 180);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "normal");
-      doc.text("Total over " + totals.remainingMonths + " months: " + formatCurrency(totals.payToday + (totals.monthlyAfter * totals.remainingMonths)), breakdownValueX, yPos + 40, { align: "right" });
-    }
-
-    yPos += totals.isFullPlan ? 35 : 55;
-
-    // ===== PAYMENT OPTIONS COMPARISON (if space allows) =====
-    if (yPos < pageHeight - 80) {
-      doc.setTextColor(51, 51, 51);
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "bold");
-      doc.text("PAYMENT OPTIONS COMPARISON", margin, yPos);
-      yPos += 8;
-
-      // Calculate both options
-      const fullPaymentTotal = totals.oneTimeCosts + (totals.totalMonthlyRecurring * 12);
-      let fullDiscount = 0;
-      if (totals.discountType === "percentage") {
-        fullDiscount = (fullPaymentTotal * totals.discountValue) / 100;
-      } else {
-        fullDiscount = Math.min(totals.discountValue, fullPaymentTotal);
-      }
-      const fullPayToday = Math.max(0, fullPaymentTotal - fullDiscount);
-
-      const monthlyPaymentUpfront = totals.oneTimeCosts + totals.totalMonthlyRecurring; // includes 1st month
-      let monthlyDiscount = 0;
-      if (totals.discountType === "percentage") {
-        monthlyDiscount = (monthlyPaymentUpfront * totals.discountValue) / 100;
-      } else {
-        monthlyDiscount = Math.min(totals.discountValue, monthlyPaymentUpfront);
-      }
-      const monthlyPayToday = Math.max(0, monthlyPaymentUpfront - monthlyDiscount);
-      const monthlyGrandTotal = monthlyPayToday + (totals.totalMonthlyRecurring * totals.remainingMonths);
-
-      // Option boxes
-      const boxWidth = (contentWidth - 10) / 2;
-
-      // Full Payment Option
-      doc.setFillColor(...(totals.isFullPlan ? [232, 245, 233] : [250, 250, 250]));
-      doc.setDrawColor(...(totals.isFullPlan ? [76, 175, 80] : [200, 200, 200]));
-      doc.setLineWidth(totals.isFullPlan ? 1 : 0.5);
-      doc.rect(margin, yPos, boxWidth, 40, "FD");
-
-      doc.setTextColor(51, 51, 51);
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "bold");
-      doc.text("OPTION 1: FULL PAYMENT", margin + 5, yPos + 10);
-      if (totals.isFullPlan) {
-        doc.setTextColor(76, 175, 80);
-        doc.text("✓ SELECTED", margin + boxWidth - 5, yPos + 10, { align: "right" });
-      }
-
+      doc.setTextColor(34, 139, 34);
+      doc.text("Discount:", totalsLabelX, totalsY);
+      doc.text(`- USD ${formatCurrency(totals.discountAmount)}`, totalsValueX, totalsY, { align: "right" });
+      totalsY += 6;
       doc.setTextColor(80, 80, 80);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "normal");
-      doc.text("Pay today: " + formatCurrency(fullPayToday), margin + 5, yPos + 20);
-      doc.text("Then monthly: $0.00", margin + 5, yPos + 27);
-      doc.setFont("helvetica", "bold");
-      doc.text("Total: " + formatCurrency(fullPayToday), margin + 5, yPos + 35);
-
-      // Monthly Payment Option
-      doc.setFillColor(...(!totals.isFullPlan ? [227, 242, 253] : [250, 250, 250]));
-      doc.setDrawColor(...(!totals.isFullPlan ? [33, 150, 243] : [200, 200, 200]));
-      doc.setLineWidth(!totals.isFullPlan ? 1 : 0.5);
-      doc.rect(margin + boxWidth + 10, yPos, boxWidth, 40, "FD");
-
-      doc.setTextColor(51, 51, 51);
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "bold");
-      doc.text("OPTION 2: MONTHLY PLAN", margin + boxWidth + 15, yPos + 10);
-      if (!totals.isFullPlan) {
-        doc.setTextColor(33, 150, 243);
-        doc.text("✓ SELECTED", pageWidth - margin - 5, yPos + 10, { align: "right" });
-      }
-
-      doc.setTextColor(80, 80, 80);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "normal");
-      doc.text("Pay today (incl. 1st mo): " + formatCurrency(monthlyPayToday), margin + boxWidth + 15, yPos + 20);
-      doc.text("Then monthly: " + formatCurrency(totals.totalMonthlyRecurring) + " × " + totals.remainingMonths, margin + boxWidth + 15, yPos + 27);
-      doc.setFont("helvetica", "bold");
-      doc.text("Total: " + formatCurrency(monthlyGrandTotal), margin + boxWidth + 15, yPos + 35);
-
-      yPos += 50;
     }
 
-    // ===== TERMS & NOTES =====
-    if (yPos < pageHeight - 50) {
-      doc.setTextColor(100, 100, 100);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "bold");
-      doc.text("TERMS & CONDITIONS", margin, yPos);
-      yPos += 6;
+    // Divider line inside Totals Box
+    doc.setDrawColor(200, 200, 200);
+    doc.line(totalsLabelX, totalsY + 1, totalsValueX, totalsY + 1);
+    totalsY += 7;
 
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(7);
-      doc.setTextColor(120, 120, 120);
-      const terms = [
-        "• This quote is valid until the expiration date shown above.",
-        "• Prices are in USD and exclude applicable taxes.",
-        "• Monthly recurring charges are billed at the start of each billing cycle.",
-        "• Additional users can be added at any time at the per-user rate shown.",
-        "• Base units are included in the module setup fee."
-      ];
-      terms.forEach(term => {
-        if (yPos < pageHeight - 20) {
-          doc.text(term, margin, yPos);
-          yPos += 5;
-        }
-      });
+    // Amount Due Today Line
+    doc.setFontSize(10.5);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(45, 51, 57);
+    doc.text("Amount Due Today:", totalsLabelX, totalsY);
+
+    doc.setFontSize(13);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(46, 125, 50);
+    doc.text(`USD ${formatCurrency(totals.payToday)}`, totalsValueX, totalsY, { align: "right" });
+
+    yPos = summaryStartY + totalsBoxHeight + 12;
+
+    // ===== PAYMENT OPTIONS COMPARISON =====
+    checkNewPage(45);
+
+    doc.setTextColor(45, 51, 57);
+    doc.setFontSize(9.5);
+    doc.setFont("helvetica", "bold");
+    doc.text("PAYMENT OPTIONS COMPARISON", margin, yPos);
+    yPos += 6;
+
+    const optionBoxWidth = (contentWidth - 8) / 2;
+
+    // Calculate options
+    const fullPaymentTotal = totals.oneTimeCosts + (totals.totalMonthlyRecurring * 12);
+    let fullDiscount = totals.discountType === "percentage" ? (fullPaymentTotal * totals.discountValue) / 100 : Math.min(totals.discountValue, fullPaymentTotal);
+    const fullPayToday = Math.max(0, fullPaymentTotal - fullDiscount);
+
+    const monthlyPaymentUpfront = totals.oneTimeCosts + totals.totalMonthlyRecurring;
+    let monthlyDiscount = totals.discountType === "percentage" ? (monthlyPaymentUpfront * totals.discountValue) / 100 : Math.min(totals.discountValue, monthlyPaymentUpfront);
+    const monthlyPayToday = Math.max(0, monthlyPaymentUpfront - monthlyDiscount);
+    const monthlyGrandTotal = monthlyPayToday + (totals.totalMonthlyRecurring * totals.remainingMonths);
+
+    // Option 1 Card
+    doc.setFillColor(...(totals.isFullPlan ? [240, 249, 241] : [250, 250, 250]));
+    doc.setDrawColor(...(totals.isFullPlan ? [46, 125, 50] : [220, 220, 220]));
+    doc.setLineWidth(totals.isFullPlan ? 0.8 : 0.4);
+    doc.rect(margin, yPos, optionBoxWidth, 34, "FD");
+
+    doc.setTextColor(45, 51, 57);
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    doc.text("OPTION 1: FULL PAYMENT", margin + 5, yPos + 8);
+    if (totals.isFullPlan) {
+      doc.setTextColor(46, 125, 50);
+      doc.text("SELECTED", margin + optionBoxWidth - 5, yPos + 8, { align: "right" });
     }
 
-    // ===== FOOTER =====
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "normal");
+    doc.text("Pay today: " + formatCurrency(fullPayToday), margin + 5, yPos + 16);
+    doc.text("Then monthly: $0.00", margin + 5, yPos + 22);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(45, 51, 57);
+    doc.text("Total: " + formatCurrency(fullPayToday), margin + 5, yPos + 29);
+
+    // Option 2 Card
+    const option2X = margin + optionBoxWidth + 8;
+    doc.setFillColor(...(!totals.isFullPlan ? [240, 247, 255] : [250, 250, 250]));
+    doc.setDrawColor(...(!totals.isFullPlan ? [21, 101, 192] : [220, 220, 220]));
+    doc.setLineWidth(!totals.isFullPlan ? 0.8 : 0.4);
+    doc.rect(option2X, yPos, optionBoxWidth, 34, "FD");
+
+    doc.setTextColor(45, 51, 57);
+    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    doc.text("OPTION 2: MONTHLY PLAN", option2X + 5, yPos + 8);
+    if (!totals.isFullPlan) {
+      doc.setTextColor(21, 101, 192);
+      doc.text("SELECTED", option2X + optionBoxWidth - 5, yPos + 8, { align: "right" });
+    }
+
+    doc.setTextColor(80, 80, 80);
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "normal");
+    doc.text("Pay today (incl. 1st mo): " + formatCurrency(monthlyPayToday), option2X + 5, yPos + 16);
+    doc.text("Then monthly: " + formatCurrency(totals.totalMonthlyRecurring) + " × " + totals.remainingMonths, option2X + 5, yPos + 22);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(45, 51, 57);
+    doc.text("Total: " + formatCurrency(monthlyGrandTotal), option2X + 5, yPos + 29);
+
+    yPos += 42;
+
+    // ===== TERMS & CONDITIONS =====
+    checkNewPage(35);
+
+    doc.setTextColor(45, 51, 57);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text("TERMS & CONDITIONS", margin, yPos);
+    yPos += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(110, 110, 110);
+    const terms = [
+      "• This quote is valid until the expiration date shown above.",
+      "• Prices are in USD and exclude applicable taxes.",
+      "• Monthly recurring charges are billed at the start of each billing cycle.",
+      "• Additional users can be added at any time at the per-user rate shown.",
+      "• Base units are included in the module setup fee."
+    ];
+    terms.forEach(term => {
+      doc.text(term, margin, yPos);
+      yPos += 4.5;
+    });
+
+    yPos += 4;
+
+    // ===== UNIQUE WEB LINK / SHARE BANNER (INVOICE STYLE) =====
+    checkNewPage(30);
+
+    doc.setFillColor(245, 245, 245);
+    doc.rect(margin, yPos, contentWidth, 24, "F");
+
     doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text("Generated by EcoStance | www.ecostance.com | support@ecostance.com", pageWidth / 2, pageHeight - 12, { align: "center" });
-    doc.text(`Quote ID: ${linkId} | Page 1 of 1`, pageWidth / 2, pageHeight - 7, { align: "center" });
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(21, 101, 192);
+    doc.text(`https://ecostance.com/other/pricing-review/${linkId}`, margin + 6, yPos + 7);
 
-    // Save the PDF
-    doc.save(`EcoStance-Pricing-Quote-${linkId}.pdf`);
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(85, 85, 85);
+    doc.text("This is a unique web link and dynamic pricing proposal generated for your EcoStance account.", margin + 6, yPos + 13);
+    doc.text("You can review module breakdown, customize user quantities, and complete order checkout directly online.", margin + 6, yPos + 18);
+
+    // ===== MULTI-PAGE FOOTER LOOP =====
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+
+      // Bottom bar
+      doc.setFillColor(245, 245, 245);
+      doc.rect(0, pageHeight - 12, pageWidth, 12, "F");
+
+      doc.setFontSize(7.5);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(110, 110, 110);
+      doc.text("+1 602 688 2330   |   4737 N Ocean Dr. Suite 270, Ft. Lauderdale, Florida, 33308, United States   |   ecostance.com", pageWidth / 2, pageHeight - 7, { align: "center" });
+
+      // Page numbers above bottom bar
+      doc.setFontSize(7);
+      doc.setTextColor(140, 140, 140);
+      doc.text(`Quote #: ${linkId}   |   Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 14, { align: "right" });
+    }
+
+    doc.save(`EcoStance-Sales-Quote-${linkId}.pdf`);
 
     addToast("Quote PDF downloaded successfully!", {
       appearance: "success",
