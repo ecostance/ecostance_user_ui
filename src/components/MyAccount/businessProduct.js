@@ -92,7 +92,7 @@ const BusinessProduct = ({
     const [downloading, setDownloading] = useState(false);
     // ponytail: fixed scale map; swap for DPI/print mm if packaging needs exact physical sizes
     const QR_SIZE_SCALE = { small: 2, medium: 3, large: 4, xlarge: 6 };
-    const [qrDownloadSize, setQrDownloadSize] = useState("medium");
+    const [openQrSizePopup, setOpenQrSizePopup] = useState(false);
     const [qrCode, setQrCode] = useState(
         `${process.env.NEXT_PUBLIC_UI_URL}?conferenceCode=${singleEvent?.conferanceCode}`
     );
@@ -2037,7 +2037,7 @@ const BusinessProduct = ({
             const croppedWidth = maxX - minX + 1;
             const croppedHeight = maxY - minY + 1;
 
-            const scaleFactor = QR_SIZE_SCALE[sizeKey || qrDownloadSize] || 3;
+            const scaleFactor = QR_SIZE_SCALE[sizeKey] || 3;
             const scaledWidth = croppedWidth * scaleFactor;
             const scaledHeight = croppedHeight * scaleFactor;
 
@@ -2655,7 +2655,7 @@ const BusinessProduct = ({
                         >
                             {!downloading ? (
                                 <BsCloudDownload
-                                    onClick={(e) => downloadCode("productQrID")}
+                                    onClick={() => setOpenQrSizePopup(true)}
                                     style={{
                                         pointerEvents: "all",
                                         width: "18px",
@@ -2692,30 +2692,6 @@ const BusinessProduct = ({
                             />
                         </div>
                     </div>
-                    <div style={{ display: "flex", gap: "14px", marginTop: "14px", flexWrap: "wrap", alignItems: "center" }}>
-                        <span style={{ fontWeight: 500 }}>Download size:</span>
-                        {[
-                            ["small", "Small"],
-                            ["medium", "Medium"],
-                            ["large", "Large"],
-                            ["xlarge", "Extra Large"],
-                        ].map(([value, label]) => (
-                            <label key={value} style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", margin: 0 }}>
-                                <input
-                                    type="radio"
-                                    name="qrDownloadSize"
-                                    value={value}
-                                    checked={qrDownloadSize === value}
-                                    disabled={downloading}
-                                    onChange={() => {
-                                        setQrDownloadSize(value);
-                                        downloadCode("productQrID", value);
-                                    }}
-                                />
-                                {label}
-                            </label>
-                        ))}
-                    </div>
                 </div>
                 <div className="qrbox" style={{ marginLeft: "10px" }}>
 
@@ -2736,6 +2712,41 @@ const BusinessProduct = ({
 
 
 
+            </div>
+        </div>
+        <div className="backdrop-popup" style={{ display: openQrSizePopup ? "" : "none", zIndex: 10000 }}>
+            <div className="sustainability--confirm-popup-holder" style={{ maxWidth: "420px" }}>
+                <button
+                    className="cart-overlay__close-icon"
+                    onClick={() => setOpenQrSizePopup(false)}
+                >
+                    <IoIosClose />
+                </button>
+                <div>
+                    <h3 className="sustainability--popup-sure-text">Select QR download size</h3>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "10px 24px 20px" }}>
+                        {[
+                            ["small", "Small"],
+                            ["medium", "Medium"],
+                            ["large", "Large"],
+                            ["xlarge", "Extra Large"],
+                        ].map(([value, label]) => (
+                            <label key={value} style={{ display: "flex", alignItems: "center", gap: "10px", cursor: downloading ? "wait" : "pointer", margin: 0, fontSize: "16px" }}>
+                                <input
+                                    type="radio"
+                                    name="qrDownloadSizePopup"
+                                    value={value}
+                                    disabled={downloading}
+                                    onChange={() => {
+                                        setOpenQrSizePopup(false);
+                                        downloadCode("productQrID", value);
+                                    }}
+                                />
+                                {label}
+                            </label>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
         <div className="table--popup" style={{ display: addProductPopup ? "" : "none" }}>
@@ -2970,7 +2981,7 @@ const BusinessProduct = ({
                                         >
                                             {!downloading ? (
                                                 <BsCloudDownload
-                                                    onClick={(e) => downloadCode("productQrID")}
+                                                    onClick={() => setOpenQrSizePopup(true)}
                                                     style={{
                                                         pointerEvents: "all",
                                                         width: "18px",
