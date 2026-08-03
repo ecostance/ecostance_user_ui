@@ -90,6 +90,9 @@ const BusinessProduct = ({
     const [socialMediaData, setSocialMediaData] = useState([]);
     const [copied, setCopied] = useState(false);
     const [downloading, setDownloading] = useState(false);
+    // ponytail: fixed scale map; swap for DPI/print mm if packaging needs exact physical sizes
+    const QR_SIZE_SCALE = { small: 2, medium: 3, large: 4, xlarge: 6 };
+    const [qrDownloadSize, setQrDownloadSize] = useState("medium");
     const [qrCode, setQrCode] = useState(
         `${process.env.NEXT_PUBLIC_UI_URL}?conferenceCode=${singleEvent?.conferanceCode}`
     );
@@ -1978,7 +1981,7 @@ const BusinessProduct = ({
         }
     }, [profileRelatedData]);
 
-    const downloadCode = async (id) => {
+    const downloadCode = async (id, sizeKey) => {
         console.log(id, "idd");
         setDownloading(true);
 
@@ -2034,8 +2037,7 @@ const BusinessProduct = ({
             const croppedWidth = maxX - minX + 1;
             const croppedHeight = maxY - minY + 1;
 
-            // Scale up the entire drawing canvas by a factor of 3 to produce a high-resolution crisp image (including the logo details)
-            const scaleFactor = 3;
+            const scaleFactor = QR_SIZE_SCALE[sizeKey || qrDownloadSize] || 3;
             const scaledWidth = croppedWidth * scaleFactor;
             const scaledHeight = croppedHeight * scaleFactor;
 
@@ -2109,8 +2111,8 @@ const BusinessProduct = ({
             const leftLabelX = (leftPadding - borderOffset) / 2;
             const rightLabelX = leftPadding + scaledWidth + borderOffset + (rightPadding - borderOffset) / 2;
 
-            // 1. Full DPP name centered above; shrink only if needed to stay within the square width
-            const topLabel = "Access Digital Product Passport (DPP)";
+            // 1. DPP label centered above; shrink only if needed to stay within the square width
+            const topLabel = "ACCESS DPP";
             const maxTopWidth = scaledWidth + (2 * borderOffset);
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             let topFontSize = fontSize;
@@ -2689,6 +2691,30 @@ const BusinessProduct = ({
                                 id={"productQrID"}
                             />
                         </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "14px", marginTop: "14px", flexWrap: "wrap", alignItems: "center" }}>
+                        <span style={{ fontWeight: 500 }}>Download size:</span>
+                        {[
+                            ["small", "Small"],
+                            ["medium", "Medium"],
+                            ["large", "Large"],
+                            ["xlarge", "Extra Large"],
+                        ].map(([value, label]) => (
+                            <label key={value} style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", margin: 0 }}>
+                                <input
+                                    type="radio"
+                                    name="qrDownloadSize"
+                                    value={value}
+                                    checked={qrDownloadSize === value}
+                                    disabled={downloading}
+                                    onChange={() => {
+                                        setQrDownloadSize(value);
+                                        downloadCode("productQrID", value);
+                                    }}
+                                />
+                                {label}
+                            </label>
+                        ))}
                     </div>
                 </div>
                 <div className="qrbox" style={{ marginLeft: "10px" }}>
