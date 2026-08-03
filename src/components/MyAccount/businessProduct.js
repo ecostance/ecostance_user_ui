@@ -93,6 +93,7 @@ const BusinessProduct = ({
     // ponytail: fixed scale map; swap for DPI/print mm if packaging needs exact physical sizes
     const QR_SIZE_SCALE = { small: 2, medium: 3, large: 4, xlarge: 6 };
     const [openQrSizePopup, setOpenQrSizePopup] = useState(false);
+    const [qrSizeChoice, setQrSizeChoice] = useState("medium");
     const [qrCode, setQrCode] = useState(
         `${process.env.NEXT_PUBLIC_UI_URL}?conferenceCode=${singleEvent?.conferanceCode}`
     );
@@ -2655,7 +2656,10 @@ const BusinessProduct = ({
                         >
                             {!downloading ? (
                                 <BsCloudDownload
-                                    onClick={() => setOpenQrSizePopup(true)}
+                                    onClick={() => {
+                                        setQrSizeChoice("medium");
+                                        setOpenQrSizePopup(true);
+                                    }}
                                     style={{
                                         pointerEvents: "all",
                                         width: "18px",
@@ -2715,37 +2719,128 @@ const BusinessProduct = ({
             </div>
         </div>
         <div className="backdrop-popup" style={{ display: openQrSizePopup ? "" : "none", zIndex: 10000 }}>
-            <div className="sustainability--confirm-popup-holder" style={{ maxWidth: "420px" }}>
+            <div
+                style={{
+                    background: "#fff",
+                    borderRadius: "8px",
+                    width: "100%",
+                    maxWidth: "380px",
+                    margin: "0 16px",
+                    padding: "28px 28px 24px",
+                    position: "relative",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+                }}
+            >
                 <button
                     className="cart-overlay__close-icon"
                     onClick={() => setOpenQrSizePopup(false)}
+                    type="button"
                 >
                     <IoIosClose />
                 </button>
-                <div>
-                    <h3 className="sustainability--popup-sure-text">Select QR download size</h3>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "10px 24px 20px" }}>
-                        {[
-                            ["small", "Small"],
-                            ["medium", "Medium"],
-                            ["large", "Large"],
-                            ["xlarge", "Extra Large"],
-                        ].map(([value, label]) => (
-                            <label key={value} style={{ display: "flex", alignItems: "center", gap: "10px", cursor: downloading ? "wait" : "pointer", margin: 0, fontSize: "16px" }}>
+                <h3
+                    style={{
+                        fontFamily: "Work Sans, sans-serif",
+                        fontSize: "20px",
+                        fontWeight: 600,
+                        color: "#222",
+                        margin: "0 0 6px",
+                        textAlign: "center",
+                    }}
+                >
+                    Select QR download size
+                </h3>
+                <p
+                    style={{
+                        fontFamily: "Work Sans, sans-serif",
+                        fontSize: "13px",
+                        color: "#777",
+                        margin: "0 0 20px",
+                        textAlign: "center",
+                    }}
+                >
+                    Choose a size, then download
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "22px" }}>
+                    {[
+                        ["small", "Small"],
+                        ["medium", "Medium"],
+                        ["large", "Large"],
+                        ["xlarge", "Extra Large"],
+                    ].map(([value, label]) => {
+                        const selected = qrSizeChoice === value;
+                        return (
+                            <label
+                                key={value}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "12px",
+                                    cursor: downloading ? "wait" : "pointer",
+                                    margin: 0,
+                                    padding: "12px 14px",
+                                    borderRadius: "6px",
+                                    border: selected ? "1.5px solid #222" : "1px solid #ddd",
+                                    background: selected ? "#f7f7f7" : "#fff",
+                                    fontFamily: "Work Sans, sans-serif",
+                                    fontSize: "15px",
+                                    color: "#333",
+                                    fontWeight: selected ? 600 : 400,
+                                }}
+                            >
+                                <span
+                                    style={{
+                                        width: "18px",
+                                        height: "18px",
+                                        borderRadius: "50%",
+                                        border: selected ? "5px solid #222" : "2px solid #999",
+                                        boxSizing: "border-box",
+                                        flexShrink: 0,
+                                        background: "#fff",
+                                    }}
+                                    aria-hidden="true"
+                                />
                                 <input
                                     type="radio"
                                     name="qrDownloadSizePopup"
                                     value={value}
+                                    checked={selected}
                                     disabled={downloading}
-                                    onChange={() => {
-                                        setOpenQrSizePopup(false);
-                                        downloadCode("productQrID", value);
+                                    onChange={() => setQrSizeChoice(value)}
+                                    style={{
+                                        position: "absolute",
+                                        opacity: 0,
+                                        width: 0,
+                                        height: 0,
+                                        margin: 0,
                                     }}
                                 />
                                 {label}
                             </label>
-                        ))}
-                    </div>
+                        );
+                    })}
+                </div>
+                <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+                    <button
+                        type="button"
+                        className="sustainability--popup-button-white button--white"
+                        onClick={() => setOpenQrSizePopup(false)}
+                        style={{ minWidth: "110px" }}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        className="sustainability--popup-button-black button--black button--cursor"
+                        disabled={downloading}
+                        onClick={() => {
+                            setOpenQrSizePopup(false);
+                            downloadCode("productQrID", qrSizeChoice);
+                        }}
+                        style={{ minWidth: "110px" }}
+                    >
+                        {downloading ? "Downloading..." : "Download"}
+                    </button>
                 </div>
             </div>
         </div>
@@ -2981,7 +3076,10 @@ const BusinessProduct = ({
                                         >
                                             {!downloading ? (
                                                 <BsCloudDownload
-                                                    onClick={() => setOpenQrSizePopup(true)}
+                                                    onClick={() => {
+                                                        setQrSizeChoice("medium");
+                                                        setOpenQrSizePopup(true);
+                                                    }}
                                                     style={{
                                                         pointerEvents: "all",
                                                         width: "18px",
