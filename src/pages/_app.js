@@ -8,10 +8,11 @@ import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 import fetchProducts from "../redux/actions/productActions";
 import React from "react";
-
+import Script from "next/script";
 var _origSymbolFor = Symbol.for;
 Symbol.for = function (key) {
-  if (key === "react.transitional.element") return _origSymbolFor("react.element");
+  if (key === "react.transitional.element")
+    return _origSymbolFor("react.element");
   return _origSymbolFor(key);
 };
 
@@ -84,7 +85,7 @@ class MyApp extends App {
       if (window.location.href.includes("refId")) {
         localStorage.setItem(
           "ReferralID",
-          window.location.href.split("refId=")[1],
+          window.location.href.split("refId=")[1]
         );
         this.deeplinkapi().catch((err) => console.log(err));
       }
@@ -96,9 +97,9 @@ class MyApp extends App {
           props.reduxStore?.dispatch(removeAllItemsFromSustainabilityPage()),
         () =>
           props.reduxStore?.dispatch(
-            removeAllItemsFromBusinessSustainabilityPage(),
+            removeAllItemsFromBusinessSustainabilityPage()
           ),
-        () => props.reduxStore?.dispatch(removeCurrentUser()),
+        () => props.reduxStore?.dispatch(removeCurrentUser())
       );
       props.reduxStore.dispatch(removeRegistationSuccess());
       Router.events.on("routeChangeStart", () => {
@@ -121,7 +122,7 @@ class MyApp extends App {
         setUniqueVisitInformation({
           userCurrencyPreference: (currencyType, currency) =>
             props.reduxStore.dispatch(
-              setUserCurrencyPreference(currencyType, currency),
+              setUserCurrencyPreference(currencyType, currency)
             ),
           setCartCurrency: (currency) =>
             props.reduxStore.dispatch(setCartCurrency(currency)),
@@ -206,7 +207,7 @@ class MyApp extends App {
       const products = (await getProducts()).data;
 
       props.reduxStore.dispatch(
-        fetchProducts(products?.map((d) => ({ ...d, id: d._id })) || []),
+        fetchProducts(products?.map((d) => ({ ...d, id: d._id })) || [])
       );
     } catch (e) {
       console.log(e);
@@ -266,7 +267,7 @@ class MyApp extends App {
           cartData?.data?.data?.temporaryCheckoutCurrency
         )
           props.reduxStore.dispatch(
-            setCartCurrency(cartData?.data?.data?.temporaryCheckoutCurrency),
+            setCartCurrency(cartData?.data?.data?.temporaryCheckoutCurrency)
           );
       }
     } catch (err) {
@@ -375,6 +376,12 @@ class MyApp extends App {
                 async
               ></script>
             </Head>
+            <Script
+              src="https://ai-widget-standalone.pages.dev/loader.js"
+              strategy="afterInteractive"
+              data-tenant-id="ee735b70-f90a-41a9-9b74-e11813edd9fb"
+              data-api-url="https://api.app.starent.ai"
+            />
             <ToastProvider
               components={{ toast: dummyToast }}
               placement="bottom-left"
