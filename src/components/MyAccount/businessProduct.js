@@ -91,7 +91,7 @@ const BusinessProduct = ({
     const [copied, setCopied] = useState(false);
     const [downloading, setDownloading] = useState(false);
     // Font scale map for text in QR code; QR resolution always stays at MAX_QR_SCALE
-    const QR_FONT_SCALE = { small: 2, medium: 3, large: 4, xlarge: 6 };
+    const QR_FONT_SCALE = { small: 3, medium: 4.5, large: 6, xlarge: 8 };
     const MAX_QR_SCALE = 6;
     const [openQrSizePopup, setOpenQrSizePopup] = useState(false);
     const [qrSizeChoice, setQrSizeChoice] = useState("medium");
