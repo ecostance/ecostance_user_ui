@@ -2116,7 +2116,7 @@ const BusinessProduct = ({
             const rightLabelX = leftPadding + scaledWidth + borderOffset + (rightPadding - borderOffset) / 2;
 
             // 1. DPP label centered above; shrink only if needed to stay within the square width
-            const topLabel = "ACCESS DPP";
+            const topLabel = "Access DPP";
             const maxTopWidth = scaledWidth + (2 * borderOffset);
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             let topFontSize = fontSize;
