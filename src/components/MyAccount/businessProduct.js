@@ -90,8 +90,9 @@ const BusinessProduct = ({
     const [socialMediaData, setSocialMediaData] = useState([]);
     const [copied, setCopied] = useState(false);
     const [downloading, setDownloading] = useState(false);
-    // ponytail: fixed scale map; swap for DPI/print mm if packaging needs exact physical sizes
-    const QR_SIZE_SCALE = { small: 2, medium: 3, large: 4, xlarge: 6 };
+    // Font scale map for text in QR code; QR resolution always stays at MAX_QR_SCALE
+    const QR_FONT_SCALE = { small: 2, medium: 3, large: 4, xlarge: 6 };
+    const MAX_QR_SCALE = 6;
     const [openQrSizePopup, setOpenQrSizePopup] = useState(false);
     const [qrSizeChoice, setQrSizeChoice] = useState("medium");
     const [qrCode, setQrCode] = useState(
@@ -2038,15 +2039,17 @@ const BusinessProduct = ({
             const croppedWidth = maxX - minX + 1;
             const croppedHeight = maxY - minY + 1;
 
-            const scaleFactor = QR_SIZE_SCALE[sizeKey] || 3;
-            const scaledWidth = croppedWidth * scaleFactor;
-            const scaledHeight = croppedHeight * scaleFactor;
+            const fontScaleFactor = QR_FONT_SCALE[sizeKey] || 3;
+            const qrScaleFactor = MAX_QR_SCALE;
+
+            const scaledWidth = croppedWidth * qrScaleFactor;
+            const scaledHeight = croppedHeight * qrScaleFactor;
 
             const fontFamily = "Work Sans, Arial, sans-serif";
-            const fontSize = 26 * scaleFactor; // +1pt vs prior 25 for clearer package print
-            const borderOffset = 3 * scaleFactor;
-            // Equal gap (a) text↔inner border and (b) text↔outer edge; bumped from prior ~5–8
-            const labelGap = 12 * scaleFactor;
+            const fontSize = 26 * fontScaleFactor; // Font size scaled based on selection
+            const borderOffset = 3 * qrScaleFactor;
+            // Equal gap (a) text↔inner border and (b) text↔outer edge
+            const labelGap = 12 * fontScaleFactor;
             const labelBand = fontSize + (2 * labelGap);
 
             const leftPadding = labelBand;
@@ -2096,7 +2099,7 @@ const BusinessProduct = ({
 
             // Inner border around the QR; outer edge of the canvas is the perimeter (equal a/b gaps)
             ctx.strokeStyle = "#000000";
-            ctx.lineWidth = 2 * scaleFactor;
+            ctx.lineWidth = 2 * qrScaleFactor;
             ctx.strokeRect(
                 leftPadding - borderOffset,
                 topPadding - borderOffset,
@@ -2748,7 +2751,7 @@ const BusinessProduct = ({
                         textAlign: "center",
                     }}
                 >
-                    Select QR download size
+                    Select font size
                 </h3>
                 <p
                     style={{
@@ -2759,7 +2762,7 @@ const BusinessProduct = ({
                         textAlign: "center",
                     }}
                 >
-                    Choose a size, then download
+                    Choose a font size, then download
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "22px" }}>
                     {[
