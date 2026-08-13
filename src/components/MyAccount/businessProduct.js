@@ -2130,15 +2130,32 @@ const BusinessProduct = ({
             ctx.textBaseline = "middle";
             ctx.fillText(topLabel, qrCenterX, topLabelY);
 
-            // 2. "Access GHG Data" vertically on the left, centered in the side channel
+            // 2. CO2 emissions vertically on the left, centered in the side channel
+            const emissionValue =
+                document.getElementById("productCo2EmissionInput")?.value?.trim() ||
+                String(carbonEmission ?? "").trim() ||
+                String(
+                    (singleProduct?.isPublic
+                        ? singleProduct?.published?.co2Emission
+                        : singleProduct?.draft?.co2Emission) ?? ""
+                ).trim() ||
+                "0";
+            const emissionLabel = `${emissionValue} Kg CO2e emissions`;
+            const maxLeftHeight = scaledHeight + (2 * borderOffset);
             ctx.save();
             ctx.font = `normal ${fontSize}px ${fontFamily}`;
             ctx.fillStyle = "#000000";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
+            let leftFontSize = fontSize;
+            const leftWidth = ctx.measureText(emissionLabel).width;
+            if (leftWidth > maxLeftHeight) {
+                leftFontSize = Math.floor(fontSize * (maxLeftHeight / leftWidth));
+                ctx.font = `normal ${leftFontSize}px ${fontFamily}`;
+            }
             ctx.translate(leftLabelX, qrCenterY);
             ctx.rotate(-Math.PI / 2);
-            ctx.fillText("Access GHG Data", 0, 0);
+            ctx.fillText(emissionLabel, 0, 0);
             ctx.restore();
 
             // 3. Product name centered below, same equal a/b gaps as top
@@ -4648,6 +4665,7 @@ const BusinessProduct = ({
                                     <div className="sustainability--contact--error-input-wrapper">
                                         <div>
                                             <input
+                                                id="productCo2EmissionInput"
                                                 onChange={(e) => [
                                                     setCarbonEmission(e.target.value),
                                                     !e.target.value ? setShowEmission(false) : "",
@@ -6587,7 +6605,10 @@ const BusinessProduct = ({
                                             onClick={() => [handleSingleProduct(item?._id, "duplicate"), setOpenQr(true)]}>View</button></div> */}
                                             <div>
                                                 <img src="/images/qr-code-img.png" alt="qrcode" width="25px"
-                                                    onClick={() => [handleSingleProduct(item?._id, "duplicate"), setOpenQr(true)]} />
+                                                    onClick={async () => {
+                                                        await handleSingleProduct(item?._id, "duplicate");
+                                                        setOpenQr(true);
+                                                    }} />
                                             </div>
                                             <div className="product-head-padding" style={{ display: "flex", gap: "10px", paddingLeft: "0px" }}>
                                                 {/* <div className="actionBtn" onClick={() => handleSingleProduct(item?._id)}>
