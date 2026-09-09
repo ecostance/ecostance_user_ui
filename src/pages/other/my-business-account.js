@@ -656,13 +656,25 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
                         <SocialMediaSharing meData={meResponse} />
                       </Tab.Pane>
                       <Tab.Pane eventKey="businessEvent">
-                        <BusinessEvent />
+                        <ModuleAccessGate
+                          moduleId={3}
+                          meData={meResponse?.meData || meData?.meData}
+                          userData={userData}
+                        >
+                          <BusinessEvent />
+                        </ModuleAccessGate>
                       </Tab.Pane>
                       <Tab.Pane eventKey="externalApps">
                         <ExternalApps />
                       </Tab.Pane>
                       <Tab.Pane eventKey="productInfo">
-                        <BusinessProduct />
+                        <ModuleAccessGate
+                          moduleId={4}
+                          meData={meResponse?.meData || meData?.meData}
+                          userData={userData}
+                        >
+                          <BusinessProduct />
+                        </ModuleAccessGate>
                       </Tab.Pane>
                       <Tab.Pane eventKey="supplierDetails">
                         <ModuleAccessGate

@@ -13,12 +13,14 @@ export const MODULE_ACCESS = {
     id: 3,
     name: "Event Page",
     routes: ["/other/conference-carbon-offset"],
+    tabKey: "businessEvent",
   },
   4: {
     id: 4,
     name: "Digital Passport Page",
-    routes: ["/other/my-account"],
+    routes: ["/other/my-account", "/other/my-business-account"],
     query: { sustainability: "true" },
+    tabKey: "productInfo",
   },
   5: {
     id: 5,
