@@ -135,3 +135,33 @@ export const submitModuleAccessInquiry = async (data) => {
   const res = await request.post("/v1/module-access-inquiries", data, { headers });
   return res;
 };
+
+export const getAdminModuleAccessInquiries = async ({
+  page = 1,
+  limit = 10,
+  status,
+  email,
+} = {}) => {
+  const params = new URLSearchParams();
+  params.append("page", page);
+  params.append("limit", limit);
+  if (status) params.append("status", status);
+  if (email) params.append("email", email);
+
+  return await request.get(
+    `/v1/admin/module-access-inquiries?${params.toString()}`,
+    {
+      headers: { Authorization: `Bearer ${getCookie("JWTToken")}` },
+    },
+  );
+};
+
+export const updateModuleAccessInquiryStatus = async (id, status) => {
+  return await request.patch(
+    `/v1/admin/module-access-inquiries/${id}`,
+    { status },
+    {
+      headers: { Authorization: `Bearer ${getCookie("JWTToken")}` },
+    },
+  );
+};

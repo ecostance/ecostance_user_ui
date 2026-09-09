@@ -8,13 +8,15 @@ import Head from "next/head";
 import { connect } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 import { Spinner } from "react-bootstrap";
-import { FaSave, FaDollarSign, FaLink, FaCopy, FaShare, FaTrash, FaExternalLinkAlt, FaCalendarAlt, FaList, FaEdit, FaTimes, FaUser, FaEnvelope, FaCheckCircle, FaRedo, FaBuilding, FaUserTie, FaChevronDown, FaChevronUp, FaCog, FaUsers, FaCalendar, FaIdCard, FaTruck, FaBriefcase, FaInfoCircle, FaMinus, FaPlus, FaTh, FaCheck, FaClock, FaSync, FaCreditCard } from "react-icons/fa";
+import { FaSave, FaDollarSign, FaLink, FaCopy, FaShare, FaTrash, FaExternalLinkAlt, FaCalendarAlt, FaList, FaEdit, FaTimes, FaUser, FaEnvelope, FaCheckCircle, FaRedo, FaBuilding, FaUserTie, FaChevronDown, FaChevronUp, FaCog, FaUsers, FaCalendar, FaIdCard, FaTruck, FaBriefcase, FaInfoCircle, FaMinus, FaPlus, FaTh, FaCheck, FaClock, FaSync, FaCreditCard, FaInbox } from "react-icons/fa";
 import {
   createPricingLink,
   getAllPricingLinks,
   deletePricingLink,
   updatePricingLink,
   getAdminPricingFunnel,
+  getAdminModuleAccessInquiries,
+  updateModuleAccessInquiryStatus,
 } from "../../apiClient/pricingLinks";
 import { isDynamicPricingAdmin } from "src/constants/dynamicPricingAdmins";
 
@@ -138,6 +140,12 @@ const DynamicPricing = ({ userData }) => {
   const [purchasesSummary, setPurchasesSummary] = useState({});
   const [purchasesTotalPages, setPurchasesTotalPages] = useState(1);
   const [expandedPurchaseLinkId, setExpandedPurchaseLinkId] = useState(null);
+  const [requestsPage, setRequestsPage] = useState(1);
+  const [requestsFilter, setRequestsFilter] = useState("all");
+  const [requestsEmail, setRequestsEmail] = useState("");
+  const [requestsLoading, setRequestsLoading] = useState(false);
+  const [requestsRows, setRequestsRows] = useState([]);
+  const [requestsTotalPages, setRequestsTotalPages] = useState(1);
 
   useEffect(() => {
     const email =
@@ -187,6 +195,45 @@ const DynamicPricing = ({ userData }) => {
       loadPurchases();
     }
   }, [activeTab, purchasesPage, purchasesFilter, purchasesEmail]);
+
+  useEffect(() => {
+    if (activeTab === "requests") {
+      loadRequests();
+    }
+  }, [activeTab, requestsPage, requestsFilter, requestsEmail]);
+
+  const loadRequests = async () => {
+    setRequestsLoading(true);
+    try {
+      const response = await getAdminModuleAccessInquiries({
+        page: requestsPage,
+        limit: 10,
+        status: requestsFilter !== "all" ? requestsFilter : undefined,
+        email: requestsEmail || undefined,
+      });
+      if (response?.data?.success) {
+        setRequestsRows(response.data.data || []);
+        setRequestsTotalPages(response.data.pagination?.totalPages || 1);
+      }
+    } catch (error) {
+      addToast("Failed to load contact requests", {
+        appearance: "error",
+        autoDismiss: true,
+      });
+    } finally {
+      setRequestsLoading(false);
+    }
+  };
+
+  const handleRequestStatusChange = async (id, status) => {
+    try {
+      await updateModuleAccessInquiryStatus(id, status);
+      addToast("Request status updated", { appearance: "success", autoDismiss: true });
+      loadRequests();
+    } catch (error) {
+      addToast("Failed to update status", { appearance: "error", autoDismiss: true });
+    }
+  };
 
   const loadPurchases = async () => {
     setPurchasesLoading(true);
@@ -751,6 +798,11 @@ const DynamicPricing = ({ userData }) => {
             <Nav.Item>
               <Nav.Link eventKey="purchases" className="d-flex align-items-center">
                 <FaCreditCard style={{ marginRight: "8px" }} />Purchases
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="requests" className="d-flex align-items-center">
+                <FaInbox style={{ marginRight: "8px" }} />Requests
               </Nav.Link>
             </Nav.Item>
           </Nav>
@@ -3117,6 +3169,154 @@ const DynamicPricing = ({ userData }) => {
                         size="sm"
                         disabled={purchasesPage >= purchasesTotalPages}
                         onClick={() => setPurchasesPage((p) => p + 1)}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  )}
+                </Card.Body>
+              </Card>
+            </>
+          )}
+
+          {activeTab === "requests" && (
+            <>
+              <Card className="mb-4">
+                <Card.Body>
+                  <Row className="align-items-end">
+                    <Col md={3}>
+                      <Form.Label>Status</Form.Label>
+                      <Form.Control
+                        as="select"
+                        value={requestsFilter}
+                        onChange={(e) => {
+                          setRequestsFilter(e.target.value);
+                          setRequestsPage(1);
+                        }}
+                      >
+                        <option value="all">All</option>
+                        <option value="new">New</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="resolved">Resolved</option>
+                      </Form.Control>
+                    </Col>
+                    <Col md={4}>
+                      <Form.Label>Search email</Form.Label>
+                      <Form.Control
+                        value={requestsEmail}
+                        onChange={(e) => setRequestsEmail(e.target.value)}
+                        placeholder="customer@email.com"
+                      />
+                    </Col>
+                    <Col md={2}>
+                      <Button variant="primary" onClick={loadRequests}>
+                        Refresh
+                      </Button>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+
+              <Card>
+                <Card.Body>
+                  {requestsLoading ? (
+                    <div className="text-center py-5">
+                      <Spinner animation="border" />
+                    </div>
+                  ) : (
+                    <Table responsive hover>
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Company</th>
+                          <th>Phone</th>
+                          <th>Module</th>
+                          <th>Message</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {requestsRows.length === 0 ? (
+                          <tr>
+                            <td colSpan={9} className="text-center text-muted py-4">
+                              No contact requests yet
+                            </td>
+                          </tr>
+                        ) : (
+                          requestsRows.map((row) => (
+                            <tr
+                              key={row._id}
+                              style={row.status === "new" ? { background: "#f0f7ff" } : {}}
+                            >
+                              <td style={{ whiteSpace: "nowrap" }}>
+                                {row.createdAt
+                                  ? new Date(row.createdAt).toLocaleString()
+                                  : "—"}
+                              </td>
+                              <td>{row.name || "—"}</td>
+                              <td>
+                                <a href={`mailto:${row.email}`}>{row.email}</a>
+                              </td>
+                              <td>{row.company || "—"}</td>
+                              <td>{row.phone || "—"}</td>
+                              <td>{row.moduleName || row.moduleId || "—"}</td>
+                              <td style={{ maxWidth: "240px" }}>
+                                {row.message || "—"}
+                              </td>
+                              <td>
+                                <Badge
+                                  variant={
+                                    row.status === "resolved"
+                                      ? "success"
+                                      : row.status === "contacted"
+                                        ? "info"
+                                        : "warning"
+                                  }
+                                >
+                                  {row.status || "new"}
+                                </Badge>
+                              </td>
+                              <td>
+                                <Form.Control
+                                  as="select"
+                                  size="sm"
+                                  value={row.status || "new"}
+                                  onChange={(e) =>
+                                    handleRequestStatusChange(row._id, e.target.value)
+                                  }
+                                  style={{ minWidth: "110px" }}
+                                >
+                                  <option value="new">New</option>
+                                  <option value="contacted">Contacted</option>
+                                  <option value="resolved">Resolved</option>
+                                </Form.Control>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </Table>
+                  )}
+
+                  {requestsTotalPages > 1 && (
+                    <div className="d-flex justify-content-between align-items-center mt-3">
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        disabled={requestsPage <= 1}
+                        onClick={() => setRequestsPage((p) => Math.max(1, p - 1))}
+                      >
+                        Previous
+                      </Button>
+                      <span>Page {requestsPage} of {requestsTotalPages}</span>
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        disabled={requestsPage >= requestsTotalPages}
+                        onClick={() => setRequestsPage((p) => p + 1)}
                       >
                         Next
                       </Button>
