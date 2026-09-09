@@ -326,11 +326,23 @@ const NewSuccess = ({
       return {
         data: {
           orderNumber: "",
-          products: Array.isArray(orderPayload?.products)
+          products: (Array.isArray(orderPayload?.products)
             ? orderPayload.products
-            : [],
-          orderTotal: parsed?.total || orderPayload?.total || 0,
-          subTotal: parsed?.total || orderPayload?.total || 0,
+            : []
+          ).map((item) => ({
+            product: {
+              id: item?.product?.id || item?.product,
+              name:
+                item?.name ||
+                item?.product?.name ||
+                item?.productName ||
+                "Module",
+            },
+            price: Number(item?.price || 0),
+            quantity: Number(item?.quantity || 1),
+          })),
+          orderTotal: Number(parsed?.total || orderPayload?.total || 0),
+          subTotal: Number(parsed?.total || orderPayload?.total || 0),
           currency: orderPayload?.currency || "USD",
           currencySymbol: orderPayload?.currencySymbol || "$",
           billingAddress: {
@@ -368,12 +380,25 @@ const NewSuccess = ({
     console.log("Handling module order...");
 
     try {
-      // Ensure UI remains in module mode regardless of localStorage cleanup
       setIsModuleFlow(true);
+
+      const sessionId = getCheckoutSessionId();
+      if (sessionId) {
+        const webhookOrder = await waitForWebhookOrder(sessionId, 30000);
+        if (webhookOrder) {
+          setOrder(webhookOrder);
+          addOrder(true, webhookOrder);
+          cleanupModuleCheckoutStorage();
+          setIsOrderLoaded(true);
+          return;
+        }
+      }
 
       // Check if this is a guest checkout (no JWT token)
       const hasJWTToken = !!getCookie("JWTToken");
-      const dynamicPricingData = localStorage.getItem("dynamicPricingCheckout");
+      const dynamicPricingData =
+        localStorage.getItem("dynamicPricingCheckout") ||
+        sessionStorage.getItem("dynamicPricingCheckout");
       const isGuestFlow = !hasJWTToken && dynamicPricingData;
 
       if (isGuestFlow) {
@@ -392,36 +417,15 @@ const NewSuccess = ({
           console.error("Error parsing guest checkout data:", parseError);
         }
 
-        // The Stripe webhook creates the real order (with order number, billing
-        // address and products). Poll for it instead of rendering a placeholder.
-        // Read the query off the URL: on this statically-optimized page
-        // Router.query can still be empty during the first effect.
-        const sessionId =
-          Router.query.session_id ||
-          new URLSearchParams(window.location.search).get("session_id");
-        const webhookOrder = sessionId
-          ? await waitForWebhookOrder(sessionId)
-          : null;
-
-        if (webhookOrder) {
-          setOrder(webhookOrder);
-          addOrder(true, webhookOrder);
-        } else {
-          // Webhook has not landed yet - show what we know from the checkout we
-          // just completed rather than an empty receipt.
-          const localOrder = buildLocalOrderFallback(guestEmailFromData);
-          if (localOrder) {
-            setOrder(localOrder);
-            addOrder(true, localOrder);
-          }
+        // Webhook has not landed yet - show what we know from the checkout we
+        // just completed rather than an empty receipt.
+        const localOrder = buildLocalOrderFallback(guestEmailFromData);
+        if (localOrder) {
+          setOrder(localOrder);
+          addOrder(true, localOrder);
         }
 
-        // Clean up localStorage
-        localStorage.removeItem("modulepurchase");
-        localStorage.removeItem("moduleOrderData");
-        localStorage.removeItem("dynamicPricingCheckout");
-        localStorage.removeItem("BusinessOrderSelection");
-        localStorage.removeItem("checkoutCartBackup");
+        cleanupModuleCheckoutStorage();
 
         setIsOrderLoaded(true);
         return;
@@ -622,10 +626,7 @@ const NewSuccess = ({
         
         // Clean up localStorage
         console.log("Cleaning up localStorage");
-        localStorage.removeItem("modulepurchase");
-        localStorage.removeItem("moduleOrderData");
-        localStorage.removeItem("BusinessOrderSelection");
-        localStorage.removeItem("checkoutCartBackup");
+        cleanupModuleCheckoutStorage();
         
         // Set order as loaded
         console.log("Setting order as loaded");
@@ -862,6 +863,24 @@ const NewSuccess = ({
 
   const formatAmount = (amount, currency) =>
     formatCurrency(Number(amount || 0).toFixed(2), currency);
+
+  const formatProductPrice = (price, currency) =>
+    formatCurrency(Number(price || 0).toFixed(2), currency);
+
+  const cleanupModuleCheckoutStorage = () => {
+    localStorage.removeItem("modulepurchase");
+    localStorage.removeItem("moduleOrderData");
+    localStorage.removeItem("dynamicPricingCheckout");
+    sessionStorage.removeItem("dynamicPricingCheckout");
+    localStorage.removeItem("BusinessOrderSelection");
+    localStorage.removeItem("checkoutCartBackup");
+  };
+
+  const getCheckoutSessionId = () =>
+    Router.query.session_id ||
+    (typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("session_id")
+      : null);
 
   // Renders "" (not "Invalid Date") until the order carries a timestamp.
   const getFormattedDateTime = (date) => {
@@ -1146,9 +1165,9 @@ const NewSuccess = ({
                               {order?.data?.currency}{" "}
                               {order?.data?.currencySymbol}
                               {formatCurrency(
-                                (
-                                  order?.data?.paymentLogs?.[0]?.amount_total /
-                                  100
+                                Number(
+                                  (order?.data?.paymentLogs?.[0]?.amount_total ||
+                                    0) / 100,
                                 ).toFixed(2),
                                 order?.data?.currency
                               )}
@@ -1194,8 +1213,9 @@ const NewSuccess = ({
                             {order?.data?.currency}{" "}
                             {order?.data?.currencySymbol}
                             {formatCurrency(
-                              (
-                                order?.data?.paymentLogs?.[0]?.amount_total / 100
+                              Number(
+                                (order?.data?.paymentLogs?.[0]?.amount_total ||
+                                  0) / 100,
                               ).toFixed(2),
                               order?.data?.currency
                             )}
@@ -1237,8 +1257,8 @@ const NewSuccess = ({
                         <p className="product-table-header-item-3">
                           {order?.data?.currency}{" "}
                           {currency || order?.data?.currencySymbol}
-                          {formatCurrency(
-                            item?.price?.toFixed(2),
+                          {formatProductPrice(
+                            item?.price,
                             order?.data?.currency
                           )}
                         </p>
@@ -1251,8 +1271,8 @@ const NewSuccess = ({
                         <p className="product-table-header-item-5">
                           {order?.data?.currency}{" "}
                           {currency || order?.data?.currencySymbol}
-                          {formatCurrency(
-                            Number(item.price * item.quantity)?.toFixed(2),
+                          {formatProductPrice(
+                            Number(item?.price || 0) * Number(item?.quantity || 1),
                             order?.data?.currency
                           )}
                         </p>
@@ -1303,8 +1323,8 @@ const NewSuccess = ({
                       <p>
                         -{order?.data?.currency}{" "}
                         {currency || order?.data?.currencySymbol}
-                        {formatCurrency(
-                          order?.data?.calculatedCouponDiscount?.toFixed(2),
+                        {formatProductPrice(
+                          order?.data?.calculatedCouponDiscount,
                           order?.data?.currency
                         )}
                       </p>

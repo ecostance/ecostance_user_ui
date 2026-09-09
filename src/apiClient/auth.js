@@ -98,8 +98,10 @@ export const login = async ({
       })
     let MyBusinessDetails = await getBusinessProfile(`Bearer ${loginResult?.data?.token}`)
     console.log("business", MyBusinessDetails)
-    if (MyBusinessDetails?.data?.success) {
-      localStorage.setItem("MyBusinessDetails", JSON.stringify(MyBusinessDetails.data.data?.[0]))
+    if (MyBusinessDetails?.data?.success && MyBusinessDetails.data.data?.[0]?.name) {
+      localStorage.setItem("MyBusinessDetails", JSON.stringify(MyBusinessDetails.data.data[0]))
+    } else {
+      localStorage.removeItem("MyBusinessDetails")
     }
 
     await getAllOrders(1, loginResult?.data?.token)

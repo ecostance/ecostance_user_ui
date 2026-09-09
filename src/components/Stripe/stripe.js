@@ -958,7 +958,7 @@ const CheckoutForm = ({
     getAllCountries();
     checkoutElement.current = removeErrorMessage;
     console.log("callcart1", cartItems);
-    if (localStorage.getItem("MyBusinessDetails")) {
+    if (userData?.isLoggedIn && localStorage.getItem("MyBusinessDetails")) {
       handleReverseCart();
     }
     updateCartForStripe(cartItems?.currency || userData?.currency);
@@ -1608,8 +1608,18 @@ const CheckoutForm = ({
     }
   };
 
+  const hasOwnBusiness = () => {
+    if (!userData?.isLoggedIn) return false;
+    try {
+      const details = JSON.parse(localStorage.getItem("MyBusinessDetails") || "null");
+      return !!details?.name;
+    } catch {
+      return false;
+    }
+  };
+
   const handlePress = () => {
-    if (localStorage.getItem("MyBusinessDetails")) {
+    if (hasOwnBusiness()) {
       setBusinessPopShown(true);
     }
   };
@@ -1674,13 +1684,11 @@ const CheckoutForm = ({
       }
     }
 
-    // Check business popup
-    if (!localStorage.getItem("BusinessOrderSelection")) {
-      if (localStorage.getItem("MyBusinessDetails")) {
-        setBusinessPopShown(true);
-        setIsPaymentLoading(false);
-        return;
-      }
+    // Check business popup — only for logged-in users who created a business
+    if (!localStorage.getItem("BusinessOrderSelection") && hasOwnBusiness()) {
+      setBusinessPopShown(true);
+      setIsPaymentLoading(false);
+      return;
     }
 
     if (orderData.isOrderPlaced) {
@@ -1707,14 +1715,18 @@ const CheckoutForm = ({
       let guestCheckoutLinkId = null;
       if (isDynamicPricingGuestFlow) {
         try {
-          const dynamicPricingData = JSON.parse(
-            localStorage.getItem("dynamicPricingCheckout") || "{}",
-          );
+          const dynamicPricingRaw =
+            localStorage.getItem("dynamicPricingCheckout") ||
+            sessionStorage.getItem("dynamicPricingCheckout") ||
+            "{}";
+          const dynamicPricingData = JSON.parse(dynamicPricingRaw);
           guestCheckoutEmail =
             dynamicPricingData?.guestEmail ||
             dynamicPricingData?.buyerInfo?.email;
           guestCheckoutLinkId =
-            dynamicPricingData?.linkId || router.query.linkId;
+            dynamicPricingData?.linkId ||
+            router.query.linkId ||
+            sessionStorage.getItem("processedDynamicPricingLinkId");
         } catch (e) {
           console.error("Error parsing dynamicPricingCheckout:", e);
         }
@@ -1756,7 +1768,13 @@ const CheckoutForm = ({
         // Get product IDs for webhook processing
         const moduleOrderData = returnAPIProductsForOrder();
         const productIds = moduleOrderData?.products
-          ?.map((p) => p.product || p._id)
+          ?.map(
+            (p) =>
+              p.productId ||
+              p.product?.id ||
+              p.product ||
+              p._id,
+          )
           .filter(Boolean);
 
         // Determine product name based on payment mode
@@ -1805,6 +1823,7 @@ const CheckoutForm = ({
             isDynamicPricing: isDynamicPricingGuestFlow ? "true" : "false",
             guestCheckout: isDynamicPricingGuestFlow ? "true" : "false",
             linkId: guestCheckoutLinkId || "",
+            pricingLinkId: guestCheckoutLinkId || "",
             productIds: JSON.stringify(productIds),
             selectedPaymentMode: paymentMode,
             paymentPlan:
@@ -1853,7 +1872,13 @@ const CheckoutForm = ({
         // Get product IDs for webhook processing
         const moduleOrderData = returnAPIProductsForOrder();
         const productIds = moduleOrderData?.products
-          ?.map((p) => p.product || p._id)
+          ?.map(
+            (p) =>
+              p.productId ||
+              p.product?.id ||
+              p.product ||
+              p._id,
+          )
           .filter(Boolean);
 
         // Determine product name based on payment mode
@@ -1902,6 +1927,7 @@ const CheckoutForm = ({
             isDynamicPricing: isDynamicPricingGuestFlow ? "true" : "false",
             guestCheckout: isDynamicPricingGuestFlow ? "true" : "false",
             linkId: guestCheckoutLinkId || "",
+            pricingLinkId: guestCheckoutLinkId || "",
             productIds: JSON.stringify(productIds),
             selectedPaymentMode: paymentMode,
           },
@@ -2141,7 +2167,13 @@ const CheckoutForm = ({
         // Get product IDs for webhook processing
         const moduleOrderData = returnAPIProductsForOrder();
         const productIds = moduleOrderData?.products
-          ?.map((p) => p.product || p._id)
+          ?.map(
+            (p) =>
+              p.productId ||
+              p.product?.id ||
+              p.product ||
+              p._id,
+          )
           .filter(Boolean);
 
         // Determine product name based on payment mode
@@ -2190,6 +2222,7 @@ const CheckoutForm = ({
             isDynamicPricing: isDynamicPricingGuestFlow ? "true" : "false",
             guestCheckout: isDynamicPricingGuestFlow ? "true" : "false",
             linkId: guestCheckoutLinkId || "",
+            pricingLinkId: guestCheckoutLinkId || "",
             productIds: JSON.stringify(productIds),
             selectedPaymentMode: paymentMode,
           },
