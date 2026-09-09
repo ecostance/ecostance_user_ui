@@ -96,3 +96,42 @@ export const createOrUpdatePricingLink = async (linkId, data) => {
   const res = await request.post(`/v1/pricing-links/${linkId}`, data);
   return res;
 };
+
+export const recordPricingLinkEvent = async (linkId, stage, metadata = {}) => {
+  const res = await request.post(`/v1/pricing-links/${linkId}/events`, {
+    stage,
+    metadata,
+  });
+  return res;
+};
+
+export const getAdminPricingFunnel = async ({
+  page = 1,
+  limit = 10,
+  stage,
+  email,
+  pricingLinkId,
+  filter = "all",
+} = {}) => {
+  const params = new URLSearchParams();
+  params.append("page", page);
+  params.append("limit", limit);
+  if (stage) params.append("stage", stage);
+  if (email) params.append("email", email);
+  if (pricingLinkId) params.append("pricingLinkId", pricingLinkId);
+  if (filter) params.append("filter", filter);
+
+  const res = await request.get(`/v1/admin/pricing-funnel?${params.toString()}`, {
+    headers: {
+      Authorization: `Bearer ${getCookie("JWTToken")}`,
+    },
+  });
+  return res;
+};
+
+export const submitModuleAccessInquiry = async (data) => {
+  const token = getCookie("JWTToken");
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const res = await request.post("/v1/module-access-inquiries", data, { headers });
+  return res;
+};

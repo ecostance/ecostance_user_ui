@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Fragment } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { Container, Row, Col, Form, Button, Card, Alert, Badge, Table, Modal, Nav, Collapse, OverlayTrigger, Tooltip, Popover } from "react-bootstrap";
 import { LayoutTwo } from "../../components/Layout";
 import { BreadcrumbOne } from "../../components/Breadcrumb";
@@ -7,8 +8,24 @@ import Head from "next/head";
 import { connect } from "react-redux";
 import { useToasts } from "react-toast-notifications";
 import { Spinner } from "react-bootstrap";
-import { FaSave, FaDollarSign, FaLink, FaCopy, FaShare, FaTrash, FaExternalLinkAlt, FaCalendarAlt, FaList, FaEdit, FaTimes, FaUser, FaEnvelope, FaCheckCircle, FaRedo, FaBuilding, FaUserTie, FaChevronDown, FaChevronUp, FaCog, FaUsers, FaCalendar, FaIdCard, FaTruck, FaBriefcase, FaInfoCircle, FaMinus, FaPlus, FaTh, FaCheck, FaClock, FaSync } from "react-icons/fa";
-import { createPricingLink, getAllPricingLinks, deletePricingLink, updatePricingLink } from "../../apiClient/pricingLinks";
+import { FaSave, FaDollarSign, FaLink, FaCopy, FaShare, FaTrash, FaExternalLinkAlt, FaCalendarAlt, FaList, FaEdit, FaTimes, FaUser, FaEnvelope, FaCheckCircle, FaRedo, FaBuilding, FaUserTie, FaChevronDown, FaChevronUp, FaCog, FaUsers, FaCalendar, FaIdCard, FaTruck, FaBriefcase, FaInfoCircle, FaMinus, FaPlus, FaTh, FaCheck, FaClock, FaSync, FaCreditCard } from "react-icons/fa";
+import {
+  createPricingLink,
+  getAllPricingLinks,
+  deletePricingLink,
+  updatePricingLink,
+  getAdminPricingFunnel,
+} from "../../apiClient/pricingLinks";
+import { isDynamicPricingAdmin } from "src/constants/dynamicPricingAdmins";
+
+const FUNNEL_STAGE_LABELS = {
+  link_sent: "Link Sent",
+  link_viewed: "Link Clicked",
+  checkout_started: "Checkout Started",
+  payment_cancelled: "Payment Cancelled",
+  payment_failed: "Payment Failed",
+  payment_completed: "Paid",
+};
 
 // Module icons mapping
 const MODULE_ICONS = {
@@ -79,6 +96,7 @@ const FIXED_MODULES = [
 ];
 
 const DynamicPricing = ({ userData }) => {
+  const router = useRouter();
   const { addToast } = useToasts();
   const [loading, setLoading] = useState(false);
   const [modules] = useState(FIXED_MODULES);
@@ -112,6 +130,23 @@ const DynamicPricing = ({ userData }) => {
   const [deleting, setDeleting] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingLinkId, setEditingLinkId] = useState(null);
+  const [purchasesPage, setPurchasesPage] = useState(1);
+  const [purchasesFilter, setPurchasesFilter] = useState("all");
+  const [purchasesEmail, setPurchasesEmail] = useState("");
+  const [purchasesLoading, setPurchasesLoading] = useState(false);
+  const [purchasesRows, setPurchasesRows] = useState([]);
+  const [purchasesSummary, setPurchasesSummary] = useState({});
+  const [purchasesTotalPages, setPurchasesTotalPages] = useState(1);
+  const [expandedPurchaseLinkId, setExpandedPurchaseLinkId] = useState(null);
+
+  useEffect(() => {
+    const email =
+      userData?.user?.email ||
+      (typeof window !== "undefined" ? localStorage.getItem("email") : "");
+    if (!userData?.isLoggedIn || !isDynamicPricingAdmin(email)) {
+      router.replace("/");
+    }
+  }, [userData, router]);
 
   useEffect(() => {
     initializePricing();
@@ -146,6 +181,33 @@ const DynamicPricing = ({ userData }) => {
       loadSavedLinks();
     }
   }, [activeTab, linksPage, linksFilter]);
+
+  useEffect(() => {
+    if (activeTab === "purchases") {
+      loadPurchases();
+    }
+  }, [activeTab, purchasesPage, purchasesFilter, purchasesEmail]);
+
+  const loadPurchases = async () => {
+    setPurchasesLoading(true);
+    try {
+      const response = await getAdminPricingFunnel({
+        page: purchasesPage,
+        limit: 10,
+        filter: purchasesFilter,
+        email: purchasesEmail || undefined,
+      });
+      if (response?.data?.success) {
+        setPurchasesRows(response.data.data || []);
+        setPurchasesSummary(response.data.summary || {});
+        setPurchasesTotalPages(response.data.pagination?.totalPages || 1);
+      }
+    } catch (error) {
+      addToast("Failed to load purchases funnel", { appearance: "error", autoDismiss: true });
+    } finally {
+      setPurchasesLoading(false);
+    }
+  };
 
   const loadSavedLinks = async () => {
     setLoadingLinks(true);
@@ -684,6 +746,11 @@ const DynamicPricing = ({ userData }) => {
             <Nav.Item>
               <Nav.Link eventKey="manage" className="d-flex align-items-center">
                 <FaList style={{ marginRight: "8px" }} />Manage Links
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="purchases" className="d-flex align-items-center">
+                <FaCreditCard style={{ marginRight: "8px" }} />Purchases
               </Nav.Link>
             </Nav.Item>
           </Nav>
@@ -2864,6 +2931,196 @@ const DynamicPricing = ({ userData }) => {
                         </div>
                       )}
                     </>
+                  )}
+                </Card.Body>
+              </Card>
+            </>
+          )}
+
+          {activeTab === "purchases" && (
+            <>
+              <Row className="mb-4">
+                {[
+                  { key: "link_sent", label: "Sent", color: "#007bff" },
+                  { key: "link_viewed", label: "Clicked", color: "#17a2b8" },
+                  { key: "checkout_started", label: "Checkout", color: "#ffc107" },
+                  { key: "payment_completed", label: "Paid", color: "#28a745" },
+                  { key: "abandoned", label: "Abandoned", color: "#dc3545" },
+                ].map((card) => (
+                  <Col md={2} sm={6} className="mb-3" key={card.key}>
+                    <Card style={{ borderLeft: `4px solid ${card.color}`, height: "100%" }}>
+                      <Card.Body className="py-3">
+                        <h6 className="text-muted mb-1">{card.label}</h6>
+                        <h4 className="mb-0">{purchasesSummary[card.key] || 0}</h4>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+
+              <Card className="mb-4">
+                <Card.Body>
+                  <Row className="align-items-end">
+                    <Col md={3}>
+                      <Form.Label>Filter</Form.Label>
+                      <Form.Control
+                        as="select"
+                        value={purchasesFilter}
+                        onChange={(e) => {
+                          setPurchasesFilter(e.target.value);
+                          setPurchasesPage(1);
+                        }}
+                      >
+                        <option value="all">All</option>
+                        <option value="paid">Paid</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="abandoned">Abandoned</option>
+                        <option value="issues">Issues (24h+)</option>
+                      </Form.Control>
+                    </Col>
+                    <Col md={4}>
+                      <Form.Label>Search email</Form.Label>
+                      <Form.Control
+                        value={purchasesEmail}
+                        onChange={(e) => setPurchasesEmail(e.target.value)}
+                        placeholder="customer@email.com"
+                      />
+                    </Col>
+                    <Col md={2}>
+                      <Button variant="primary" onClick={loadPurchases}>
+                        Refresh
+                      </Button>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+
+              <Card>
+                <Card.Body>
+                  {purchasesLoading ? (
+                    <div className="text-center py-5">
+                      <Spinner animation="border" />
+                    </div>
+                  ) : (
+                    <Table responsive hover>
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>Customer</th>
+                          <th>Email</th>
+                          <th>Link ID</th>
+                          <th>Stage</th>
+                          <th>Last Activity</th>
+                          <th>Amount</th>
+                          <th>Modules</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {purchasesRows.length === 0 ? (
+                          <tr>
+                            <td colSpan={8} className="text-center text-muted py-4">
+                              No records found
+                            </td>
+                          </tr>
+                        ) : (
+                          purchasesRows.map((row) => (
+                            <Fragment key={row.linkId}>
+                            <tr style={row.isStuck ? { background: "#fff3cd" } : {}}>
+                              <td>
+                                <Button
+                                  variant="link"
+                                  size="sm"
+                                  onClick={() =>
+                                    setExpandedPurchaseLinkId(
+                                      expandedPurchaseLinkId === row.linkId
+                                        ? null
+                                        : row.linkId,
+                                    )
+                                  }
+                                >
+                                  {expandedPurchaseLinkId === row.linkId ? "−" : "+"}
+                                </Button>
+                              </td>
+                              <td>{row.customerName || "—"}</td>
+                              <td>{row.customerEmail || "—"}</td>
+                              <td>
+                                <code style={{ fontSize: "11px" }}>{row.linkId}</code>
+                              </td>
+                              <td>
+                                <Badge variant={row.funnelStage === "payment_completed" ? "success" : "warning"}>
+                                  {FUNNEL_STAGE_LABELS[row.funnelStage] || row.funnelStage}
+                                </Badge>
+                                {row.isStuck && <Badge variant="danger" className="ml-1">Issue</Badge>}
+                              </td>
+                              <td>
+                                {row.lastActivity
+                                  ? new Date(row.lastActivity).toLocaleString()
+                                  : "—"}
+                              </td>
+                              <td>
+                                {row.purchase?.paymentDetails?.grandTotal != null
+                                  ? `$${row.purchase.paymentDetails.grandTotal}`
+                                  : "—"}
+                              </td>
+                              <td>
+                                {(row.purchase?.selectedModules || row.modules || [])
+                                  .map((m) => m.moduleName || m.name)
+                                  .filter(Boolean)
+                                  .join(", ") || "—"}
+                              </td>
+                            </tr>
+                            {expandedPurchaseLinkId === row.linkId && (
+                              <tr key={`${row.linkId}-details`}>
+                                <td colSpan={8} style={{ background: "#f8f9fa" }}>
+                                  <div className="p-3">
+                                    <strong>Event timeline</strong>
+                                    <ul className="mb-2 mt-2">
+                                      {(row.funnelEvents || []).map((event, idx) => (
+                                        <li key={idx}>
+                                          {FUNNEL_STAGE_LABELS[event.stage] || event.stage} —{" "}
+                                          {event.at
+                                            ? new Date(event.at).toLocaleString()
+                                            : "—"}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                    {row.purchase?.paymentInfo?.stripeSessionId && (
+                                      <p className="mb-0">
+                                        <strong>Stripe session:</strong>{" "}
+                                        {row.purchase.paymentInfo.stripeSessionId}
+                                      </p>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                            </Fragment>
+                          ))
+                        )}
+                      </tbody>
+                    </Table>
+                  )}
+
+                  {purchasesTotalPages > 1 && (
+                    <div className="d-flex justify-content-between align-items-center mt-3">
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        disabled={purchasesPage <= 1}
+                        onClick={() => setPurchasesPage((p) => Math.max(1, p - 1))}
+                      >
+                        Previous
+                      </Button>
+                      <span>Page {purchasesPage} of {purchasesTotalPages}</span>
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        disabled={purchasesPage >= purchasesTotalPages}
+                        onClick={() => setPurchasesPage((p) => p + 1)}
+                      >
+                        Next
+                      </Button>
+                    </div>
                   )}
                 </Card.Body>
               </Card>

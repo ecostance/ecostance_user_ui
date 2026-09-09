@@ -36,6 +36,7 @@ import MyEmployer from "src/components/MyAccount/myEmployer";
 import EmployerBusiness from "src/components/MyEmployerAccount/employerBusiness"
 import EmployerBusinessSustainability from "src/components/MyAccount/employerBusinessSustainability";
 import EmployerDashboard from "./employerDashboard";
+import ModuleAccessGate from "src/components/ModuleAccess/ModuleAccessGate";
 
 const MyEmployerAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
     const [meResponse, setMeResponse] = useState(meData);
@@ -603,7 +604,15 @@ const MyEmployerAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
         </MyProvider>
     );
 
-    return <>{MyEmployerAccount()}</>;
+    return (
+        <ModuleAccessGate
+            moduleId={2}
+            meData={meResponse?.meData || meData?.meData}
+            userData={userData}
+        >
+            {MyEmployerAccount()}
+        </ModuleAccessGate>
+    );
 };
 
 const returnResponseFailed = () => {

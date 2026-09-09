@@ -159,6 +159,13 @@ const CheckoutForm = ({
     router.query.moduleOrder === "true" ||
     localStorage.getItem("modulepurchase") === "true";
 
+  useEffect(() => {
+    if (router.query.dynamicPricing === "true") {
+      const plan = localStorage.getItem("dynamicPricingPaymentPlan") || "full";
+      paymentOptionChange(plan === "monthly" ? "subscription" : "module");
+    }
+  }, [router.query.dynamicPricing]);
+
   // Debug module order detection
   console.log("=== MODULE ORDER DETECTION DEBUG ===");
   console.log("router.query.moduleOrder:", router.query.moduleOrder);
@@ -1800,6 +1807,8 @@ const CheckoutForm = ({
             linkId: guestCheckoutLinkId || "",
             productIds: JSON.stringify(productIds),
             selectedPaymentMode: paymentMode,
+            paymentPlan:
+              localStorage.getItem("dynamicPricingPaymentPlan") || "full",
           },
         });
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { recordPricingLinkEvent } from "src/apiClient/pricingLinks";
 import { BreadcrumbOne } from "../../components/Breadcrumb";
 import { LayoutTwo } from "../../components/Layout";
 import Link from "next/link";
@@ -13,8 +14,22 @@ const Cancel = (props) => {
   const [order, setOrder] = useState({});
 
   useEffect(() => {
-    localStorage.removeItem("BusinessOrderSelection")
-    // handleStripeSession()
+    localStorage.removeItem("BusinessOrderSelection");
+
+    const linkId =
+      Router.query.linkId ||
+      new URLSearchParams(window.location.search).get("linkId");
+    const isDynamicPricing =
+      Router.query.dynamicPricing === "true" ||
+      new URLSearchParams(window.location.search).get("dynamicPricing") ===
+        "true" ||
+      localStorage.getItem("dynamicPricingCheckout");
+
+    if (linkId && isDynamicPricing) {
+      recordPricingLinkEvent(linkId, "payment_cancelled", {
+        sessionId: Router.query.session_id,
+      }).catch(() => {});
+    }
   }, []);
 
   return (

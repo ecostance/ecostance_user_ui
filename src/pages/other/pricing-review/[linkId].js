@@ -6,7 +6,7 @@ import { BreadcrumbOne } from "../../../components/Breadcrumb";
 import Head from "next/head";
 import { useToasts } from "react-toast-notifications";
 import { FaCreditCard, FaDownload, FaCheckCircle, FaExclamationTriangle, FaCalendarAlt, FaBriefcase, FaUsers, FaCalendar, FaIdCard, FaTruck, FaCog, FaMinus, FaPlus, FaList, FaTh, FaUser, FaEnvelope, FaBuilding, FaUserTie, FaInfoCircle } from "react-icons/fa";
-import { getPricingLinkById } from "../../../apiClient/pricingLinks";
+import { getPricingLinkById, recordPricingLinkEvent } from "../../../apiClient/pricingLinks";
 import jsPDF from "jspdf";
 
 // Module icons mapping
@@ -85,6 +85,8 @@ const PricingReview = () => {
         initialQuantities[module.id] = adminAddlUnits;
       });
       setQuantities(initialQuantities);
+
+      recordPricingLinkEvent(linkId, "link_viewed").catch(() => {});
 
       // Show warning for expired links
       if (linkData.status === "expired") {
@@ -183,6 +185,8 @@ const PricingReview = () => {
       sessionStorage.setItem('dynamicPricingCheckout', JSON.stringify(checkoutData));
       // Clear any previous processed flag so checkout page will process fresh data
       sessionStorage.removeItem('processedDynamicPricingLinkId');
+
+      await recordPricingLinkEvent(linkId, "checkout_started").catch(() => {});
 
       // Navigate to checkout page with module order parameters
       // Address will be collected on checkout page

@@ -38,6 +38,7 @@ import {
 import { connect } from "react-redux";
 import { me } from "src/apiClient/auth";
 import * as cookie from "cookie";
+import ModuleAccessGate from "src/components/ModuleAccess/ModuleAccessGate";
 import { returnCorrectImage } from "src/components/helpers/returnCorrectImage";
 import airportList from "src/data/airportsList.json";
 import { Value } from "sass";
@@ -1602,6 +1603,7 @@ function ConferenceCarbonOffset(props) {
         return { success: false };
       });
   return (
+    <ModuleAccessGate moduleId={3} userData={props.userData}>
     <LayoutTwo>
       {/* breadcrumb */}
       <BreadcrumbOne
@@ -4223,6 +4225,7 @@ function ConferenceCarbonOffset(props) {
       )}
       </NoSSR>
     </LayoutTwo>
+    </ModuleAccessGate>
   );
 }
 

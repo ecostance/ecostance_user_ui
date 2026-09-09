@@ -45,6 +45,7 @@ import ExternalApps from "src/components/MyAccount/externalApps";
 import { useRouter } from "next/router";
 import BusinessProduct from "src/components/MyAccount/businessProduct";
 import Suppliers from "src/components/MyAccount/supplierDetails";
+import ModuleAccessGate from "src/components/ModuleAccess/ModuleAccessGate";
 // import businessProductEdit from "src/components/MyAccount/businessProductEdit";
 // import BusinessProductEdit from "src/components/MyAccount/businessProductEdit";
 
@@ -664,7 +665,13 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
                         <BusinessProduct />
                       </Tab.Pane>
                       <Tab.Pane eventKey="supplierDetails">
-                        <Suppliers />
+                        <ModuleAccessGate
+                          moduleId={5}
+                          meData={meResponse?.meData || meData?.meData}
+                          userData={userData}
+                        >
+                          <Suppliers />
+                        </ModuleAccessGate>
                       </Tab.Pane>
                       {/* <Tab.Pane eventKey="productEdit">
                         <BusinessProductEdit handleShowStartAgainModal={handleShowStartAgainModal}
@@ -702,7 +709,16 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
     </MyProvider>
   );
 
-  return <>{MyBusinessAccount()}</>;
+  return (
+    <ModuleAccessGate
+      moduleIds={[1, 5]}
+      moduleId={1}
+      meData={meResponse?.meData || meData?.meData}
+      userData={userData}
+    >
+      {MyBusinessAccount()}
+    </ModuleAccessGate>
+  );
 };
 
 const returnResponseFailed = () => {

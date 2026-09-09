@@ -1,19 +1,13 @@
 import { useEffect } from "react";
 import Link from "next/link";
+import { isDynamicPricingAdmin } from "src/constants/dynamicPricingAdmins";
 
 const MobileMenuNav = ({ getActiveStatus, handleLogout, loggedInUserInfo }) => {
-  // Allowed emails for Dynamic Pricing
-  const allowedEmails = [
-    "rofep35802@calunia.com",
-    "tgiroti@yahoo.com",
-    "vinu988031@gmail.com",
-    "rafi496@yopmail.com",
-  ];
   const currentUserEmail =
     typeof window !== "undefined" ? localStorage.getItem("email") : null;
   const isLoggedIn = loggedInUserInfo?.isLoggedIn || false;
   const showDynamicPricing =
-    isLoggedIn && allowedEmails.includes(currentUserEmail);
+    isLoggedIn && isDynamicPricingAdmin(currentUserEmail);
   useEffect(() => {
     const offCanvasNav = document.querySelector(
       "#offcanvas-mobile-menu__navigation",

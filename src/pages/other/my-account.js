@@ -30,8 +30,12 @@ import * as cookie from "cookie";
 import Resetpasswordflow from "../resetpasswordflow";
 import Business from "src/components/MyAccount/Business";
 import Refferal from "src/components/MyAccount/Refferal";
+import { useRouter } from "next/router";
+import ModuleAccessGate from "src/components/ModuleAccess/ModuleAccessGate";
 
 const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
+  const router = useRouter();
+  const isSustainabilityView = router.query.sustainability === "true";
   const [meResponse, setMeResponse] = useState(meData);
   const { addToast } = useToasts();
   const [isEmailLoading, setIsEmailLoading] = useState(false);
@@ -557,7 +561,21 @@ const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
     </>
   );
 
-  return <>{MyAccount()}</>;
+  const content = MyAccount();
+
+  if (isSustainabilityView) {
+    return (
+      <ModuleAccessGate
+        moduleId={4}
+        meData={meResponse?.meData || meData?.meData}
+        userData={userData}
+      >
+        {content}
+      </ModuleAccessGate>
+    );
+  }
+
+  return <>{content}</>;
 };
 
 const returnResponseFailed = () => {

@@ -1,22 +1,16 @@
 import Link from "next/link";
 import { useState } from "react";
+import { isDynamicPricingAdmin } from "src/constants/dynamicPricingAdmins";
 import { IoIosArrowDown, IoIosArrowForward } from "react-icons/io";
 import SearchOverlay from "./SearchOverlay";
 const Navigation = ({ handleTrackWindow, userData }) => {
   const [offCanvasSearchActive, setOffCanvasSearchActive] = useState(false);
 
-  // Allowed emails for Dynamic Pricing
-  const allowedEmails = [
-    "rofep35802@calunia.com",
-    "tgiroti@yahoo.com",
-    "vinu988031@gmail.com",
-    "rafi496@yopmail.com",
-  ];
   const currentUserEmail =
     typeof window !== "undefined" ? localStorage.getItem("email") : null;
   const isLoggedIn = userData?.isLoggedIn || false;
   const showDynamicPricing =
-    isLoggedIn && allowedEmails.includes(currentUserEmail);
+    isLoggedIn && isDynamicPricingAdmin(currentUserEmail);
 
   return (
     <nav className="header-content__navigation d-none d-xl-block">
