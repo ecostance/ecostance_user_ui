@@ -1444,12 +1444,16 @@ const CheckoutForm = ({
 
       // Add module-specific fields if this is a module order
       if (isModuleOrder && !express) {
-        // For module orders, add the required fields
+        const setupCost = Number(
+          each?.mainPrice || each?.price || productPrice || 0,
+        );
+        const maintenanceCost = Number(each?.maintenancePrice || 0);
         productObj = {
           ...productObj,
-          startupCost: each?.mainPrice || each?.price || productPrice, // Price of the module
-          additionalQuantity: each?.additionalUnit || 0, // Quantity for additional units
-          additionalPrice: each?.additionalPrice || each?.price || productPrice, // Per month price for additional units
+          price: setupCost + maintenanceCost,
+          startupCost: setupCost,
+          additionalQuantity: each?.additionalUnit || 0,
+          additionalPrice: maintenanceCost,
         };
       }
 
@@ -1710,15 +1714,19 @@ const CheckoutForm = ({
     setCookies("checkout", userAddressData);
 
     try {
-      // Get guest email for dynamic pricing checkout
+      // Guest dynamic-pricing checkout data (survives Stripe redirect via storage)
       let guestCheckoutEmail = null;
       let guestCheckoutLinkId = null;
-      if (isDynamicPricingGuestFlow) {
+      let guestCheckoutPaymentPlan = null;
+      const dynamicPricingRaw =
+        localStorage.getItem("dynamicPricingCheckout") ||
+        sessionStorage.getItem("dynamicPricingCheckout");
+      const isGuestModuleCheckout =
+        !userData?.isLoggedIn &&
+        (!!dynamicPricingRaw || isDynamicPricingGuestFlow);
+
+      if (isGuestModuleCheckout && dynamicPricingRaw) {
         try {
-          const dynamicPricingRaw =
-            localStorage.getItem("dynamicPricingCheckout") ||
-            sessionStorage.getItem("dynamicPricingCheckout") ||
-            "{}";
           const dynamicPricingData = JSON.parse(dynamicPricingRaw);
           guestCheckoutEmail =
             dynamicPricingData?.guestEmail ||
@@ -1727,6 +1735,10 @@ const CheckoutForm = ({
             dynamicPricingData?.linkId ||
             router.query.linkId ||
             sessionStorage.getItem("processedDynamicPricingLinkId");
+          guestCheckoutPaymentPlan =
+            dynamicPricingData?.paymentPlan ||
+            localStorage.getItem("dynamicPricingPaymentPlan") ||
+            "monthly";
         } catch (e) {
           console.error("Error parsing dynamicPricingCheckout:", e);
         }
@@ -1820,10 +1832,11 @@ const CheckoutForm = ({
           metadata: {
             calculationBreakdown: JSON.stringify(moduleTotals),
             isModulePurchase: "true",
-            isDynamicPricing: isDynamicPricingGuestFlow ? "true" : "false",
-            guestCheckout: isDynamicPricingGuestFlow ? "true" : "false",
+            isDynamicPricing: isGuestModuleCheckout ? "true" : "false",
+            guestCheckout: isGuestModuleCheckout ? "true" : "false",
             linkId: guestCheckoutLinkId || "",
             pricingLinkId: guestCheckoutLinkId || "",
+            paymentPlan: guestCheckoutPaymentPlan || "monthly",
             productIds: JSON.stringify(productIds),
             selectedPaymentMode: paymentMode,
             paymentPlan:
@@ -1924,10 +1937,11 @@ const CheckoutForm = ({
           metadata: {
             calculationBreakdown: JSON.stringify(moduleTotals),
             isModulePurchase: "true",
-            isDynamicPricing: isDynamicPricingGuestFlow ? "true" : "false",
-            guestCheckout: isDynamicPricingGuestFlow ? "true" : "false",
+            isDynamicPricing: isGuestModuleCheckout ? "true" : "false",
+            guestCheckout: isGuestModuleCheckout ? "true" : "false",
             linkId: guestCheckoutLinkId || "",
             pricingLinkId: guestCheckoutLinkId || "",
+            paymentPlan: guestCheckoutPaymentPlan || "monthly",
             productIds: JSON.stringify(productIds),
             selectedPaymentMode: paymentMode,
           },
@@ -2219,10 +2233,11 @@ const CheckoutForm = ({
           metadata: {
             calculationBreakdown: JSON.stringify(moduleTotals),
             isModulePurchase: "true",
-            isDynamicPricing: isDynamicPricingGuestFlow ? "true" : "false",
-            guestCheckout: isDynamicPricingGuestFlow ? "true" : "false",
+            isDynamicPricing: isGuestModuleCheckout ? "true" : "false",
+            guestCheckout: isGuestModuleCheckout ? "true" : "false",
             linkId: guestCheckoutLinkId || "",
             pricingLinkId: guestCheckoutLinkId || "",
+            paymentPlan: guestCheckoutPaymentPlan || "monthly",
             productIds: JSON.stringify(productIds),
             selectedPaymentMode: paymentMode,
           },

@@ -12,7 +12,7 @@ import { addOrder } from "src/redux/actions/orderActions";
 import { useToasts } from "react-toast-notifications";
 import { getOrderPdf } from "src/apiClient/orders";
 import { getAllOrders } from "src/apiClient/orders";
-import { getOrderByCheckoutSession } from "src/apiClient/orders";
+import { getOrderByCheckoutSession, syncOrderByCheckoutSession } from "src/apiClient/orders";
 import {
   deleteAllFromCart,
   removeExpressItemAddedToCart,
@@ -310,12 +310,91 @@ const NewSuccess = ({
     return null;
   };
 
+  const getDynamicPricingCheckoutRaw = () =>
+    localStorage.getItem("dynamicPricingCheckout") ||
+    sessionStorage.getItem("dynamicPricingCheckout");
+
   // Fallback receipt built from the checkout we just completed. Field names here
   // must match what the receipt below reads (addressLine1/pincode/phone), not the
   // checkout form's own names (streetAddressOne/mailcode).
-  const buildLocalOrderFallback = (guestEmailFromData) => {
+  const buildLocalOrderFallback = (guestEmailFromData, dynamicPricingRaw) => {
     const rawModuleOrder = localStorage.getItem("moduleOrderData");
-    if (!rawModuleOrder) return null;
+    const checkoutRaw = dynamicPricingRaw || getDynamicPricingCheckoutRaw();
+
+    const buildFromDynamicPricing = () => {
+      if (!checkoutRaw) return null;
+      try {
+        const checkout = JSON.parse(checkoutRaw);
+        const modules =
+          checkout.selectedModules || checkout.pricingData?.modules || [];
+        const customPrices = checkout.pricingData?.customPrices || {};
+        const totals = checkout.totals || {};
+        const products = modules.map((mod) => {
+          const pricing =
+            customPrices[mod.id] || mod.customPricing || mod.defaultPricing || {};
+          const modulePrice = Number(pricing.modulePrice || 0);
+          const maintenance = Number(pricing.monthlyMaintenance || 0);
+          return {
+            product: { id: mod.id, name: mod.name },
+            price: modulePrice + maintenance,
+            quantity: 1,
+            startupCost: modulePrice,
+            additionalPrice: maintenance,
+          };
+        });
+        const total = Number(
+          checkout.payToday || totals.payToday || totals.grandTotal || 0,
+        );
+        const buyerInfo = checkout.buyerInfo || {};
+        return {
+          data: {
+            orderNumber: "",
+            products,
+            orderTotal: total,
+            subTotal: total,
+            currency: "USD",
+            currencySymbol: "$",
+            billingAddress: {
+              firstName: buyerInfo.firstName || "",
+              lastName: buyerInfo.lastName || "",
+              companyName: buyerInfo.company || "",
+              addressLine1: "",
+              city: "",
+              state: "",
+              country: "",
+              pincode: "",
+              phone: {},
+            },
+            paymentStatus: "success",
+            paymentMethod: "card",
+            paymentLogs: [
+              {
+                customer_email:
+                  guestEmailFromData ||
+                  checkout.guestEmail ||
+                  buyerInfo.email ||
+                  "",
+                payment_method_types: ["card"],
+              },
+            ],
+            createdAt: new Date().toISOString(),
+            isModulePurchase: true,
+          },
+          user: {
+            email:
+              guestEmailFromData ||
+              checkout.guestEmail ||
+              buyerInfo.email ||
+              "",
+          },
+        };
+      } catch (parseError) {
+        console.error("Error building fallback from dynamic pricing:", parseError);
+        return null;
+      }
+    };
+
+    if (!rawModuleOrder) return buildFromDynamicPricing();
 
     try {
       const parsed = JSON.parse(rawModuleOrder);
@@ -338,8 +417,14 @@ const NewSuccess = ({
                 item?.productName ||
                 "Module",
             },
-            price: Number(item?.price || 0),
+            price: Number(
+              item?.startupCost != null && item?.additionalPrice != null
+                ? Number(item.startupCost) + Number(item.additionalPrice)
+                : item?.price || 0,
+            ),
             quantity: Number(item?.quantity || 1),
+            startupCost: Number(item?.startupCost || 0),
+            additionalPrice: Number(item?.additionalPrice || 0),
           })),
           orderTotal: Number(parsed?.total || orderPayload?.total || 0),
           subTotal: Number(parsed?.total || orderPayload?.total || 0),
@@ -372,8 +457,17 @@ const NewSuccess = ({
       };
     } catch (parseError) {
       console.error("Error building local guest order:", parseError);
-      return null;
+      return buildFromDynamicPricing();
     }
+  };
+
+  const resolveModuleOrder = async (sessionId) => {
+    if (!sessionId) return null;
+    let order = await waitForWebhookOrder(sessionId, 15000);
+    if (order) return order;
+    await syncOrderByCheckoutSession(sessionId);
+    order = await waitForWebhookOrder(sessionId, 15000);
+    return order;
   };
 
   const handleModuleOrder = async () => {
@@ -384,7 +478,7 @@ const NewSuccess = ({
 
       const sessionId = getCheckoutSessionId();
       if (sessionId) {
-        const webhookOrder = await waitForWebhookOrder(sessionId, 30000);
+        const webhookOrder = await resolveModuleOrder(sessionId);
         if (webhookOrder) {
           setOrder(webhookOrder);
           addOrder(true, webhookOrder);
@@ -396,9 +490,7 @@ const NewSuccess = ({
 
       // Check if this is a guest checkout (no JWT token)
       const hasJWTToken = !!getCookie("JWTToken");
-      const dynamicPricingData =
-        localStorage.getItem("dynamicPricingCheckout") ||
-        sessionStorage.getItem("dynamicPricingCheckout");
+      const dynamicPricingData = getDynamicPricingCheckoutRaw();
       const isGuestFlow = !hasJWTToken && dynamicPricingData;
 
       if (isGuestFlow) {
@@ -419,7 +511,10 @@ const NewSuccess = ({
 
         // Webhook has not landed yet - show what we know from the checkout we
         // just completed rather than an empty receipt.
-        const localOrder = buildLocalOrderFallback(guestEmailFromData);
+        const localOrder = buildLocalOrderFallback(
+          guestEmailFromData,
+          dynamicPricingData,
+        );
         if (localOrder) {
           setOrder(localOrder);
           addOrder(true, localOrder);
@@ -1645,19 +1740,30 @@ ${process.env.NEXT_PUBLIC_UI_URL}/c/${order?.slug}`}
             </div>
 
             <div className="order__success__closing-text mt-4">
-              {isGuestCheckout ? (
+              {isGuestCheckout || isModuleFlow ? (
                 <>
                   <p style={{ fontWeight: "bold", marginBottom: "10px" }}>
                     Thank you for your purchase!
                   </p>
                   <p>
                     Within a few minutes, you will receive an email at{" "}
-                    <strong>{guestEmail || order?.user?.email}</strong> with your order details
-                    and a link to set up your account password.
+                    <strong>
+                      {guestEmail ||
+                        order?.user?.email ||
+                        order?.data?.paymentLogs?.[0]?.customer_email}
+                    </strong>{" "}
+                    with your order details.
                   </p>
                   <p style={{ marginTop: "10px" }}>
-                    Once you set your password, you can log in to access your account
-                    and view your orders.
+                    If you are a new customer, that email will also include
+                    temporary login credentials and a link to set your password.
+                    Once your password is set, log in to access your modules and
+                    order history.
+                  </p>
+                  <p style={{ marginTop: "10px", fontSize: "14px", color: "#666" }}>
+                    Your invoice PDF will be available shortly once processing
+                    completes. If details above look incomplete, refresh this
+                    page in a minute — your payment was received.
                   </p>
                 </>
               ) : (

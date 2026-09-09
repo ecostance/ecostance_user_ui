@@ -92,6 +92,16 @@ export const getOrderByCheckoutSession = async (sessionId) => {
   return response.data;
 };
 
+/**
+ * Webhook fallback: create the order from Stripe when checkout.session.completed
+ * was missed or delayed. Public — guest buyers have no JWT on the success page.
+ */
+export const syncOrderByCheckoutSession = async (sessionId) => {
+  const response = await request.post(`/v1/orders/session/${sessionId}/sync`);
+  if (response?.status !== 200 || !response?.data?.success) return null;
+  return response.data;
+};
+
 export const getAllOrders = async (page, token) => {
   if (getCookie("JWTToken") || token) {
     return await request.get(`/v1/customer-orders?page=${page}&cert={true}`, {
