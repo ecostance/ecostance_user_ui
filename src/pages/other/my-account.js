@@ -251,6 +251,16 @@ const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
     }
   }, []);
 
+  const moduleSupported =
+    meResponse?.meData?.moduleSupported ||
+    meResponse?.meData?.data?.moduleSupported ||
+    meResponse?.moduleSupported ||
+    meResponse?.data?.moduleSupported ||
+    meData?.meData?.moduleSupported ||
+    meData?.meData?.data?.moduleSupported ||
+    meData?.moduleSupported ||
+    [];
+
   // getServerSideProps can return { success: false } on refresh (SSR env, API
   // errors, or cookie timing) while the browser session is still valid — refetch /me on the client.
   useEffect(() => {
@@ -492,7 +502,7 @@ const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
                       <Orders reviewPopUpHandler={reviewPopUpHandler} />
                     </Tab.Pane>
                     <Tab.Pane eventKey="modulePurchases">
-                      <ModulePurchases />
+                      <ModulePurchases moduleSupported={moduleSupported} />
                     </Tab.Pane>
                     <Tab.Pane
                       className="tabPage-sustainability"
