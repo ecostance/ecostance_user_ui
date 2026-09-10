@@ -89,10 +89,13 @@ const NewSuccess = ({
   let totalProductCount = 0;
 
   const handleSuccess = async () => {
+    const sessionId = getCheckoutSessionId();
     const isModuleOrder =
       localStorage.getItem("modulepurchase") === "true" ||
       !!localStorage.getItem("moduleOrderData") ||
-      Router.query.moduleOrder === "true";
+      Router.query.moduleOrder === "true" ||
+      !!getDynamicPricingCheckoutRaw() ||
+      (sessionId && Router.query.moduleOrder === "true");
     console.log("handleSuccess called, isModuleOrder:", isModuleOrder);
     console.log("orderData:", orderData);
     
@@ -209,6 +212,10 @@ const NewSuccess = ({
   };
 
   useEffect(() => {
+    // Next.js hydrates query params after first paint — wait before resolving
+    // the Stripe session id or module-order detection will miss session_id.
+    if (!Router.isReady) return;
+
     if (Router.query.nonPayment == "true") {
       cartItems?.expressAddedToCart &&
         removeExpressItemAddedToCart(
@@ -243,7 +250,7 @@ const NewSuccess = ({
     // return () => {
     //   clearInterval(intervalId)
     // }
-  }, []);
+  }, [Router.isReady, Router.query.session_id, Router.query.moduleOrder]);
 
   const applyInvoiceFromOrder = (orderLike) => {
     const orderData = orderLike?.data || orderLike;
@@ -566,6 +573,8 @@ const NewSuccess = ({
       setIsModuleFlow(true);
 
       const sessionId = getCheckoutSessionId();
+      const dynamicPricingData = getDynamicPricingCheckoutRaw();
+
       if (sessionId) {
         const webhookOrder = await resolveModuleOrder(sessionId);
         if (webhookOrder) {
@@ -578,16 +587,42 @@ const NewSuccess = ({
           setIsOrderLoaded(true);
           return;
         }
+
+        // Stripe redirected back but webhook order is not ready yet — show the
+        // checkout quote as a receipt and keep polling for the real order/PDF.
+        if (dynamicPricingData) {
+          let buyerEmail = "";
+          try {
+            const parsed = JSON.parse(dynamicPricingData);
+            buyerEmail =
+              parsed?.guestEmail || parsed?.buyerInfo?.email || "";
+            setGuestEmail(buyerEmail);
+            setIsGuestCheckout(!getCookie("JWTToken"));
+          } catch (parseError) {
+            console.error("Error parsing dynamic pricing checkout:", parseError);
+          }
+
+          const localOrder = buildLocalOrderFallback(
+            buyerEmail,
+            dynamicPricingData,
+          );
+          if (localOrder) {
+            setOrder(localOrder);
+            addOrder(true, localOrder);
+          }
+          pollModuleInvoiceBySession(sessionId);
+          setIsOrderLoaded(true);
+          return;
+        }
       }
 
-      // Check if this is a guest checkout (no JWT token)
+      // Dynamic pricing fallback when session id is not in the URL yet
       const hasJWTToken = !!getCookie("JWTToken");
-      const dynamicPricingData = getDynamicPricingCheckoutRaw();
       const isGuestFlow = !hasJWTToken && dynamicPricingData;
 
-      if (isGuestFlow) {
-        console.log("Guest checkout detected - webhook creates the order");
-        setIsGuestCheckout(true);
+      if (dynamicPricingData) {
+        console.log("Dynamic pricing checkout - using local receipt fallback");
+        setIsGuestCheckout(!hasJWTToken);
 
         let guestEmailFromData = "";
         try {
@@ -601,8 +636,6 @@ const NewSuccess = ({
           console.error("Error parsing guest checkout data:", parseError);
         }
 
-        // Webhook has not landed yet - show what we know from the checkout we
-        // just completed rather than an empty receipt.
         const localOrder = buildLocalOrderFallback(
           guestEmailFromData,
           dynamicPricingData,
@@ -612,7 +645,9 @@ const NewSuccess = ({
           addOrder(true, localOrder);
         }
 
-        cleanupModuleCheckoutStorage();
+        if (sessionId) {
+          pollModuleInvoiceBySession(sessionId);
+        }
 
         setIsOrderLoaded(true);
         return;

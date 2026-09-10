@@ -119,6 +119,15 @@ const Handler = async (req, res) => {
       metadata: baseMetadata,
     };
 
+    const isModuleCheckout =
+      baseMetadata.isModulePurchase === "true" ||
+      baseMetadata.isDynamicPricing === "true" ||
+      baseMetadata.guestCheckout === "true" ||
+      !!(baseMetadata.linkId && String(baseMetadata.linkId).trim()) ||
+      !!(baseMetadata.pricingLinkId && String(baseMetadata.pricingLinkId).trim());
+
+    const moduleSuccessUrl = `${baseUrl}/checkout/success?moduleOrder=true&session_id={CHECKOUT_SESSION_ID}`;
+
     // Handle different payment modes
     if (paymentMode === "subscription") {
       // Subscription mode: create recurring payment for 12 months
@@ -156,6 +165,10 @@ const Handler = async (req, res) => {
         return item;
       });
 
+      if (isModuleCheckout) {
+        checkoutSessionPayload.success_url = moduleSuccessUrl;
+      }
+
       console.log("Creating subscription checkout session");
     } else if (paymentMode === "module") {
       // Module payment: one-time payment with metadata for future subscription setup
@@ -168,7 +181,7 @@ const Handler = async (req, res) => {
         requiresSubscriptionSetup: "true",
         ...baseMetadata,
       };
-      checkoutSessionPayload.success_url = `${baseUrl}/checkout/success?moduleOrder=true&session_id={CHECKOUT_SESSION_ID}`;
+      checkoutSessionPayload.success_url = moduleSuccessUrl;
 
       console.log("Creating module payment checkout session");
     } else {
@@ -181,6 +194,12 @@ const Handler = async (req, res) => {
         paymentType: "one-time",
         ...baseMetadata,
       };
+
+      // Dynamic-pricing module checkouts use paymentMode "payment" but still
+      // need moduleOrder=true on the success redirect for the receipt page.
+      if (isModuleCheckout) {
+        checkoutSessionPayload.success_url = moduleSuccessUrl;
+      }
 
       console.log("Creating one-time payment checkout session");
     }

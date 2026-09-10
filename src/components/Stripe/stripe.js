@@ -217,7 +217,11 @@ const CheckoutForm = ({
     const metadata = {
       calculationBreakdown: JSON.stringify(moduleTotals),
       isModulePurchase: "true",
-      isDynamicPricing: isGuestModuleCheckout ? "true" : "false",
+      isDynamicPricing:
+        isGuestModuleCheckout || router.query.dynamicPricing === "true"
+          ? "true"
+          : "false",
+      isPricingLinkPurchase: guestCheckoutLinkId ? "true" : "false",
       guestCheckout: isGuestModuleCheckout ? "true" : "false",
       linkId: guestCheckoutLinkId || "",
       pricingLinkId: guestCheckoutLinkId || "",
@@ -1834,7 +1838,24 @@ const CheckoutForm = ({
           JSON.stringify(expressModuleData),
         );
         localStorage.setItem("BusinessOrderSelection", "express");
+
+        // Keep pricing quote in sessionStorage so the success page can render a
+        // receipt even if localStorage is cleared during the Stripe redirect.
+        const pricingCheckoutRaw =
+          localStorage.getItem("dynamicPricingCheckout") ||
+          sessionStorage.getItem("dynamicPricingCheckout");
+        if (pricingCheckoutRaw) {
+          sessionStorage.setItem("dynamicPricingCheckout", pricingCheckoutRaw);
+        }
+
         const moduleAmount = Math.round(chargeAmount * 100);
+        if (!moduleAmount || moduleAmount < 50) {
+          addToast(
+            "Payment amount could not be calculated. Please go back and try again.",
+            { appearance: "error", autoDismiss: true },
+          );
+          return;
+        }
 
         // Get product IDs for webhook processing
         const moduleOrderData = returnAPIProductsForOrder();
