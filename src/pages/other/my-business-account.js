@@ -46,6 +46,8 @@ import { useRouter } from "next/router";
 import BusinessProduct from "src/components/MyAccount/businessProduct";
 import Suppliers from "src/components/MyAccount/supplierDetails";
 import ModuleAccessGate from "src/components/ModuleAccess/ModuleAccessGate";
+import ModuleLockedModal from "src/components/ModuleAccess/ModuleLockedModal";
+import { hasModuleAccess, MODULE_ACCESS } from "src/constants/moduleAccess";
 // import businessProductEdit from "src/components/MyAccount/businessProductEdit";
 // import BusinessProductEdit from "src/components/MyAccount/businessProductEdit";
 
@@ -113,6 +115,91 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
   const [isSocialSharingActive, setIsSocialSharingActive] = useState(false);
   const [showForgotPasswordPopup, setShowForgotPasswordPopup] = useState(false);
   const [primaryEmailChangeTo, setPrimaryEmailChangeTo] = useState("");
+
+  const TAB_MODULE_MAP = {
+    productInfo: 4,
+    supplierDetails: 5,
+    businessEvent: 3,
+  };
+
+  const moduleSupported =
+    meResponse?.meData?.moduleSupported ||
+    meResponse?.meData?.data?.moduleSupported ||
+    meResponse?.moduleSupported ||
+    meResponse?.data?.moduleSupported ||
+    meData?.meData?.moduleSupported ||
+    meData?.meData?.data?.moduleSupported ||
+    meData?.moduleSupported ||
+    [];
+
+  const [activeTab, setActiveTab] = useState(() => {
+    const initialRequestedTab =
+      query.data === "event"
+        ? "businessEvent"
+        : router.query?.businessSustainability === "true"
+        ? "sustainabilityPage"
+        : router.query?.tab || "business";
+
+    const targetModId = TAB_MODULE_MAP[initialRequestedTab];
+    if (targetModId && !hasModuleAccess(moduleSupported, targetModId)) {
+      return "business";
+    }
+    return initialRequestedTab;
+  });
+
+  const [lockedModal, setLockedModal] = useState({
+    show: false,
+    moduleId: null,
+    moduleName: "",
+  });
+
+  useEffect(() => {
+    const hasModules = moduleSupported?.length;
+    if (!hasModules && userData?.isLoggedIn) {
+      getMeData();
+    }
+  }, [userData?.isLoggedIn]);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    const requestedTab =
+      query.data === "event"
+        ? "businessEvent"
+        : router.query?.businessSustainability === "true"
+        ? "sustainabilityPage"
+        : router.query?.tab || "business";
+
+    const targetModuleId = TAB_MODULE_MAP[requestedTab];
+    if (targetModuleId && !hasModuleAccess(moduleSupported, targetModuleId)) {
+      setActiveTab("business");
+      setLockedModal({
+        show: true,
+        moduleId: targetModuleId,
+        moduleName: MODULE_ACCESS[targetModuleId]?.name || "Module",
+      });
+    } else {
+      setActiveTab(requestedTab);
+    }
+  }, [router.isReady]);
+
+  const handleTabSelect = (eventKey) => {
+    const targetModuleId = TAB_MODULE_MAP[eventKey];
+    if (targetModuleId && !hasModuleAccess(moduleSupported, targetModuleId)) {
+      setLockedModal({
+        show: true,
+        moduleId: targetModuleId,
+        moduleName: MODULE_ACCESS[targetModuleId]?.name || "Module",
+      });
+      return;
+    }
+
+    setActiveTab(eventKey);
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set("tab", eventKey);
+    if (currentUrl.searchParams.has("data")) currentUrl.searchParams.delete("data");
+    if (currentUrl.searchParams.has("businessSustainability")) currentUrl.searchParams.delete("businessSustainability");
+    window.history.replaceState({}, "", currentUrl.toString());
+  };
 
   const handleShowStartAgainModal = (val) => {
     setShowStartAgainModal({ val: true, type: val });
@@ -356,17 +443,8 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
               <div className="my-account-area space-mt--r130 space-mb--r130">
                 <Container className="orders-container">
                   <Tab.Container
-                    defaultActiveKey={
-                      query.data === "event" ? "businessEvent" : 
-                      router.query.businessSustainability == "true" ? "sustainabilityPage" : 
-                      router.query.tab ? router.query.tab : "business"
-                    }
-                    onSelect={(eventKey) => {
-                      // Update URL to preserve tab state on refresh
-                      const currentUrl = new URL(window.location.href);
-                      currentUrl.searchParams.set('tab', eventKey);
-                      window.history.replaceState({}, '', currentUrl.toString());
-                    }}
+                    activeKey={activeTab}
+                    onSelect={handleTabSelect}
                   >
                     <Nav
                       variant="pills"
@@ -656,34 +734,16 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
                         <SocialMediaSharing meData={meResponse} />
                       </Tab.Pane>
                       <Tab.Pane eventKey="businessEvent">
-                        <ModuleAccessGate
-                          moduleId={3}
-                          meData={meResponse?.meData || meData?.meData}
-                          userData={userData}
-                        >
-                          <BusinessEvent />
-                        </ModuleAccessGate>
+                        {hasModuleAccess(moduleSupported, 3) && <BusinessEvent />}
                       </Tab.Pane>
                       <Tab.Pane eventKey="externalApps">
                         <ExternalApps />
                       </Tab.Pane>
                       <Tab.Pane eventKey="productInfo">
-                        <ModuleAccessGate
-                          moduleId={4}
-                          meData={meResponse?.meData || meData?.meData}
-                          userData={userData}
-                        >
-                          <BusinessProduct />
-                        </ModuleAccessGate>
+                        {hasModuleAccess(moduleSupported, 4) && <BusinessProduct />}
                       </Tab.Pane>
                       <Tab.Pane eventKey="supplierDetails">
-                        <ModuleAccessGate
-                          moduleId={5}
-                          meData={meResponse?.meData || meData?.meData}
-                          userData={userData}
-                        >
-                          <Suppliers />
-                        </ModuleAccessGate>
+                        {hasModuleAccess(moduleSupported, 5) && <Suppliers />}
                       </Tab.Pane>
                       {/* <Tab.Pane eventKey="productEdit">
                         <BusinessProductEdit handleShowStartAgainModal={handleShowStartAgainModal}
@@ -714,6 +774,25 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
                   </Tab.Container>
                 </Container>
               </div>
+              <ModuleLockedModal
+                show={lockedModal.show}
+                onHide={() =>
+                  setLockedModal({
+                    show: false,
+                    moduleId: null,
+                    moduleName: "",
+                  })
+                }
+                moduleId={lockedModal.moduleId}
+                moduleName={lockedModal.moduleName}
+                defaultName={
+                  userData?.user?.firstName
+                    ? `${userData.user.firstName} ${userData.user.lastName || ""}`.trim()
+                    : ""
+                }
+                defaultEmail={userData?.user?.email || ""}
+                defaultCompany=""
+              />
             </LayoutTwo>
           </div>
         )}

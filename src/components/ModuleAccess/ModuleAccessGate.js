@@ -8,6 +8,7 @@ const ModuleAccessGate = ({
   moduleIds,
   meData,
   userData,
+  onHide,
   children,
 }) => {
   const [profile, setProfile] = useState(meData);
@@ -42,6 +43,7 @@ const ModuleAccessGate = ({
     return (
       <ModuleLockedModal
         show
+        onHide={onHide}
         moduleId={primaryModuleId}
         moduleName={moduleName}
         defaultName={
