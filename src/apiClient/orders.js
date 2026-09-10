@@ -125,7 +125,17 @@ export const getAllModuleOrders = async (page, token) => {
 
 export const getModulePurchases = async (token) => {
   if (getCookie("JWTToken") || token) {
-    return await request.get(`v1/module-purchases`, {
+    return await request.get(`v1/module-purchases?populate=invoice,pricingLink,selectedModules.productRef`, {
+      headers: {
+        Authorization: `Bearer ${getCookie("JWTToken") || token}`,
+      },
+    });
+  }
+};
+
+export const getModulePurchaseById = async (id, token) => {
+  if (getCookie("JWTToken") || token) {
+    return await request.get(`v1/module-purchases/${id}?populate=invoice,pricingLink`, {
       headers: {
         Authorization: `Bearer ${getCookie("JWTToken") || token}`,
       },
