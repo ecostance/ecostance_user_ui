@@ -195,6 +195,14 @@ const CheckoutForm = ({
     );
   };
 
+  const SUBSCRIPTION_INSTALLMENTS = 12;
+
+  const toStripeUnitAmount = (amount, mode = paymentMode) =>
+    Math.round(
+      (mode === "subscription" ? amount / SUBSCRIPTION_INSTALLMENTS : amount) *
+        100,
+    );
+
   const resolveModuleChargeAmount = (moduleTotals) => {
     const dynamicPayToday =
       router.query.dynamicPricing === "true" ? getDynamicPricingPayToday() : null;
@@ -2135,7 +2143,7 @@ const CheckoutForm = ({
           const quantity = product.quantity || 1;
 
           console.log(
-            `Product: ${name}, Price: ${price}, Quantity: ${quantity}`,
+            `Product: ${name}, Price: ${price}, Quantity: ${quantity}, paymentMode: ${paymentMode}`,
           );
 
           return {
@@ -2145,7 +2153,7 @@ const CheckoutForm = ({
                 name: name,
                 images: images,
               },
-              unit_amount: Math.round(price * 100),
+              unit_amount: toStripeUnitAmount(price),
             },
             quantity: quantity,
           };
@@ -2192,7 +2200,7 @@ const CheckoutForm = ({
                   name: "Order Total (coupon applied)",
                   images: [],
                 },
-                unit_amount: Math.round(discountedTotal * 100),
+                unit_amount: toStripeUnitAmount(discountedTotal),
               },
               quantity: 1,
             },
@@ -2203,18 +2211,31 @@ const CheckoutForm = ({
           );
         }
 
+        const checkoutTotal =
+          discountedTotal !== null ? discountedTotal : localTotal;
         const response = await axios.post("/api/checkout_sessions", {
           paymentMode:
             paymentMode === "subscription" ? "subscription" : "payment",
           items: finalStripeItems,
           email: userData?.user?.email || initialValues?.email || "",
           address: userAddressData,
-          total: discountedTotal !== null ? discountedTotal : localTotal,
+          total:
+            paymentMode === "subscription"
+              ? checkoutTotal / SUBSCRIPTION_INSTALLMENTS
+              : checkoutTotal,
           totalQuantity: localTotalQuantity,
           currency: returnCorrectCurrency(
             cartItems?.currency || userData?.currency,
           ),
           express: express || false,
+          metadata: {
+            paymentType:
+              paymentMode === "subscription" ? "subscription" : "one-time",
+            selectedPaymentMode: paymentMode,
+            ...(paymentMode === "subscription"
+              ? { priceInterval: "monthly", pricesAreMonthly: "true" }
+              : {}),
+          },
         });
 
         if (response.data?.url) {

@@ -147,14 +147,26 @@ const Handler = async (req, res) => {
         },
       };
 
-      // Transform line_items to include recurring interval for subscription
+      const SUBSCRIPTION_INSTALLMENTS = 12;
+      const pricesAreMonthly =
+        baseMetadata.priceInterval === "monthly" ||
+        baseMetadata.pricesAreMonthly === "true";
+
+      // Transform line_items to include recurring interval for subscription.
+      // Legacy clients sent the full 12-month total; newer clients send monthly.
       checkoutSessionPayload.line_items = (items || []).map((item) => {
-        // If item has price_data, add recurring interval
         if (item.price_data) {
+          const unitAmount = item.price_data.unit_amount || 0;
+          const monthlyUnitAmount =
+            !isModuleCheckout && !pricesAreMonthly
+              ? Math.round(unitAmount / SUBSCRIPTION_INSTALLMENTS)
+              : unitAmount;
+
           return {
             ...item,
             price_data: {
               ...item.price_data,
+              unit_amount: monthlyUnitAmount,
               recurring: {
                 interval: "month",
                 interval_count: 1,
