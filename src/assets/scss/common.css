@@ -78,7 +78,7 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 10;
+  z-index: 1050;
 }
 
 .module-locked-close-btn:hover {

@@ -3,6 +3,8 @@ import ModuleLockedModal from "./ModuleLockedModal";
 import { hasAnyModuleAccess, hasModuleAccess, MODULE_ACCESS } from "src/constants/moduleAccess";
 import { me } from "src/apiClient/auth";
 
+import { useRouter } from "next/router";
+
 const ModuleAccessGate = ({
   moduleId,
   moduleIds,
@@ -11,6 +13,16 @@ const ModuleAccessGate = ({
   onHide,
   children,
 }) => {
+  const router = useRouter();
+  const handleClose =
+    onHide ||
+    (() => {
+      if (typeof window !== "undefined" && window.history.length > 1) {
+        router.back();
+      } else {
+        router.push("/other/my-business-account");
+      }
+    });
   const [profile, setProfile] = useState(meData);
   const ids = moduleIds?.length ? moduleIds : [moduleId];
   const primaryModuleId = moduleId || ids[0];
@@ -43,7 +55,7 @@ const ModuleAccessGate = ({
     return (
       <ModuleLockedModal
         show
-        onHide={onHide}
+        onHide={handleClose}
         moduleId={primaryModuleId}
         moduleName={moduleName}
         defaultName={

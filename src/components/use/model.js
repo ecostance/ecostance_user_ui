@@ -6,7 +6,7 @@ const UseModel = ({
   isCentered = false,
   showModel = true,
   handleModelClose,
-  closeButton = false,
+  closeButton = true,
   backdrop = "",
   size = "",
 }) => {

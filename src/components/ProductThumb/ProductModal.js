@@ -206,7 +206,7 @@ const ProductModal = (props) => {
         <Modal.Header>
           <div
             className="cross-icon-svg-holder product-modal-cross"
-            onClick={() => onHide()}
+            onClick={() => props.onHide && props.onHide()}
           >
             <svg
               className="close-popup-icon"
