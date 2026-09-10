@@ -123,6 +123,16 @@ export const getAllModuleOrders = async (page, token) => {
   }
 };
 
+export const getModulePurchases = async (token) => {
+  if (getCookie("JWTToken") || token) {
+    return await request.get(`v1/module-purchases`, {
+      headers: {
+        Authorization: `Bearer ${getCookie("JWTToken") || token}`,
+      },
+    });
+  }
+};
+
 export const getAdminModulePurchases = async ({ page, limit, status, pricingLinkId } = {}) => {
   const token = getCookie("JWTToken");
   if (!token) return;

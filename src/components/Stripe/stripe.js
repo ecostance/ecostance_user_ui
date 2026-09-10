@@ -161,10 +161,75 @@ const CheckoutForm = ({
 
   useEffect(() => {
     if (router.query.dynamicPricing === "true") {
-      const plan = localStorage.getItem("dynamicPricingPaymentPlan") || "full";
-      paymentOptionChange(plan === "monthly" ? "subscription" : "module");
+      // Both full and monthly plans use "payment" mode; plan is read inside
+      // getModuleOrderTotal via dynamicPricingPaymentPlan in localStorage.
+      paymentOptionChange("payment");
     }
   }, [router.query.dynamicPricing]);
+
+  const getDynamicPricingCheckoutData = () => {
+    const raw =
+      localStorage.getItem("dynamicPricingCheckout") ||
+      sessionStorage.getItem("dynamicPricingCheckout");
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  };
+
+  const getDynamicPricingPayToday = () => {
+    const data = getDynamicPricingCheckoutData();
+    if (!data) return null;
+    const payToday = Number(data.payToday ?? data.totals?.payToday);
+    return payToday > 0 ? payToday : null;
+  };
+
+  const getDynamicPricingPaymentPlan = () => {
+    const data = getDynamicPricingCheckoutData();
+    return (
+      data?.paymentPlan ||
+      localStorage.getItem("dynamicPricingPaymentPlan") ||
+      "full"
+    );
+  };
+
+  const resolveModuleChargeAmount = (moduleTotals) => {
+    const dynamicPayToday =
+      router.query.dynamicPricing === "true" ? getDynamicPricingPayToday() : null;
+    if (dynamicPayToday != null) return dynamicPayToday;
+    if (paymentMode === "subscription") {
+      return moduleTotals?.subscriptionTotal || localTotal / 12 || 0;
+    }
+    return moduleTotals?.oneTimeTotal || localTotal || 0;
+  };
+
+  const buildModuleCheckoutMetadata = ({
+    moduleTotals,
+    productIds,
+    isGuestModuleCheckout,
+    guestCheckoutLinkId,
+    guestCheckoutPaymentPlan,
+  }) => {
+    const paymentPlan =
+      guestCheckoutPaymentPlan || getDynamicPricingPaymentPlan();
+    const metadata = {
+      calculationBreakdown: JSON.stringify(moduleTotals),
+      isModulePurchase: "true",
+      isDynamicPricing: isGuestModuleCheckout ? "true" : "false",
+      guestCheckout: isGuestModuleCheckout ? "true" : "false",
+      linkId: guestCheckoutLinkId || "",
+      pricingLinkId: guestCheckoutLinkId || "",
+      paymentPlan,
+      productIds: JSON.stringify(productIds),
+      selectedPaymentMode: paymentMode,
+    };
+    if (paymentPlan === "monthly") {
+      metadata.requiresSubscriptionSetup = "true";
+    }
+    return metadata;
+  };
 
   // Debug module order detection
   console.log("=== MODULE ORDER DETECTION DEBUG ===");
@@ -837,7 +902,7 @@ const CheckoutForm = ({
       (cartItems?.moduleProducts?.length > 0 || cartItems?.products?.length > 0)
     ) {
       console.log("=== CALCULATING MODULE ORDER TOTAL ===");
-      const totals = getModuleOrderTotal("payment");
+      const totals = getModuleOrderTotal(paymentMode);
       console.log("Module order totals calculated:", totals);
 
       // Use originalOneTimeTotal for Cart Total display (before discount)
@@ -1748,13 +1813,15 @@ const CheckoutForm = ({
       if (express && isModuleOrder) {
         // Determine period based on payment mode
         const expressPeriod = paymentMode === "module" ? 1 : 12;
+        const moduleTotals = getModuleOrderTotal(paymentMode);
+        const chargeAmount = resolveModuleChargeAmount(moduleTotals);
 
         const expressModuleData = {
           isModulePurchase: true,
           period: expressPeriod,
           products: returnAPIProductsForOrder(),
           address: userAddressData,
-          total: localTotal,
+          total: chargeAmount,
           paymentLogs: [],
           user: isDynamicPricingGuestFlow
             ? { email: guestCheckoutEmail }
@@ -1767,15 +1834,7 @@ const CheckoutForm = ({
           JSON.stringify(expressModuleData),
         );
         localStorage.setItem("BusinessOrderSelection", "express");
-
-        // Use the actual selected paymentMode instead of hardcoded "module"
-        const moduleTotals = getModuleOrderTotal(paymentMode);
-        // For subscription, use monthly amount; otherwise use full amount
-        const moduleAmount = Math.round(
-          (paymentMode === "subscription"
-            ? moduleTotals?.subscriptionTotal || localTotal / 12 || 0
-            : moduleTotals?.oneTimeTotal || localTotal || 0) * 100,
-        );
+        const moduleAmount = Math.round(chargeAmount * 100);
 
         // Get product IDs for webhook processing
         const moduleOrderData = returnAPIProductsForOrder();
@@ -1792,7 +1851,10 @@ const CheckoutForm = ({
         // Determine product name based on payment mode
         let productName = "Module Payment (Setup + Current Monthly)";
         if (paymentMode === "payment") {
-          productName = "One-Time Payment (Full Amount)";
+          productName =
+            getDynamicPricingPaymentPlan() === "monthly"
+              ? "Module Payment (Setup + First Month)"
+              : "One-Time Payment (Full Amount)";
         } else if (paymentMode === "subscription") {
           productName = "Subscription Payment (Monthly)";
         }
@@ -1818,10 +1880,7 @@ const CheckoutForm = ({
             },
           ],
           address: userAddressData,
-          total:
-            paymentMode === "subscription"
-              ? moduleTotals?.subscriptionTotal || localTotal / 12
-              : moduleTotals?.oneTimeTotal || localTotal,
+          total: chargeAmount,
           totalQuantity: localTotalQuantity,
           currency: returnCorrectCurrency(
             cartItems?.currency || userData?.currency,
@@ -1829,19 +1888,13 @@ const CheckoutForm = ({
           express: true,
           // Pass guest email for Stripe customer_email
           customerEmail: guestCheckoutEmail || userData?.user?.email,
-          metadata: {
-            calculationBreakdown: JSON.stringify(moduleTotals),
-            isModulePurchase: "true",
-            isDynamicPricing: isGuestModuleCheckout ? "true" : "false",
-            guestCheckout: isGuestModuleCheckout ? "true" : "false",
-            linkId: guestCheckoutLinkId || "",
-            pricingLinkId: guestCheckoutLinkId || "",
-            paymentPlan: guestCheckoutPaymentPlan || "monthly",
-            productIds: JSON.stringify(productIds),
-            selectedPaymentMode: paymentMode,
-            paymentPlan:
-              localStorage.getItem("dynamicPricingPaymentPlan") || "full",
-          },
+          metadata: buildModuleCheckoutMetadata({
+            moduleTotals,
+            productIds,
+            isGuestModuleCheckout,
+            guestCheckoutLinkId,
+            guestCheckoutPaymentPlan,
+          }),
         });
 
         if (response.data?.url) {
@@ -1856,13 +1909,15 @@ const CheckoutForm = ({
       if (isModuleOrder && !express) {
         // Determine period based on payment mode
         const regularPeriod = paymentMode === "module" ? 1 : 12;
+        const moduleTotals = getModuleOrderTotal(paymentMode);
+        const chargeAmount = resolveModuleChargeAmount(moduleTotals);
 
         const moduleData = {
           isModulePurchase: true,
           period: regularPeriod,
           products: returnAPIProductsForOrder(),
           address: userAddressData,
-          total: localTotal,
+          total: chargeAmount,
           paymentLogs: [],
           user: isDynamicPricingGuestFlow
             ? { email: guestCheckoutEmail }
@@ -1872,15 +1927,7 @@ const CheckoutForm = ({
         localStorage.setItem("modulepurchase", "true");
         localStorage.setItem("moduleOrderData", JSON.stringify(moduleData));
         localStorage.setItem("BusinessOrderSelection", "regular");
-
-        // Use the actual selected paymentMode instead of hardcoded "module"
-        const moduleTotals = getModuleOrderTotal(paymentMode);
-        // For subscription, use monthly amount; otherwise use full amount
-        const moduleAmount = Math.round(
-          (paymentMode === "subscription"
-            ? moduleTotals?.subscriptionTotal || localTotal / 12 || 0
-            : moduleTotals?.oneTimeTotal || localTotal || 0) * 100,
-        );
+        const moduleAmount = Math.round(chargeAmount * 100);
 
         // Get product IDs for webhook processing
         const moduleOrderData = returnAPIProductsForOrder();
@@ -1897,7 +1944,10 @@ const CheckoutForm = ({
         // Determine product name based on payment mode
         let productName = "Module Payment (Setup + Current Monthly)";
         if (paymentMode === "payment") {
-          productName = "One-Time Payment (Full Amount)";
+          productName =
+            getDynamicPricingPaymentPlan() === "monthly"
+              ? "Module Payment (Setup + First Month)"
+              : "One-Time Payment (Full Amount)";
         } else if (paymentMode === "subscription") {
           productName = "Subscription Payment (Monthly)";
         }
@@ -1923,10 +1973,7 @@ const CheckoutForm = ({
             },
           ],
           address: userAddressData,
-          total:
-            paymentMode === "subscription"
-              ? moduleTotals?.subscriptionTotal || localTotal / 12
-              : moduleTotals?.oneTimeTotal || localTotal,
+          total: chargeAmount,
           totalQuantity: localTotalQuantity,
           currency: returnCorrectCurrency(
             cartItems?.currency || userData?.currency,
@@ -1934,17 +1981,13 @@ const CheckoutForm = ({
           express: false,
           // Pass guest email for Stripe customer_email
           customerEmail: guestCheckoutEmail || userData?.user?.email,
-          metadata: {
-            calculationBreakdown: JSON.stringify(moduleTotals),
-            isModulePurchase: "true",
-            isDynamicPricing: isGuestModuleCheckout ? "true" : "false",
-            guestCheckout: isGuestModuleCheckout ? "true" : "false",
-            linkId: guestCheckoutLinkId || "",
-            pricingLinkId: guestCheckoutLinkId || "",
-            paymentPlan: guestCheckoutPaymentPlan || "monthly",
-            productIds: JSON.stringify(productIds),
-            selectedPaymentMode: paymentMode,
-          },
+          metadata: buildModuleCheckoutMetadata({
+            moduleTotals,
+            productIds,
+            isGuestModuleCheckout,
+            guestCheckoutLinkId,
+            guestCheckoutPaymentPlan,
+          }),
         });
 
         if (response.data?.url) {
@@ -2149,13 +2192,15 @@ const CheckoutForm = ({
       if (isModuleOrder && express === undefined) {
         // Determine period based on payment mode
         const fallbackPeriod = paymentMode === "module" ? 1 : 12;
+        const moduleTotals = getModuleOrderTotal(paymentMode);
+        const chargeAmount = resolveModuleChargeAmount(moduleTotals);
 
         const fallbackModuleData = {
           isModulePurchase: true,
           period: fallbackPeriod,
           products: returnAPIProductsForOrder(),
           address: userAddressData,
-          total: localTotal,
+          total: chargeAmount,
           paymentLogs: [],
           user: isDynamicPricingGuestFlow
             ? { email: guestCheckoutEmail }
@@ -2168,15 +2213,7 @@ const CheckoutForm = ({
           JSON.stringify(fallbackModuleData),
         );
         localStorage.setItem("BusinessOrderSelection", "fallback");
-
-        // Use the actual selected paymentMode instead of hardcoded "module"
-        const moduleTotals = getModuleOrderTotal(paymentMode);
-        // For subscription, use monthly amount; otherwise use full amount
-        const moduleAmount = Math.round(
-          (paymentMode === "subscription"
-            ? moduleTotals?.subscriptionTotal || localTotal / 12 || 0
-            : moduleTotals?.oneTimeTotal || localTotal || 0) * 100,
-        );
+        const moduleAmount = Math.round(chargeAmount * 100);
 
         // Get product IDs for webhook processing
         const moduleOrderData = returnAPIProductsForOrder();
@@ -2193,7 +2230,10 @@ const CheckoutForm = ({
         // Determine product name based on payment mode
         let productName = "Module Payment (Setup + Current Monthly)";
         if (paymentMode === "payment") {
-          productName = "One-Time Payment (Full Amount)";
+          productName =
+            getDynamicPricingPaymentPlan() === "monthly"
+              ? "Module Payment (Setup + First Month)"
+              : "One-Time Payment (Full Amount)";
         } else if (paymentMode === "subscription") {
           productName = "Subscription Payment (Monthly)";
         }
@@ -2219,10 +2259,7 @@ const CheckoutForm = ({
             },
           ],
           address: userAddressData,
-          total:
-            paymentMode === "subscription"
-              ? moduleTotals?.subscriptionTotal || localTotal / 12
-              : moduleTotals?.oneTimeTotal || localTotal,
+          total: chargeAmount,
           totalQuantity: localTotalQuantity,
           currency: returnCorrectCurrency(
             cartItems?.currency || userData?.currency,
@@ -2230,17 +2267,13 @@ const CheckoutForm = ({
           express: false,
           // Pass guest email for Stripe customer_email
           customerEmail: guestCheckoutEmail || userData?.user?.email,
-          metadata: {
-            calculationBreakdown: JSON.stringify(moduleTotals),
-            isModulePurchase: "true",
-            isDynamicPricing: isGuestModuleCheckout ? "true" : "false",
-            guestCheckout: isGuestModuleCheckout ? "true" : "false",
-            linkId: guestCheckoutLinkId || "",
-            pricingLinkId: guestCheckoutLinkId || "",
-            paymentPlan: guestCheckoutPaymentPlan || "monthly",
-            productIds: JSON.stringify(productIds),
-            selectedPaymentMode: paymentMode,
-          },
+          metadata: buildModuleCheckoutMetadata({
+            moduleTotals,
+            productIds,
+            isGuestModuleCheckout,
+            guestCheckoutLinkId,
+            guestCheckoutPaymentPlan,
+          }),
         });
 
         if (response.data?.url) {

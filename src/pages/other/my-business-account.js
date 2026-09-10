@@ -14,6 +14,7 @@ import { MyProvider, useMyContext } from "src/Context"
 // import businessSustainability from "src/components/MyBusinessAccount/businessSustainability";
 import Orders from "src/components/MyAccount/orders";
 import BusinessOrders from "src/components/MyAccount/businessOrders";
+import ModulePurchases from "src/components/MyAccount/modulePurchases";
 import Address from "../../components/MyAccount/Address";
 import { useEffect } from "react";
 import { verifyLoggedIn } from "src/apiClient/user";
@@ -490,6 +491,20 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
                       >
                         <Nav.Link
                           className="navbar-item"
+                          eventKey="modulePurchases"
+                        >
+                          Module Purchases
+                        </Nav.Link>
+                      </Nav.Item>
+
+                      <Nav.Item
+                        onClick={() => [
+                          setIsPasswordTabActive(false),
+                          setIsChangeEmailActive(false),
+                        ]}
+                      >
+                        <Nav.Link
+                          className="navbar-item"
                           eventKey="sustainabilityPage"
                         >
                           Business EcoStance Page
@@ -660,6 +675,9 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
                     </Tab.Pane> */}
                       <Tab.Pane eventKey="orders">
                         <BusinessOrders reviewPopUpHandler={reviewPopUpHandler} />
+                      </Tab.Pane>
+                      <Tab.Pane eventKey="modulePurchases">
+                        <ModulePurchases moduleSupported={moduleSupported} />
                       </Tab.Pane>
                       <Tab.Pane
                         className="tabPage-sustainability"

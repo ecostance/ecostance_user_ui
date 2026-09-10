@@ -121,7 +121,15 @@ const Checkout = ({
         const moduleProducts = selectedModules.map(module => {
           const additionalUsers = checkoutData.quantities[module.id] || 0;
           const totalUsers = baseUsers + additionalUsers;
-          const pricing = module.customPricing || {};
+          const pricing =
+            checkoutData.pricingData?.customPrices?.[module.id] ||
+            module.customPricing ||
+            {};
+
+          const includedUnits =
+            pricing.includedUnits ||
+            checkoutData.pricingData?.minUnits ||
+            baseUsers;
 
           return {
             productId: module.id,
@@ -129,8 +137,9 @@ const Checkout = ({
             name: module.name,
             quantity: 1, // Each module is purchased once
             additionalUnit: additionalUsers, // Only users beyond base 5 (base users are included in module cost)
-            totalUsers: totalUsers, // Total users for this module
-            baseUsers: baseUsers,
+            totalUsers: includedUnits + additionalUsers,
+            baseUsers: includedUnits,
+            includedUnits,
             // Pricing breakdown
             price: pricing.modulePrice || 0, // One-time setup fee
             mainPrice: pricing.modulePrice || 0,

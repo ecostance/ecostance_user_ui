@@ -116,8 +116,18 @@ const CartSummary = ({
       }
     });
 
-    // Calculate subtotal before discount
-    const subtotalOneTime = totalModuleCost + ((totalAdditionalCostMonthly + totalMaintenanceCostMonthly) * 12) + oneTimeFee;
+    const paymentPlan =
+      typeof window !== "undefined"
+        ? localStorage.getItem("dynamicPricingPaymentPlan") || "full"
+        : "full";
+    const isMonthlyPlan = paymentPlan === "monthly";
+    const monthlyRecurring =
+      totalAdditionalCostMonthly + totalMaintenanceCostMonthly;
+
+    // Calculate subtotal before discount based on selected plan
+    const subtotalOneTime = isMonthlyPlan
+      ? totalModuleCost + monthlyRecurring + oneTimeFee
+      : totalModuleCost + monthlyRecurring * 12 + oneTimeFee;
 
     // Calculate discount amount
     let discountAmount = 0;
@@ -128,6 +138,8 @@ const CartSummary = ({
         discountAmount = Math.min(discountValue, subtotalOneTime);
       }
     }
+
+    const grandTotal = Math.max(0, subtotalOneTime - discountAmount);
 
     return {
       totalModuleCost,
@@ -140,8 +152,14 @@ const CartSummary = ({
       discountType: discountType,
       discountAmount: discountAmount,
       subtotalBeforeDiscount: subtotalOneTime,
-      grandTotalOneTime: Math.max(0, subtotalOneTime - discountAmount),
-      grandTotalCurrentMonth: totalModuleCost + totalAdditionalCostMonthly + totalMaintenanceCostMonthly + oneTimeFee
+      grandTotalOneTime: grandTotal,
+      grandTotalCurrentMonth:
+        totalModuleCost + monthlyRecurring + oneTimeFee - discountAmount,
+      isMonthlyPlan,
+      monthlyRecurring,
+      payToday: grandTotal,
+      monthlyAfter: isMonthlyPlan ? monthlyRecurring : 0,
+      remainingMonths: isMonthlyPlan ? 11 : 0,
     };
   };
   
@@ -722,12 +740,39 @@ const CartSummary = ({
                 </div>
 
                 <div className="module-breakdown-row">
-                  <span className="module-breakdown-label">Total Additional Order:</span>
+                  <span className="module-breakdown-label">
+                    {breakdown.isMonthlyPlan
+                      ? "Recurring (1st month included):"
+                      : "Total Additional Order:"}
+                  </span>
                   <span className="module-breakdown-value">
                     {currencyCode || cartItems?.currency || userData?.currency} {currencySymbol}
-                    {formatCurrency((breakdown.totalAdditionalCostYearly + breakdown.totalMaintenanceCostYearly), cartItems?.currency || userData?.currency)}
+                    {formatCurrency(
+                      breakdown.isMonthlyPlan
+                        ? breakdown.monthlyRecurring
+                        : breakdown.totalAdditionalCostYearly +
+                          breakdown.totalMaintenanceCostYearly,
+                      cartItems?.currency || userData?.currency,
+                    )}
                   </span>
                 </div>
+
+                {breakdown.isMonthlyPlan && breakdown.monthlyAfter > 0 && (
+                  <div className="module-breakdown-row">
+                    <span className="module-breakdown-label">
+                      Then monthly for {breakdown.remainingMonths} months:
+                    </span>
+                    <span className="module-breakdown-value">
+                      {currencyCode || cartItems?.currency || userData?.currency}{" "}
+                      {currencySymbol}
+                      {formatCurrency(
+                        breakdown.monthlyAfter,
+                        cartItems?.currency || userData?.currency,
+                      )}
+                      /mo
+                    </span>
+                  </div>
+                )}
 
                 {breakdown.oneTimeFee > 0 && (
                   <div className="module-breakdown-row">
@@ -740,10 +785,17 @@ const CartSummary = ({
                 )}
 
                 <div className="module-breakdown-row module-breakdown-total">
-                  <span className="module-breakdown-label">Total:</span>
+                  <span className="module-breakdown-label">
+                    {breakdown.isMonthlyPlan ? "Pay Today:" : "Total:"}
+                  </span>
                   <span className="module-breakdown-value">
                     {currencyCode || cartItems?.currency || userData?.currency} {currencySymbol}
-                    {formatCurrency(breakdown.subtotalBeforeDiscount, cartItems?.currency || userData?.currency)}
+                    {formatCurrency(
+                      breakdown.isMonthlyPlan
+                        ? breakdown.payToday
+                        : breakdown.subtotalBeforeDiscount,
+                      cartItems?.currency || userData?.currency,
+                    )}
                   </span>
                 </div>
               </div>

@@ -72,6 +72,7 @@ const NewSuccess = ({
   const [qrCode, setQrCode] = useState("");
   const [quoteURL, setQuoteURL] = useState("/c/");
   const [pdfFilePath, setPdfFilePath] = useState(null);
+  const [pdfGenerating, setPdfGenerating] = useState(false);
   const [currency, setCurrency] = useState("");
   const [discount, setDiscount] = useState("");
   const [companyAddress, setCompanyAddress] = useState({});
@@ -166,9 +167,22 @@ const NewSuccess = ({
     localStorage.removeItem("BusinessOrderSelection");
     localStorage.removeItem("modulepurchase");
     localStorage.removeItem("checkoutCartBackup"); // Clean up cart backup
-    // Guest (dynamic pricing) buyers have no JWT yet — these endpoints require
-    // one, and a 401 would sign them out and bounce them to the login page.
-    if (!getCookie("JWTToken")) return;
+
+    const orderPayload = orderData?.order?.data;
+    if (
+      isModuleFlow ||
+      orderPayload?.isModulePurchase ||
+      Router.query.moduleOrder === "true"
+    ) {
+      if (!applyInvoiceFromOrder(orderData.order)) {
+        const sessionId = getCheckoutSessionId();
+        if (sessionId) pollModuleInvoiceBySession(sessionId);
+      }
+      if (!getCookie("JWTToken")) return;
+    } else if (!getCookie("JWTToken")) {
+      return;
+    }
+
     ordersData();
     const intervalId = setInterval(() => {
       const orderId = orderData?.order?.data?._id;
@@ -178,7 +192,7 @@ const NewSuccess = ({
     return () => {
       clearInterval(intervalId);
     };
-  }, [orderData?.order?.data?._id]);
+  }, [orderData?.order?.data?._id, isModuleFlow]);
 
   const ordersData = async () => {
     console.log("OrdersDataa", orderData?.order?.data);
@@ -231,6 +245,20 @@ const NewSuccess = ({
     // }
   }, []);
 
+  const applyInvoiceFromOrder = (orderLike) => {
+    const orderData = orderLike?.data || orderLike;
+    const filePath =
+      orderData?.invoiceFilePath ||
+      orderData?.invoice?.filePath ||
+      null;
+    if (filePath) {
+      setPdfFilePath(filePath);
+      setPdfGenerating(false);
+      return true;
+    }
+    return false;
+  };
+
   const getPdf = async (orderId, lastOrder) => {
     await getOrderPdf(orderId, lastOrder)
       .then((response) => {
@@ -242,12 +270,31 @@ const NewSuccess = ({
             response.data?.data?.invoice?.filePath
           ) {
             setPdfFilePath(response.data?.data?.invoice?.filePath);
+            setPdfGenerating(false);
           } else {
             setPdfFilePath(null);
           }
         }
       })
       .catch((error) => console.log("error", error));
+  };
+
+  const pollModuleInvoiceBySession = async (sessionId, timeoutMs = 60000) => {
+    if (!sessionId) return;
+    setPdfGenerating(true);
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      try {
+        const response = await getOrderByCheckoutSession(sessionId);
+        if (response?.data && applyInvoiceFromOrder({ data: response.data })) {
+          return;
+        }
+      } catch (err) {
+        console.log("Error polling module invoice", err);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
+    setPdfGenerating(false);
   };
 
   const getQRCode = async (text = "https://google.com") => {
@@ -329,23 +376,40 @@ const NewSuccess = ({
           checkout.selectedModules || checkout.pricingData?.modules || [];
         const customPrices = checkout.pricingData?.customPrices || {};
         const totals = checkout.totals || {};
+        const paymentPlan = checkout.paymentPlan || "full";
+        const isFullPlan = paymentPlan === "full";
         const products = modules.map((mod) => {
           const pricing =
             customPrices[mod.id] || mod.customPricing || mod.defaultPricing || {};
           const modulePrice = Number(pricing.modulePrice || 0);
           const maintenance = Number(pricing.monthlyMaintenance || 0);
+          const monthlyCostPerUser = Number(pricing.monthlyCostPerUser || 0);
+          const additionalUsers = checkout.quantities?.[mod.id] || 0;
+          const includedUnits =
+            pricing.includedUnits || checkout.pricingData?.minUnits || 5;
+          const monthlyRecurring =
+            maintenance + monthlyCostPerUser * additionalUsers;
+          const linePrice = isFullPlan
+            ? modulePrice + monthlyRecurring * 12
+            : modulePrice + monthlyRecurring;
           return {
             product: { id: mod.id, name: mod.name },
-            price: modulePrice + maintenance,
+            price: linePrice,
             quantity: 1,
             startupCost: modulePrice,
             additionalPrice: maintenance,
+            includedUnits,
+            monthlyMaintenance: maintenance,
+            monthlyCostPerUser,
+            additionalUsers,
           };
         });
         const total = Number(
           checkout.payToday || totals.payToday || totals.grandTotal || 0,
         );
         const buyerInfo = checkout.buyerInfo || {};
+        const oneYearFromNow =
+          Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60;
         return {
           data: {
             orderNumber: "",
@@ -379,6 +443,31 @@ const NewSuccess = ({
             ],
             createdAt: new Date().toISOString(),
             isModulePurchase: true,
+            moduleExpiresAt: oneYearFromNow,
+            paymentDetails: {
+              totalModulePrice: totals.totalModulePrice || 0,
+              totalMonthlyMaintenance: totals.totalMonthlyMaintenance || 0,
+              totalMonthlyCost: totals.totalMonthlyCost || 0,
+              oneTimeFee: totals.oneTimeFee || checkout.oneTimeFee || 0,
+              discount: totals.discountValue || checkout.discount || 0,
+              discountType: totals.discountType || checkout.discountType || "percentage",
+              paymentPlan,
+              grandTotal: total,
+              payToday: total,
+              monthlyAfter: totals.monthlyAfter || 0,
+            },
+            priceBreakdown: {
+              totalModulePrice: totals.totalModulePrice || 0,
+              totalMonthlyMaintenance: totals.totalMonthlyMaintenance || 0,
+              totalMonthlyCost: totals.totalMonthlyCost || 0,
+              totalIncludedUnits: totals.totalIncludedUnits || 0,
+              oneTimeFee: totals.oneTimeFee || checkout.oneTimeFee || 0,
+              discount: totals.discountValue || checkout.discount || 0,
+              discountType: totals.discountType || checkout.discountType || "percentage",
+              paymentPlan,
+              payToday: total,
+              monthlyAfter: totals.monthlyAfter || 0,
+            },
           },
           user: {
             email:
@@ -482,6 +571,9 @@ const NewSuccess = ({
         if (webhookOrder) {
           setOrder(webhookOrder);
           addOrder(true, webhookOrder);
+          if (!applyInvoiceFromOrder(webhookOrder)) {
+            pollModuleInvoiceBySession(sessionId);
+          }
           cleanupModuleCheckoutStorage();
           setIsOrderLoaded(true);
           return;
@@ -918,12 +1010,141 @@ const NewSuccess = ({
     return !!getCookie("JWTToken");
   };
 
-  const handlePfdClick = () => {
+  const handlePfdClick = (e) => {
     if (pdfFilePath != null) return;
-    addToast("Your PDF is Generating, Please wait!", {
+    e.preventDefault();
+    addToast("Your PDF is generating, please wait!", {
       appearance: "info",
       autoDismiss: true,
     });
+  };
+
+  const renderModuleOrderBreakdown = () => {
+    const breakdown =
+      order?.data?.priceBreakdown || order?.data?.paymentDetails;
+    if (!breakdown || !(isModuleFlow || order?.data?.isModulePurchase)) {
+      return null;
+    }
+
+    const sym = currency || order?.data?.currencySymbol || "$";
+    const cur = order?.data?.currency || "USD";
+    const isFullPlan = breakdown.paymentPlan === "full";
+    const expiryTs = order?.data?.moduleExpiresAt;
+
+    return (
+      <div
+        className="module-breakdown-box"
+        style={{
+          margin: "20px 0",
+          padding: "16px",
+          border: "1px solid #e0e0e0",
+          borderRadius: "8px",
+          background: "#fafafa",
+        }}
+      >
+        <h5 style={{ marginBottom: "12px", fontWeight: 600 }}>
+          Module Order Summary
+        </h5>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          {breakdown.totalModulePrice > 0 && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Module Setup</span>
+              <span>
+                {cur} {sym}
+                {formatCurrency(breakdown.totalModulePrice, cur)}
+              </span>
+            </div>
+          )}
+          {breakdown.totalMonthlyMaintenance > 0 && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>
+                Base Maintenance
+                {breakdown.totalIncludedUnits
+                  ? ` (${breakdown.totalIncludedUnits} included units)`
+                  : ""}
+              </span>
+              <span>
+                {cur} {sym}
+                {formatCurrency(breakdown.totalMonthlyMaintenance, cur)}/mo
+              </span>
+            </div>
+          )}
+          {breakdown.totalMonthlyCost > 0 && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Additional Users (monthly)</span>
+              <span>
+                {cur} {sym}
+                {formatCurrency(breakdown.totalMonthlyCost, cur)}/mo
+              </span>
+            </div>
+          )}
+          {breakdown.oneTimeFee > 0 && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>One-Time Fee</span>
+              <span>
+                {cur} {sym}
+                {formatCurrency(breakdown.oneTimeFee, cur)}
+              </span>
+            </div>
+          )}
+          {breakdown.discount > 0 && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>
+                Discount ({breakdown.discount}
+                {breakdown.discountType === "percentage" ? "%" : ""})
+              </span>
+              <span>
+                -{cur} {sym}
+                {formatCurrency(
+                  breakdown.discountAmount ||
+                    (breakdown.discountType === "percentage"
+                      ? (breakdown.payToday || 0) *
+                        (breakdown.discount / (100 - breakdown.discount))
+                      : breakdown.discount),
+                  cur,
+                )}
+              </span>
+            </div>
+          )}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              fontWeight: 600,
+              borderTop: "1px solid #ddd",
+              paddingTop: "8px",
+            }}
+          >
+            <span>Payment Plan</span>
+            <span>{isFullPlan ? "Pay Full Today" : "12-Month Plan"}</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>Pay Today</span>
+            <span>
+              {cur} {sym}
+              {formatCurrency(breakdown.payToday || order?.data?.orderTotal, cur)}
+            </span>
+          </div>
+          {!isFullPlan && breakdown.monthlyAfter > 0 && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Then monthly for 11 months</span>
+              <span>
+                {cur} {sym}
+                {formatCurrency(breakdown.monthlyAfter, cur)}/mo
+              </span>
+            </div>
+          )}
+          {expiryTs && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Module Expires</span>
+              <span>
+                {getFormattedDate(expiryTs)} {getFormattedTime(expiryTs)}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const formatCertificateNumber = (certificateNumber) => {
@@ -1135,10 +1356,14 @@ const NewSuccess = ({
                 <div className="order__success-order-detail-pdf-container">
                   <a
                     className="order__success-order-detail-pdf-download-container"
-                    href={pdfFilePath}
+                    href={pdfFilePath || undefined}
                     target="_blank"
-                    download
+                    download={pdfFilePath ? "Order.pdf" : undefined}
                     onClick={handlePfdClick}
+                    style={{
+                      pointerEvents: pdfFilePath ? "auto" : "none",
+                      opacity: pdfFilePath ? 1 : 0.6,
+                    }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -1156,7 +1381,7 @@ const NewSuccess = ({
                         d="M10.121-.001H3.293c-.997 0-1.81.812-1.81 1.81v6.69h-.176a.729.729 0 00-.729.73v4.42c0 .404.327.73.73.73h.176v.81c0 .999.812 1.81 1.81 1.81h9.316c.997 0 1.809-.811 1.809-1.81V4.282L10.12 0zm-7.63 10.027c.214-.036.514-.063.937-.063.428 0 .732.081.937.245.196.155.328.41.328.71s-.1.555-.282.728c-.237.223-.587.323-.997.323-.09 0-.172-.005-.236-.013v1.096H2.49v-3.026zm10.119 5.865H3.293a.702.702 0 01-.7-.701v-.811h8.684c.403 0 .73-.326.73-.73V9.23a.729.729 0 00-.73-.73H2.593v-6.69c0-.386.314-.7.7-.7L9.707 1.1v2.371c0 .693.561 1.255 1.254 1.255l2.323-.007.026 10.47a.701.701 0 01-.7.7zm-7.474-2.853v-3.012c.254-.04.587-.063.937-.063.582 0 .96.104 1.256.327.318.237.518.614.518 1.156 0 .587-.213.992-.51 1.242-.322.268-.814.396-1.414.396-.36 0-.614-.023-.787-.046zm4.965-1.783v.564h-1.1v1.233h-.697V9.986h1.874v.568H9v.7h1.101z"
                       ></path>
                     </svg>
-                    <p>Order.pdf</p>
+                    <p>{pdfFilePath ? "Order.pdf" : pdfGenerating ? "Generating PDF..." : "Order.pdf"}</p>
                   </a>
                 </div>
                 <div
@@ -1375,13 +1600,7 @@ const NewSuccess = ({
                     );
                   })}
 
-                {/* <div className="order__success__product-row">
-                  <p className="product-table-header-item-1">2</p>
-                  <p className="product-table-header-item-2">Kariba Red++</p>
-                  <p className="product-table-header-item-3">INR₹ 100.00</p>
-                  <p className="product-table-header-item-4">100</p>
-                  <p className="product-table-header-item-5">INR₹ 2000.00</p>
-                </div> */}
+                {renderModuleOrderBreakdown()}
 
                 <div className="order__success__order-price-container">
                   <div className="order__success__total-items-container">

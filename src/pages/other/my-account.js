@@ -10,6 +10,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { useToasts } from "react-toast-notifications";
 import Sustainability from "../../components/MyAccount/Sustainability";
 import Orders from "src/components/MyAccount/orders";
+import ModulePurchases from "src/components/MyAccount/modulePurchases";
 import Address from "../../components/MyAccount/Address";
 import { verifyLoggedIn } from "src/apiClient/user";
 import router from "next/router";
@@ -403,6 +404,20 @@ const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
                     >
                       <Nav.Link
                         className="navbar-item"
+                        eventKey="modulePurchases"
+                      >
+                        Module Purchases
+                      </Nav.Link>
+                    </Nav.Item>
+
+                    <Nav.Item
+                      onClick={() => [
+                        setIsPasswordTabActive(false),
+                        setIsChangeEmailActive(false),
+                      ]}
+                    >
+                      <Nav.Link
+                        className="navbar-item"
                         eventKey="sustainabilityPage"
                       >
                         EcoStance Page
@@ -475,6 +490,9 @@ const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
                     </Tab.Pane>
                     <Tab.Pane eventKey="orders">
                       <Orders reviewPopUpHandler={reviewPopUpHandler} />
+                    </Tab.Pane>
+                    <Tab.Pane eventKey="modulePurchases">
+                      <ModulePurchases />
                     </Tab.Pane>
                     <Tab.Pane
                       className="tabPage-sustainability"
