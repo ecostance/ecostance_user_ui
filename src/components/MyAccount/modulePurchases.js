@@ -97,6 +97,20 @@ const moduleMatchesPurchase = (mod, purchase) => {
   });
 };
 
+const dedupePurchases = (purchaseList) => {
+  const seen = new Set();
+  return purchaseList.filter((purchase) => {
+    const key =
+      purchase?._id ||
+      purchase?.purchaseNumber ||
+      purchase?.orderNumber ||
+      purchase?.orderId;
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
 const findPurchaseForModule = (mod, purchaseList) => {
   const directMatch = purchaseList.find((purchase) =>
     moduleMatchesPurchase(mod, purchase),
@@ -136,21 +150,23 @@ const ModulePurchases = ({ moduleSupported = [] }) => {
         let purchaseList = [];
         const purchasesResponse = await getModulePurchases();
         if (purchasesResponse?.status === 200) {
-          purchaseList = purchasesResponse.data?.data || [];
+          const rawPurchases = purchasesResponse.data?.data || [];
+          purchaseList = (Array.isArray(rawPurchases) ? rawPurchases : []).map(
+            normalizeModuleOrder,
+          );
         }
 
-        if (!purchaseList.length) {
-          const ordersResponse = await getAllModuleOrders();
-          if (ordersResponse?.status === 200) {
-            const rawOrders =
-              ordersResponse.data?.data ||
-              ordersResponse.data?.orders ||
-              ordersResponse.data ||
-              [];
-            purchaseList = (Array.isArray(rawOrders) ? rawOrders : []).map(
-              normalizeModuleOrder,
-            );
-          }
+        const ordersResponse = await getAllModuleOrders();
+        if (ordersResponse?.status === 200) {
+          const rawOrders =
+            ordersResponse.data?.data ||
+            ordersResponse.data?.orders ||
+            ordersResponse.data ||
+            [];
+          const orderPurchases = (Array.isArray(rawOrders) ? rawOrders : []).map(
+            normalizeModuleOrder,
+          );
+          purchaseList = dedupePurchases([...purchaseList, ...orderPurchases]);
         }
 
         setPurchases(purchaseList);
