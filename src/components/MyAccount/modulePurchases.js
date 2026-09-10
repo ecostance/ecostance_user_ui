@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, Spinner } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import axios from "axios";
 import fileDownload from "js-file-download";
 import { getCookie } from "cookies-next";
@@ -44,9 +44,9 @@ const getRenewalLabel = (expiryValue) => {
     const monthPart = `${months} month${months === 1 ? "" : "s"}`;
     const dayPart =
       remDays > 0 ? ` ${remDays} day${remDays === 1 ? "" : "s"}` : "";
-    return `${monthPart}${dayPart} left to renew`;
+    return `${monthPart}${dayPart} left`;
   }
-  return `${days} day${days === 1 ? "" : "s"} left to renew`;
+  return `${days} day${days === 1 ? "" : "s"} left`;
 };
 
 const normalizeModuleOrder = (order) => ({
@@ -334,14 +334,6 @@ const ModulePurchases = ({ moduleSupported = [] }) => {
     }
   };
 
-  const formatPurchaseNumber = (num) => {
-    if (!num) return "";
-    return String(num)
-      .split("")
-      .map((c, i) => (i === 4 || i === 8 ? ` ${c}` : c))
-      .join("");
-  };
-
   const now = Math.floor(Date.now() / 1000);
 
   const allActiveModules = useMemo(() => {
@@ -398,247 +390,382 @@ const ModulePurchases = ({ moduleSupported = [] }) => {
           units:
             mod.units ||
             mod.otherDetail?.numberofUnits ||
-            mod.otherDetail?.numberofUnit,
+            mod.otherDetail?.numberofUnit ||
+            1,
         };
       }),
     [allActiveModules, purchases],
   );
 
+  const totalAllocatedUnits = useMemo(() => {
+    return moduleDetails.reduce((sum, item) => sum + (Number(item.units) || 1), 0);
+  }, [moduleDetails]);
+
   if (loading) {
     return (
       <div className="text-center p-5">
-        <Spinner animation="border" />
+        <Spinner animation="border" variant="success" />
+        <p className="mt-3 text-muted" style={{ fontSize: "14px" }}>
+          Loading your module purchases...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="my-account-area__content no--border">
-      <h3>Module Purchases</h3>
+    <div className="module-purchases-container">
+      {/* Header & Overview */}
+      <div className="mp-header-area">
+        <h3 className="mp-title">Module Purchases</h3>
+        <p className="mp-subtitle">
+          Manage your active enterprise modules, subscription details, and tax invoices.
+        </p>
 
+        {/* Quick Stats Banner */}
+        <div className="mp-stats-row">
+          <div className="mp-stat-card">
+            <div className="mp-stat-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div>
+              <div className="mp-stat-value">{moduleDetails.length}</div>
+              <div className="mp-stat-label">Active Modules</div>
+            </div>
+          </div>
+
+          <div className="mp-stat-card">
+            <div className="mp-stat-icon secondary">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div>
+              <div className="mp-stat-value">{totalAllocatedUnits}</div>
+              <div className="mp-stat-label">Allocated Units / Seats</div>
+            </div>
+          </div>
+
+          <div className="mp-stat-card">
+            <div className="mp-stat-icon warning">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div>
+              <div className="mp-stat-value">{purchases.length}</div>
+              <div className="mp-stat-label">Completed Orders</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Active Modules Section */}
       {moduleDetails.length > 0 && (
         <div className="mb-4">
-          <h5 style={{ marginBottom: "12px" }}>Active Modules</h5>
-          {moduleDetails.map((entry, index) => (
-            <Card key={entry.mod._id || index} className="mb-3 p-3">
-              <h6 style={{ marginBottom: "10px" }}>{entry.label}</h6>
-              <p className="mb-1">
-                <strong>Purchased:</strong> {formatTimestamp(entry.purchasedAt)}
-              </p>
-              <p className="mb-1">
-                <strong>Unlocked:</strong> {formatTimestamp(entry.unlockedAt)}
-              </p>
-              <p className="mb-1">
-                <strong>Renewal:</strong> {entry.renewalLabel}
-                {entry.expiry
-                  ? ` (expires ${formatTimestamp(entry.expiry)})`
-                  : ""}
-              </p>
-              {entry.units ? (
-                <p className="mb-0">
-                  <strong>Units:</strong> {entry.units}
-                </p>
-              ) : null}
-            </Card>
-          ))}
+          <div className="mp-section-header">
+            <h4 className="mp-section-title">
+              Active Modules
+              <span className="mp-badge-count">{moduleDetails.length}</span>
+            </h4>
+          </div>
+
+          <div className="mp-active-grid">
+            {moduleDetails.map((entry, index) => (
+              <div key={entry.mod._id || index} className="mp-active-card">
+                <div className="mp-active-card-top">
+                  <div className="mp-active-header-left">
+                    <div className="mp-active-icon-badge">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h5 className="mp-active-title">{entry.label}</h5>
+                    </div>
+                  </div>
+                  <span className="mp-active-tag">
+                    <span className="mp-pulse-dot"></span>
+                    Active
+                  </span>
+                </div>
+
+                <div className="mp-active-card-body">
+                  <div className="mp-meta-block">
+                    <span className="mp-meta-label">Units / Seats</span>
+                    <span className="mp-meta-value">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                      </svg>
+                      {entry.units} {entry.units === 1 ? "Unit" : "Units"}
+                    </span>
+                  </div>
+
+                  <div className="mp-meta-block">
+                    <span className="mp-meta-label">Purchased On</span>
+                    <span className="mp-meta-value" style={{ fontSize: "12px" }}>
+                      {formatTimestamp(entry.purchasedAt)}
+                    </span>
+                  </div>
+
+                  <div className="mp-meta-block">
+                    <span className="mp-meta-label">Unlocked On</span>
+                    <span className="mp-meta-value" style={{ fontSize: "12px" }}>
+                      {formatTimestamp(entry.unlockedAt)}
+                    </span>
+                  </div>
+
+                  <div className="mp-meta-block">
+                    <span className="mp-meta-label">Status</span>
+                    <span className="mp-meta-value" style={{ color: "#16a34a" }}>
+                      Unlocked & Active
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mp-active-card-footer">
+                  <div className="mp-renewal-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span>Renewal: {entry.renewalLabel}</span>
+                  </div>
+                  {entry.expiry && (
+                    <span className="mp-expiry-hint">
+                      Exp: {new Date(toMs(entry.expiry)).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {!purchases.length ? (
-        <p>No module purchase orders found.</p>
-      ) : (
-        <>
-          <h5 style={{ marginBottom: "16px", marginTop: "24px" }}>
+      {/* Purchase History Section */}
+      <div className="mt-4">
+        <div className="mp-section-header">
+          <h4 className="mp-section-title">
             Purchase History
-          </h5>
-          {purchases.map((purchase, index) => {
-            const details = purchase.paymentDetails || {};
-            const sym = details.currencySymbol || "$";
-            const cur = details.currency || "USD";
-            const amount =
-              details.grandTotal ?? purchase.paymentInfo?.amountPaid ?? 0;
-            const planLabel =
-              details.paymentPlan === "monthly"
-                ? "12-Month Plan"
-                : "Pay Full Today";
-            const modules = purchase.selectedModules || [];
-            const isDownloading =
-              downloadingId === (purchase._id || purchase.purchaseNumber);
+            <span className="mp-badge-count">{purchases.length}</span>
+          </h4>
+        </div>
 
-            return (
-              <Card
-                key={purchase._id || index}
-                className="my-account--order-card mb-3"
-              >
-                <div className="orders-main-container p-3">
-                  <div
-                    className="d-flex justify-content-between align-items-center flex-wrap"
-                    style={{
-                      gap: "12px",
-                      borderBottom: "1px solid #eee",
-                      paddingBottom: "12px",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    <div className="orders--orderNumber-PDF-holder">
-                      <p className="orders--orderNumber-Holder mb-0">
-                        Purchase #:{" "}
-                        <b>{formatPurchaseNumber(purchase.purchaseNumber)}</b>
-                      </p>
+        {!purchases.length ? (
+          <div className="mp-empty-state">
+            <div className="mp-empty-icon">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+            <h5 className="mp-empty-title">No module purchases found</h5>
+            <p className="mp-empty-desc">
+              When you purchase or unlock enterprise modules, your detailed invoices, purchase history, and receipts will appear here.
+            </p>
+          </div>
+        ) : (
+          <div className="mp-history-list">
+            {purchases.map((purchase, index) => {
+              const details = purchase.paymentDetails || {};
+              const sym = details.currencySymbol || "$";
+              const cur = details.currency || "USD";
+              const amount =
+                details.grandTotal ?? purchase.paymentInfo?.amountPaid ?? 0;
+              const planLabel =
+                details.paymentPlan === "monthly"
+                  ? "12-Month Plan"
+                  : "Pay Full Today";
+              const modules = purchase.selectedModules || [];
+              const isDownloading =
+                downloadingId === (purchase._id || purchase.purchaseNumber);
+              const cleanPurchaseNum = purchase.purchaseNumber || `MP-${String(index + 1).padStart(5, "0")}`;
+
+              return (
+                <div
+                  key={purchase._id || index}
+                  className="mp-history-card"
+                >
+                  {/* Card Top Bar */}
+                  <div className="mp-history-header">
+                    <div className="mp-history-id-group">
+                      <span className="mp-order-number">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                          <line x1="16" y1="13" x2="8" y2="13"/>
+                          <line x1="16" y1="17" x2="8" y2="17"/>
+                          <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        Purchase #: <strong>{cleanPurchaseNum}</strong>
+                      </span>
+                      <span className="mp-status-pill mp-status-completed">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        {purchase.status || "Completed"}
+                      </span>
                     </div>
-                    <div
-                      className="orders--download-pdf-holder"
-                      style={{
-                        cursor: isDownloading ? "not-allowed" : "pointer",
-                      }}
-                      onClick={() =>
-                        !isDownloading && handleInvoiceDownload(purchase)
-                      }
-                      title="Download Invoice PDF"
+
+                    {/* Invoice Download Action */}
+                    <button
+                      type="button"
+                      className="mp-invoice-btn"
+                      disabled={isDownloading}
+                      onClick={() => handleInvoiceDownload(purchase)}
+                      title="Download Official Tax Invoice PDF"
                     >
                       {isDownloading ? (
-                        <Spinner animation="border" size="sm" variant="danger" />
+                        <>
+                          <Spinner animation="border" size="sm" variant="danger" />
+                          <span>Downloading...</span>
+                        </>
                       ) : (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="22"
-                          height="26"
-                          fill="none"
-                          viewBox="0 0 22 26"
-                        >
-                          <path
-                            fill="#B7323B"
-                            d="M5.66 16.727c0-.431-.3-.689-.829-.689-.216 0-.362.021-.438.042v1.385c.09.02.201.027.355.027.563 0 .911-.284.911-.765zM8.931 16.053c-.236 0-.39.02-.48.041v3.069c.09.02.237.02.37.02.96.008 1.586-.521 1.586-1.641.007-.974-.564-1.49-1.476-1.49z"
-                          ></path>
-                          <path
-                            fill="#B7323B"
-                            d="M15.011 0H4.57A2.771 2.771 0 001.8 2.767V13h-.27c-.616 0-1.115.499-1.115 1.115v6.763c0 .616.5 1.115 1.115 1.115h.27v1.24A2.77 2.77 0 004.57 26h14.248a2.77 2.77 0 002.767-2.767V6.549L15.01 0zM3.341 15.335a8.742 8.742 0 011.434-.096c.654 0 1.12.124 1.433.375.3.236.501.627.501 1.086 0 .459-.153.849-.431 1.113-.362.34-.898.494-1.524.494-.14 0-.264-.007-.362-.02v1.676h-1.05v-4.628zm15.476 8.97H4.57c-.591 0-1.072-.48-1.072-1.072v-1.24h13.282c.616 0 1.116-.5 1.116-1.115v-6.763c0-.616-.5-1.115-1.116-1.115H3.497V2.767c0-.59.481-1.07 1.072-1.07l9.808-.01v3.625c0 1.059.86 1.919 1.92 1.919l3.551-.01.04 16.012c0 .591-.48 1.072-1.07 1.072zm-11.43-4.363v-4.607c.39-.062.897-.096 1.433-.096.89 0 1.468.16 1.92.5.488.362.793.94.793 1.768 0 .897-.326 1.517-.779 1.9-.494.41-1.245.605-2.164.605-.55 0-.94-.035-1.204-.07zm7.594-2.727v.862h-1.684v1.886h-1.065v-4.69H15.1v.87h-1.802v1.072h1.684z"
-                          ></path>
-                        </svg>
+                        <>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="20"
+                            fill="none"
+                            viewBox="0 0 22 26"
+                          >
+                            <path
+                              fill="#B7323B"
+                              d="M5.66 16.727c0-.431-.3-.689-.829-.689-.216 0-.362.021-.438.042v1.385c.09.02.201.027.355.027.563 0 .911-.284.911-.765zM8.931 16.053c-.236 0-.39.02-.48.041v3.069c.09.02.237.02.37.02.96.008 1.586-.521 1.586-1.641.007-.974-.564-1.49-1.476-1.49z"
+                            />
+                            <path
+                              fill="#B7323B"
+                              d="M15.011 0H4.57A2.771 2.771 0 001.8 2.767V13h-.27c-.616 0-1.115.499-1.115 1.115v6.763c0 .616.5 1.115 1.115 1.115h.27v1.24A2.77 2.77 0 004.57 26h14.248a2.77 2.77 0 002.767-2.767V6.549L15.01 0zM3.341 15.335a8.742 8.742 0 011.434-.096c.654 0 1.12.124 1.433.375.3.236.501.627.501 1.086 0 .459-.153.849-.431 1.113-.362.34-.898.494-1.524.494-.14 0-.264-.007-.362-.02v1.676h-1.05v-4.628zm15.476 8.97H4.57c-.591 0-1.072-.48-1.072-1.072v-1.24h13.282c.616 0 1.116-.5 1.116-1.115v-6.763c0-.616-.5-1.115-1.116-1.115H3.497V2.767c0-.59.481-1.07 1.072-1.07l9.808-.01v3.625c0 1.059.86 1.919 1.92 1.919l3.551-.01.04 16.012c0 .591-.48 1.072-1.07 1.072zm-11.43-4.363v-4.607c.39-.062.897-.096 1.433-.096.89 0 1.468.16 1.92.5.488.362.793.94.793 1.768 0 .897-.326 1.517-.779 1.9-.494.41-1.245.605-2.164.605-.55 0-.94-.035-1.204-.07zm7.594-2.727v.862h-1.684v1.886h-1.065v-4.69H15.1v.87h-1.802v1.072h1.684z"
+                            />
+                          </svg>
+                          <span>INVOICE (PDF)</span>
+                        </>
                       )}
-                      <p style={{ margin: 0 }}>Invoice</p>
-                    </div>
+                    </button>
                   </div>
 
-                  <div
-                    className="d-flex justify-content-between flex-wrap"
-                    style={{ gap: "20px" }}
-                  >
-                    <div style={{ flex: 1, minWidth: "260px" }}>
-                      <p className="mb-1">
-                        <strong>Date:</strong> {formatTimestamp(purchase.createdAt)}
-                      </p>
-                      <p className="mb-1">
-                        <strong>Status:</strong>{" "}
-                        <span
-                          style={{
-                            display: "inline-block",
-                            padding: "2px 10px",
-                            borderRadius: "12px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                            textTransform: "capitalize",
-                            backgroundColor:
-                              purchase.status === "completed" ||
-                              purchase.status === "active"
-                                ? "#dcfce7"
-                                : "#fef3c7",
-                            color:
-                              purchase.status === "completed" ||
-                              purchase.status === "active"
-                                ? "#166534"
-                                : "#92400e",
-                          }}
-                        >
-                          {purchase.status || "Completed"}
-                        </span>
-                      </p>
-                      <p className="mb-1">
-                        <strong>Plan:</strong> {planLabel}
-                      </p>
-                      {purchase.moduleExpiresAt && (
-                        <p className="mb-1">
-                          <strong>Expires:</strong>{" "}
-                          {formatTimestamp(purchase.moduleExpiresAt)}
-                        </p>
-                      )}
-                      {purchase.unlockedAt && (
-                        <p className="mb-1">
-                          <strong>Unlocked:</strong>{" "}
-                          {formatTimestamp(purchase.unlockedAt)}
-                        </p>
-                      )}
+                  {/* Card Content Grid */}
+                  <div className="mp-history-body">
+                    {/* Left Column: Modules & Purchase Timing */}
+                    <div className="mp-modules-col">
+                      <div className="mb-2">
+                        <span className="mp-meta-label">Purchased Modules</span>
+                        {modules.map((mod, i) => (
+                          <div key={i} className="mp-module-item mt-2">
+                            <div className="mp-module-item-icon">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                              </svg>
+                            </div>
+                            <div>
+                              <div className="mp-module-item-name">
+                                {mod.moduleName || mod.name || "Module Access"}
+                              </div>
+                              <div className="mp-module-item-desc">
+                                {mod.units ? `${mod.units} allocated user seat${mod.units === 1 ? "" : "s"}` : "Standard Tier"}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Info Chips */}
+                      <div className="mp-info-chips">
+                        <div className="mp-chip">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                          </svg>
+                          Date: <strong>{formatTimestamp(purchase.createdAt)}</strong>
+                        </div>
+
+                        {purchase.moduleExpiresAt && (
+                          <div className="mp-chip">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                              <line x1="16" y1="2" x2="16" y2="6"/>
+                              <line x1="8" y1="2" x2="8" y2="6"/>
+                              <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                            Expires: <strong>{formatTimestamp(purchase.moduleExpiresAt)}</strong>
+                          </div>
+                        )}
+
+                        <div className="mp-chip">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                            <line x1="1" y1="10" x2="23" y2="10"/>
+                          </svg>
+                          Plan: <strong>{planLabel}</strong>
+                        </div>
+                      </div>
                     </div>
 
-                    <div style={{ flex: 1, minWidth: "260px" }}>
-                      <p className="mb-1">
-                        <strong>Amount Paid:</strong>{" "}
-                        <span
-                          style={{
-                            fontSize: "16px",
-                            fontWeight: "700",
-                            color: "#111",
-                          }}
-                        >
-                          {cur} {sym}
-                          {formatCurrency(amount, cur)}
-                        </span>
-                      </p>
-                      {details.totalModulePrice != null && (
-                        <p
-                          className="mb-1"
-                          style={{ fontSize: "13px", color: "#666" }}
-                        >
-                          • Base Price: {cur} {sym}
-                          {formatCurrency(details.totalModulePrice, cur)}
-                        </p>
-                      )}
-                      {details.totalMonthlyMaintenance != null && (
-                        <p
-                          className="mb-1"
-                          style={{ fontSize: "13px", color: "#666" }}
-                        >
-                          • Maintenance: {cur} {sym}
-                          {formatCurrency(
-                            details.totalMonthlyMaintenance,
-                            cur,
-                          )}
-                          /mo ({sym}
-                          {formatCurrency(
-                            details.totalMonthlyMaintenance * 12,
-                            cur,
-                          )}
-                          /yr)
-                        </p>
-                      )}
+                    {/* Right Column: Pricing & Calculation Breakdown Box */}
+                    <div className="mp-pricing-box">
+                      <div className="mp-meta-label" style={{ marginBottom: "12px" }}>
+                        Payment Summary
+                      </div>
 
-                      {modules.length > 0 && (
-                        <div style={{ marginTop: "10px" }}>
-                          <strong>Modules:</strong>
-                          <ul style={{ marginBottom: 0, paddingLeft: "18px" }}>
-                            {modules.map((mod, i) => (
-                              <li key={i}>
-                                <b>
-                                  {mod.moduleName || mod.name || "Module"}
-                                </b>
-                                {mod.units
-                                  ? ` (${mod.units} unit${
-                                      mod.units === 1 ? "" : "s"
-                                    })`
-                                  : ""}
-                              </li>
-                            ))}
-                          </ul>
+                      {details.totalModulePrice != null && (
+                        <div className="mp-pricing-row">
+                          <span>Module Price</span>
+                          <span>
+                            {cur} {sym}{formatCurrency(details.totalModulePrice, cur)}
+                          </span>
                         </div>
                       )}
+
+                      {details.totalMonthlyMaintenance != null && (
+                        <div className="mp-pricing-row">
+                          <span>
+                            Annual Maintenance ({sym}{formatCurrency(details.totalMonthlyMaintenance, cur)}/mo × 12)
+                          </span>
+                          <span>
+                            {cur} {sym}{formatCurrency(details.totalMonthlyMaintenance * 12, cur)}
+                          </span>
+                        </div>
+                      )}
+
+                      {details.totalMonthlyCost != null && details.totalMonthlyCost > 0 && (
+                        <div className="mp-pricing-row">
+                          <span>Additional Users</span>
+                          <span>
+                            {cur} {sym}{formatCurrency(details.totalMonthlyCost, cur)}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="mp-pricing-row">
+                        <span>Payment Method</span>
+                        <span>Credit / Debit Card</span>
+                      </div>
+
+                      <div className="mp-pricing-row total">
+                        <span>Total Paid</span>
+                        <span>
+                          {cur} {sym}{formatCurrency(amount, cur)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </Card>
-            );
-          })}
-        </>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
