@@ -167,6 +167,49 @@
   text-align: end;
 }
 
+.module-table-header-item-1 {
+  flex: 0 0 50px;
+  max-width: 50px;
+  width: 100%;
+}
+
+.module-table-header-item-2 {
+  flex: 1 1 200px;
+  min-width: 150px;
+  width: 100%;
+}
+
+.module-table-header-item-3 {
+  flex: 0 0 130px;
+  max-width: 140px;
+  width: 100%;
+}
+
+.module-table-header-item-4 {
+  flex: 0 0 230px;
+  max-width: 250px;
+  width: 100%;
+}
+
+.module-table-header-item-5 {
+  flex: 0 0 140px;
+  max-width: 150px;
+  width: 100%;
+}
+
+.module-table-header-item-6 {
+  flex: 0 0 130px;
+  max-width: 140px;
+  width: 100%;
+  text-align: end;
+}
+
+.module-subtext {
+  font-size: 13px;
+  color: #666666;
+  font-weight: 400;
+}
+
 .order__success__total-items-container,
 .order__success__cart-total-container {
   display: flex;

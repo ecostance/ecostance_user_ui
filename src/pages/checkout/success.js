@@ -1059,17 +1059,145 @@ const NewSuccess = ({
     });
   };
 
+  const getModuleRowPricing = (item, orderData, breakdown) => {
+    const name =
+      item?.moduleName ||
+      item?.product?.name ||
+      item?.name ||
+      "Module";
+
+    const isFullPlan = (breakdown?.paymentPlan || "full") === "full";
+    const orderTotal = Number(orderData?.orderTotal || 0);
+
+    // Module Setup Price:
+    let modulePrice = Number(
+      item?.startupCost ??
+      item?.mainPrice ??
+      item?.modulePrice ??
+      (orderData?.products?.length === 1 ? breakdown?.totalModulePrice : null) ??
+      0
+    );
+
+    // Base Maintenance Price (monthly):
+    let monthlyMaintenance = Number(
+      item?.monthlyMaintenance ??
+      (item?.additionalPrice && Number(item.additionalPrice) !== Number(item.price) ? item.additionalPrice : null) ??
+      (orderData?.products?.length === 1 ? breakdown?.totalMonthlyMaintenance : null) ??
+      6
+    );
+
+    if (!modulePrice && orderTotal > 0) {
+      const estimatedMaint = monthlyMaintenance * (isFullPlan ? 12 : 1);
+      if (orderTotal >= estimatedMaint) {
+        modulePrice = orderTotal - estimatedMaint;
+      } else {
+        modulePrice = 60;
+      }
+    }
+    if (!modulePrice) modulePrice = 60;
+
+    const maintenanceTotal = monthlyMaintenance * (isFullPlan ? 12 : 1);
+
+    // Additional Users:
+    const additionalUnits = Number(
+      item?.additionalQuantity ??
+      item?.additionalUsers ??
+      item?.additionalUnit ??
+      (orderData?.products?.length === 1 ? breakdown?.totalAdditionalUnits : null) ??
+      0
+    );
+
+    const costPerUser = Number(
+      item?.monthlyCostPerUser ??
+      (additionalUnits > 0 && breakdown?.totalMonthlyCost ? breakdown.totalMonthlyCost / additionalUnits : 0) ??
+      0
+    );
+
+    const hasAdditionalUsers = additionalUnits > 0 && costPerUser > 0;
+    const additionalMonthly = hasAdditionalUsers ? additionalUnits * costPerUser : 0;
+    const additionalTotal = isFullPlan ? additionalMonthly * 12 : additionalMonthly;
+
+    let lineFinal = Number(item?.lineTotal || 0);
+    if (orderData?.products?.length === 1 && orderTotal > 0) {
+      lineFinal = orderTotal;
+    } else if (!lineFinal || lineFinal === 0) {
+      lineFinal = modulePrice + maintenanceTotal + additionalTotal;
+    }
+
+    return {
+      name,
+      modulePrice,
+      monthlyMaintenance,
+      maintenanceTotal,
+      isFullPlan,
+      additionalUnits,
+      hasAdditionalUsers,
+      costPerUser,
+      additionalMonthly,
+      additionalTotal,
+      lineFinal,
+    };
+  };
+
   const renderModuleOrderBreakdown = () => {
+    const isModule =
+      isModuleFlow ||
+      !!order?.data?.isModulePurchase ||
+      Router.query.moduleOrder === "true";
     const breakdown =
       order?.data?.priceBreakdown || order?.data?.paymentDetails;
-    if (!breakdown || !(isModuleFlow || order?.data?.isModulePurchase)) {
+    if (!breakdown && !isModule) {
       return null;
     }
 
+    const b = breakdown || {};
     const sym = currency || order?.data?.currencySymbol || "$";
     const cur = order?.data?.currency || "USD";
-    const isFullPlan = breakdown.paymentPlan === "full";
+    const isFullPlan = (b.paymentPlan || "full") === "full";
     const expiryTs = order?.data?.moduleExpiresAt;
+
+    // Resolve module setup price
+    const setupCost = Number(
+      b.totalModulePrice ||
+      order?.data?.products?.[0]?.startupCost ||
+      order?.data?.products?.[0]?.mainPrice ||
+      60
+    );
+
+    // Resolve base monthly maintenance
+    const monthlyMaintenance = Number(
+      b.totalMonthlyMaintenance ||
+      order?.data?.products?.[0]?.monthlyMaintenance ||
+      order?.data?.products?.[0]?.additionalPrice ||
+      6
+    );
+
+    const maintenanceMonths = isFullPlan ? 12 : 1;
+    const maintenanceTotal = monthlyMaintenance * maintenanceMonths;
+
+    // Additional users: only show if customer actually added additional users
+    const additionalUnits = Number(
+      b.totalAdditionalUnits ||
+      order?.data?.products?.[0]?.additionalQuantity ||
+      order?.data?.products?.[0]?.additionalUsers ||
+      order?.data?.products?.[0]?.additionalUnit ||
+      0
+    );
+
+    const monthlyCostPerUser = Number(
+      order?.data?.products?.[0]?.monthlyCostPerUser ||
+      (additionalUnits > 0 && b.totalMonthlyCost ? b.totalMonthlyCost / additionalUnits : 0)
+    );
+
+    const hasAdditionalUsers = additionalUnits > 0 && monthlyCostPerUser > 0;
+    const additionalMonthlyCost = hasAdditionalUsers ? additionalUnits * monthlyCostPerUser : 0;
+    const additionalTotal = isFullPlan ? additionalMonthlyCost * 12 : additionalMonthlyCost;
+
+    const payTodayTotal = Number(
+      b.payToday ||
+      order?.data?.orderTotal ||
+      (setupCost + maintenanceTotal + additionalTotal)
+    );
 
     return (
       <div
@@ -1086,61 +1214,65 @@ const NewSuccess = ({
           Module Order Summary
         </h5>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {breakdown.totalModulePrice > 0 && (
+          {setupCost > 0 && (
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <span>Module Setup</span>
               <span>
                 {cur} {sym}
-                {formatCurrency(breakdown.totalModulePrice, cur)}
+                {formatCurrency(setupCost, cur)}
               </span>
             </div>
           )}
-          {breakdown.totalMonthlyMaintenance > 0 && (
+          {monthlyMaintenance > 0 && (
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <span>
                 Base Maintenance
-                {breakdown.totalIncludedUnits
-                  ? ` (${breakdown.totalIncludedUnits} included units)`
+                {isFullPlan
+                  ? ` (${cur} ${sym}${formatCurrency(monthlyMaintenance, cur)}/mo × 12)`
+                  : ` (${cur} ${sym}${formatCurrency(monthlyMaintenance, cur)}/mo)`}
+                {b.totalIncludedUnits
+                  ? ` · ${b.totalIncludedUnits} included units`
                   : ""}
               </span>
               <span>
                 {cur} {sym}
-                {formatCurrency(breakdown.totalMonthlyMaintenance, cur)}/mo
+                {formatCurrency(maintenanceTotal, cur)}
               </span>
             </div>
           )}
-          {breakdown.totalMonthlyCost > 0 && (
+          {hasAdditionalUsers && (
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Additional Users (monthly)</span>
+              <span>
+                Additional Users ({additionalUnits} {additionalUnits === 1 ? "user" : "users"} @ {cur} {sym}{formatCurrency(monthlyCostPerUser, cur)}/mo {isFullPlan ? "× 12" : ""})
+              </span>
               <span>
                 {cur} {sym}
-                {formatCurrency(breakdown.totalMonthlyCost, cur)}/mo
+                {formatCurrency(additionalTotal, cur)}
               </span>
             </div>
           )}
-          {breakdown.oneTimeFee > 0 && (
+          {b.oneTimeFee > 0 && (
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <span>One-Time Fee</span>
               <span>
                 {cur} {sym}
-                {formatCurrency(breakdown.oneTimeFee, cur)}
+                {formatCurrency(b.oneTimeFee, cur)}
               </span>
             </div>
           )}
-          {breakdown.discount > 0 && (
+          {b.discount > 0 && (
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <span>
-                Discount ({breakdown.discount}
-                {breakdown.discountType === "percentage" ? "%" : ""})
+                Discount ({b.discount}
+                {b.discountType === "percentage" ? "%" : ""})
               </span>
               <span>
                 -{cur} {sym}
                 {formatCurrency(
-                  breakdown.discountAmount ||
-                    (breakdown.discountType === "percentage"
-                      ? (breakdown.payToday || 0) *
-                        (breakdown.discount / (100 - breakdown.discount))
-                      : breakdown.discount),
+                  b.discountAmount ||
+                    (b.discountType === "percentage"
+                      ? (payTodayTotal * (b.discount / (100 - b.discount)))
+                      : b.discount),
                   cur,
                 )}
               </span>
@@ -1158,19 +1290,45 @@ const NewSuccess = ({
             <span>Payment Plan</span>
             <span>{isFullPlan ? "Pay Full Today" : "12-Month Plan"}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+
+          {/* Proper calculation breakdown row */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              background: "#eaf5ec",
+              padding: "10px 14px",
+              borderRadius: "6px",
+              margin: "6px 0",
+              border: "1px solid #c3e2cb",
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#1e4620",
+            }}
+          >
+            <span>Calculation</span>
+            <span>
+              {cur} {sym}{formatCurrency(setupCost, cur)} (Setup) + ({cur} {sym}{formatCurrency(monthlyMaintenance, cur)} × 12 Maint)
+              {hasAdditionalUsers ? ` + (${cur} ${sym}${formatCurrency(additionalMonthlyCost, cur)} × 12 Users)` : ""}
+              {" = "}
+              {cur} {sym}{formatCurrency(payTodayTotal, cur)}
+            </span>
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 600, fontSize: "16px" }}>
             <span>Pay Today</span>
             <span>
               {cur} {sym}
-              {formatCurrency(breakdown.payToday || order?.data?.orderTotal, cur)}
+              {formatCurrency(payTodayTotal, cur)}
             </span>
           </div>
-          {!isFullPlan && breakdown.monthlyAfter > 0 && (
+          {!isFullPlan && b.monthlyAfter > 0 && (
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <span>Then monthly for 11 months</span>
               <span>
                 {cur} {sym}
-                {formatCurrency(breakdown.monthlyAfter, cur)}/mo
+                {formatCurrency(b.monthlyAfter, cur)}/mo
               </span>
             </div>
           )}
@@ -1178,7 +1336,8 @@ const NewSuccess = ({
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <span>Module Expires</span>
               <span>
-                {getFormattedDate(expiryTs)} {getFormattedTime(expiryTs)}
+                {getFormattedDate(expiryTs < 1e11 ? expiryTs * 1000 : expiryTs)}{" "}
+                {getFormattedTime(expiryTs < 1e11 ? expiryTs * 1000 : expiryTs)}
               </span>
             </div>
           )}
@@ -1617,59 +1776,138 @@ const NewSuccess = ({
 
             <div className="order__success__section_three">
               <div className="order__success__main-container_row">
-                <div className="order__success__product-table-header">
-                  <p className="product-table-header-item-1">Num</p>
-                  <p className="product-table-header-item-3">Product Num</p>
-                  <p className="product-table-header-item-2">Product Name</p>
-                  <p className="product-table-header-item-3">Unit Price</p>
-                  <p className="product-table-header-item-4">Qty</p>
-                  <p className="product-table-header-item-5">Product Total</p>
-                </div>
-                {order?.data?.products?.length > 0 &&
-                  order?.data?.products.map((item, index) => {
-                    calculateTotalProductCount(item?.quantity);
-                    const lineItem = getModuleLineItemDisplay(
-                      item,
-                      order?.data,
-                      index,
-                      order?.data?.products?.length,
-                    );
-                    return (
-                      <div key={index} className="order__success__product-row">
-                        <p className="product-table-header-item-1">
-                          {index + 1}
-                        </p>
-                        <p className="product-table-header-item-3">
-                          {formatCertificateNumber(item?.product?.id)}
-                        </p>
-                        <p className="product-table-header-item-2">
-                          {lineItem.name}
-                        </p>
-                        <p className="product-table-header-item-3">
-                          {order?.data?.currency}{" "}
-                          {currency || order?.data?.currencySymbol}
-                          {formatProductPrice(
-                            lineItem.unitPrice,
-                            order?.data?.currency
-                          )}
-                        </p>
-                        <p
-                          className="product-table-header-item-4"
-                          style={{ paddingLeft: "2px" }}
-                        >
-                          {item?.quantity}
-                        </p>
-                        <p className="product-table-header-item-5">
-                          {order?.data?.currency}{" "}
-                          {currency || order?.data?.currencySymbol}
-                          {formatProductPrice(
-                            lineItem.lineTotal,
-                            order?.data?.currency
-                          )}
-                        </p>
-                      </div>
-                    );
-                  })}
+                {isModuleFlow || order?.data?.isModulePurchase || Router.query.moduleOrder === "true" ? (
+                  <>
+                    <div className="order__success__product-table-header module-table-header">
+                      <p className="module-table-header-item-1">Num</p>
+                      <p className="module-table-header-item-2">Product Name</p>
+                      <p className="module-table-header-item-3">Module Price</p>
+                      <p className="module-table-header-item-4">Maintenance Price</p>
+                      <p className="module-table-header-item-5">Additional Users</p>
+                      <p className="module-table-header-item-6">Final Price</p>
+                    </div>
+                    {order?.data?.products?.length > 0 &&
+                      order?.data?.products.map((item, index) => {
+                        calculateTotalProductCount(1);
+                        const modulePricing = getModuleRowPricing(
+                          item,
+                          order?.data,
+                          order?.data?.priceBreakdown || order?.data?.paymentDetails,
+                        );
+                        const cur = order?.data?.currency || "USD";
+                        const sym = currency || order?.data?.currencySymbol || "$";
+                        return (
+                          <div key={index} className="order__success__product-row module-table-row">
+                            <p className="module-table-header-item-1">
+                              {index + 1}
+                            </p>
+                            <p className="module-table-header-item-2">
+                              {modulePricing.name}
+                            </p>
+                            <p className="module-table-header-item-3">
+                              {cur} {sym}
+                              {formatProductPrice(
+                                modulePricing.modulePrice,
+                                cur
+                              )}
+                            </p>
+                            <p className="module-table-header-item-4">
+                              {cur} {sym}
+                              {formatProductPrice(
+                                modulePricing.maintenanceTotal,
+                                cur
+                              )}
+                              {modulePricing.isFullPlan && (
+                                <span className="module-subtext">
+                                  {" "}({cur} {sym}{formatCurrency(modulePricing.monthlyMaintenance, cur)} × 12)
+                                </span>
+                              )}
+                              {!modulePricing.isFullPlan && (
+                                <span className="module-subtext">
+                                  {" "}/mo
+                                </span>
+                              )}
+                            </p>
+                            <p className="module-table-header-item-5">
+                              {modulePricing.hasAdditionalUsers ? (
+                                <span>
+                                  {modulePricing.additionalUnits} user{modulePricing.additionalUnits > 1 ? "s" : ""}
+                                  <span className="module-subtext">
+                                    {" "}({cur} {sym}{formatProductPrice(modulePricing.additionalTotal, cur)})
+                                  </span>
+                                </span>
+                              ) : (
+                                "-"
+                              )}
+                            </p>
+                            <p className="module-table-header-item-6">
+                              {cur} {sym}
+                              {formatProductPrice(
+                                modulePricing.lineFinal,
+                                cur
+                              )}
+                            </p>
+                          </div>
+                        );
+                      })}
+                  </>
+                ) : (
+                  <>
+                    <div className="order__success__product-table-header">
+                      <p className="product-table-header-item-1">Num</p>
+                      <p className="product-table-header-item-3">Product Num</p>
+                      <p className="product-table-header-item-2">Product Name</p>
+                      <p className="product-table-header-item-3">Unit Price</p>
+                      <p className="product-table-header-item-4">Qty</p>
+                      <p className="product-table-header-item-5">Product Total</p>
+                    </div>
+                    {order?.data?.products?.length > 0 &&
+                      order?.data?.products.map((item, index) => {
+                        calculateTotalProductCount(item?.quantity);
+                        const lineItem = getModuleLineItemDisplay(
+                          item,
+                          order?.data,
+                          index,
+                          order?.data?.products?.length,
+                        );
+                        return (
+                          <div key={index} className="order__success__product-row">
+                            <p className="product-table-header-item-1">
+                              {index + 1}
+                            </p>
+                            <p className="product-table-header-item-3">
+                              {formatCertificateNumber(item?.product?.id)}
+                            </p>
+                            <p className="product-table-header-item-2">
+                              {lineItem.name}
+                            </p>
+                            <p className="product-table-header-item-3">
+                              {order?.data?.currency}{" "}
+                              {currency || order?.data?.currencySymbol}
+                              {formatProductPrice(
+                                lineItem.unitPrice,
+                                order?.data?.currency
+                              )}
+                            </p>
+                            <p
+                              className="product-table-header-item-4"
+                              style={{ paddingLeft: "2px" }}
+                            >
+                              {item?.quantity}
+                            </p>
+                            <p className="product-table-header-item-5">
+                              {order?.data?.currency}{" "}
+                              {currency || order?.data?.currencySymbol}
+                              {formatProductPrice(
+                                lineItem.lineTotal,
+                                order?.data?.currency
+                              )}
+                            </p>
+                          </div>
+                        );
+                      })}
+                  </>
+                )}
 
                 {renderModuleOrderBreakdown()}
 
@@ -1679,7 +1917,9 @@ const NewSuccess = ({
                       Total items
                     </p>
                     <p className="order__success__total-items">
-                      {totalProductCount}
+                      {isModuleFlow || order?.data?.isModulePurchase || Router.query.moduleOrder === "true"
+                        ? order?.data?.products?.length || 1
+                        : totalProductCount}
                     </p>
                   </div>
                   <div className="order__success__cart-total-container">
