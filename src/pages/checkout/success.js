@@ -385,6 +385,9 @@ const NewSuccess = ({
         const totals = checkout.totals || {};
         const paymentPlan = checkout.paymentPlan || "full";
         const isFullPlan = paymentPlan === "full";
+        const total = Number(
+          checkout.payToday || totals.payToday || totals.grandTotal || 0,
+        );
         const products = modules.map((mod) => {
           const pricing =
             customPrices[mod.id] || mod.customPricing || mod.defaultPricing || {};
@@ -394,13 +397,18 @@ const NewSuccess = ({
           const additionalUsers = checkout.quantities?.[mod.id] || 0;
           const includedUnits =
             pricing.includedUnits || checkout.pricingData?.minUnits || 5;
-          const monthlyRecurring =
-            maintenance + monthlyCostPerUser * additionalUsers;
-          const linePrice = isFullPlan
-            ? modulePrice + monthlyRecurring * 12
-            : modulePrice + monthlyRecurring;
+          const linePrice =
+            modules.length === 1 && total > 0
+              ? total
+              : isFullPlan
+                ? modulePrice +
+                  (maintenance + monthlyCostPerUser * additionalUsers) * 12
+                : modulePrice +
+                  maintenance +
+                  monthlyCostPerUser * additionalUsers;
           return {
             product: { id: mod.id, name: mod.name },
+            moduleName: mod.name,
             price: linePrice,
             quantity: 1,
             startupCost: modulePrice,
@@ -411,9 +419,6 @@ const NewSuccess = ({
             additionalUsers,
           };
         });
-        const total = Number(
-          checkout.payToday || totals.payToday || totals.grandTotal || 0,
-        );
         const buyerInfo = checkout.buyerInfo || {};
         const oneYearFromNow =
           Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60;
@@ -1218,6 +1223,31 @@ const NewSuccess = ({
   const formatProductPrice = (price, currency) =>
     formatCurrency(Number(price || 0).toFixed(2), currency);
 
+  const getModuleLineItemDisplay = (item, orderData, productIndex, productCount) => {
+    const name =
+      item?.moduleName ||
+      item?.product?.name ||
+      item?.name ||
+      "Module";
+    const orderTotal = Number(orderData?.orderTotal || 0);
+    const quantity = Number(item?.quantity || 1);
+    let unitPrice = Number(item?.price || 0);
+
+    if (
+      (isModuleFlow || orderData?.isModulePurchase) &&
+      productCount === 1 &&
+      orderTotal > 0
+    ) {
+      unitPrice = orderTotal / quantity;
+    }
+
+    return {
+      name,
+      unitPrice,
+      lineTotal: unitPrice * quantity,
+    };
+  };
+
   const cleanupModuleCheckoutStorage = () => {
     localStorage.removeItem("modulepurchase");
     localStorage.removeItem("moduleOrderData");
@@ -1598,6 +1628,12 @@ const NewSuccess = ({
                 {order?.data?.products?.length > 0 &&
                   order?.data?.products.map((item, index) => {
                     calculateTotalProductCount(item?.quantity);
+                    const lineItem = getModuleLineItemDisplay(
+                      item,
+                      order?.data,
+                      index,
+                      order?.data?.products?.length,
+                    );
                     return (
                       <div key={index} className="order__success__product-row">
                         <p className="product-table-header-item-1">
@@ -1607,13 +1643,13 @@ const NewSuccess = ({
                           {formatCertificateNumber(item?.product?.id)}
                         </p>
                         <p className="product-table-header-item-2">
-                          {item?.product?.name}
+                          {lineItem.name}
                         </p>
                         <p className="product-table-header-item-3">
                           {order?.data?.currency}{" "}
                           {currency || order?.data?.currencySymbol}
                           {formatProductPrice(
-                            item?.price,
+                            lineItem.unitPrice,
                             order?.data?.currency
                           )}
                         </p>
@@ -1627,7 +1663,7 @@ const NewSuccess = ({
                           {order?.data?.currency}{" "}
                           {currency || order?.data?.currencySymbol}
                           {formatProductPrice(
-                            Number(item?.price || 0) * Number(item?.quantity || 1),
+                            lineItem.lineTotal,
                             order?.data?.currency
                           )}
                         </p>

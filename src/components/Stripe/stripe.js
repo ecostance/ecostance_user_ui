@@ -214,6 +214,11 @@ const CheckoutForm = ({
   }) => {
     const paymentPlan =
       guestCheckoutPaymentPlan || getDynamicPricingPaymentPlan();
+    const checkoutData = getDynamicPricingCheckoutData();
+    const selectedModules =
+      checkoutData?.selectedModules ||
+      checkoutData?.pricingData?.modules ||
+      [];
     const metadata = {
       calculationBreakdown: JSON.stringify(moduleTotals),
       isModulePurchase: "true",
@@ -227,6 +232,15 @@ const CheckoutForm = ({
       pricingLinkId: guestCheckoutLinkId || "",
       paymentPlan,
       productIds: JSON.stringify(productIds),
+      selectedModules: JSON.stringify(
+        selectedModules.map((m) => ({
+          id: m.id,
+          moduleId: m.id,
+          name: m.name,
+          moduleName: m.name,
+          description: m.description,
+        })),
+      ),
       selectedPaymentMode: paymentMode,
     };
     if (paymentPlan === "monthly") {
@@ -1512,13 +1526,15 @@ const CheckoutForm = ({
       };
 
       // Add module-specific fields if this is a module order
-      if (isModuleOrder && !express) {
+      if (isModuleOrder) {
         const setupCost = Number(
           each?.mainPrice || each?.price || productPrice || 0,
         );
         const maintenanceCost = Number(each?.maintenancePrice || 0);
         productObj = {
           ...productObj,
+          productId: each?.productId || each?.cartItemId || each?.product?._id,
+          name: each?.name || each?.product?.name,
           price: setupCost + maintenanceCost,
           startupCost: setupCost,
           additionalQuantity: each?.additionalUnit || 0,
