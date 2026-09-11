@@ -6,7 +6,7 @@ import { LayoutTwo } from "../../components/Layout";
 import { BreadcrumbOne } from "../../components/Breadcrumb";
 import { me, sendResetPasswordLink } from "src/apiClient/auth";
 import { connect } from "react-redux";
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { useToasts } from "react-toast-notifications";
 import Sustainability from "../../components/MyAccount/Sustainability";
 import Orders from "src/components/MyAccount/orders";
