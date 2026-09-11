@@ -48,7 +48,13 @@ import BusinessProduct from "src/components/MyAccount/businessProduct";
 import Suppliers from "src/components/MyAccount/supplierDetails";
 import ModuleAccessGate from "src/components/ModuleAccess/ModuleAccessGate";
 import ModuleLockedModal from "src/components/ModuleAccess/ModuleLockedModal";
-import { hasModuleAccess, MODULE_ACCESS } from "src/constants/moduleAccess";
+import {
+  hasModuleAccess,
+  MODULE_ACCESS,
+  fetchUserPurchasedModules,
+  getCachedPurchasedModules,
+  mergeModuleLists,
+} from "src/constants/moduleAccess";
 // import businessProductEdit from "src/components/MyAccount/businessProductEdit";
 // import BusinessProductEdit from "src/components/MyAccount/businessProductEdit";
 
@@ -123,7 +129,7 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
     businessEvent: 3,
   };
 
-  const moduleSupported =
+  const rawProfileModules =
     meResponse?.meData?.moduleSupported ||
     meResponse?.meData?.data?.moduleSupported ||
     meResponse?.moduleSupported ||
@@ -132,6 +138,31 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
     meData?.meData?.data?.moduleSupported ||
     meData?.moduleSupported ||
     [];
+
+  const [purchasedModules, setPurchasedModules] = useState(() =>
+    getCachedPurchasedModules()
+  );
+
+  const moduleSupported = useMemo(() => {
+    return mergeModuleLists(rawProfileModules, purchasedModules);
+  }, [rawProfileModules, purchasedModules]);
+
+  useEffect(() => {
+    if (!userData?.isLoggedIn) return;
+    let isMounted = true;
+    fetchUserPurchasedModules(meResponse?.meData || meData?.meData || meResponse || meData)
+      .then((mods) => {
+        if (isMounted && Array.isArray(mods) && mods.length > 0) {
+          setPurchasedModules((prev) => mergeModuleLists(prev, mods));
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching user module purchases:", err);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [userData?.isLoggedIn, meResponse]);
 
   const [activeTab, setActiveTab] = useState(() => {
     const initialRequestedTab =
@@ -153,6 +184,20 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
     moduleId: null,
     moduleName: "",
   });
+
+  useEffect(() => {
+    if (lockedModal.show && lockedModal.moduleId) {
+      if (hasModuleAccess(moduleSupported, lockedModal.moduleId)) {
+        setLockedModal({ show: false, moduleId: null, moduleName: "" });
+        const matchingTab = Object.keys(TAB_MODULE_MAP).find(
+          (k) => TAB_MODULE_MAP[k] === lockedModal.moduleId
+        );
+        if (matchingTab) {
+          setActiveTab(matchingTab);
+        }
+      }
+    }
+  }, [moduleSupported, lockedModal.show, lockedModal.moduleId]);
 
   useEffect(() => {
     const hasModules = moduleSupported?.length;
@@ -677,7 +722,14 @@ const MyBusinessAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) =>
                         <BusinessOrders reviewPopUpHandler={reviewPopUpHandler} />
                       </Tab.Pane>
                       <Tab.Pane eventKey="modulePurchases">
-                        <ModulePurchases moduleSupported={moduleSupported} />
+                        <ModulePurchases
+                          moduleSupported={moduleSupported}
+                          onActiveModulesChange={(mods) => {
+                            if (Array.isArray(mods) && mods.length > 0) {
+                              setPurchasedModules((prev) => mergeModuleLists(prev, mods));
+                            }
+                          }}
+                        />
                       </Tab.Pane>
                       <Tab.Pane
                         className="tabPage-sustainability"

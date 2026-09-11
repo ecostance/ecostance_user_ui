@@ -33,6 +33,11 @@ import Business from "src/components/MyAccount/Business";
 import Refferal from "src/components/MyAccount/Refferal";
 import { useRouter } from "next/router";
 import ModuleAccessGate from "src/components/ModuleAccess/ModuleAccessGate";
+import {
+  mergeModuleLists,
+  getCachedPurchasedModules,
+  fetchUserPurchasedModules,
+} from "src/constants/moduleAccess";
 
 const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
   const router = useRouter();
@@ -251,7 +256,7 @@ const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
     }
   }, []);
 
-  const moduleSupported =
+  const rawProfileModules =
     meResponse?.meData?.moduleSupported ||
     meResponse?.meData?.data?.moduleSupported ||
     meResponse?.moduleSupported ||
@@ -260,6 +265,29 @@ const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
     meData?.meData?.data?.moduleSupported ||
     meData?.moduleSupported ||
     [];
+
+  const [purchasedModules, setPurchasedModules] = useState(() =>
+    getCachedPurchasedModules()
+  );
+
+  const moduleSupported = useMemo(() => {
+    return mergeModuleLists(rawProfileModules, purchasedModules);
+  }, [rawProfileModules, purchasedModules]);
+
+  useEffect(() => {
+    if (!userData?.isLoggedIn) return;
+    let isMounted = true;
+    fetchUserPurchasedModules(meResponse?.meData || meData?.meData || meResponse || meData)
+      .then((mods) => {
+        if (isMounted && Array.isArray(mods) && mods.length > 0) {
+          setPurchasedModules((prev) => mergeModuleLists(prev, mods));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, [userData?.isLoggedIn, meResponse]);
 
   // getServerSideProps can return { success: false } on refresh (SSR env, API
   // errors, or cookie timing) while the browser session is still valid — refetch /me on the client.
@@ -502,7 +530,14 @@ const MyAccount = ({ userData, meData, setIsEmailChangeAttemptLeft }) => {
                       <Orders reviewPopUpHandler={reviewPopUpHandler} />
                     </Tab.Pane>
                     <Tab.Pane eventKey="modulePurchases">
-                      <ModulePurchases moduleSupported={moduleSupported} />
+                      <ModulePurchases
+                        moduleSupported={moduleSupported}
+                        onActiveModulesChange={(mods) => {
+                          if (Array.isArray(mods) && mods.length > 0) {
+                            setPurchasedModules((prev) => mergeModuleLists(prev, mods));
+                          }
+                        }}
+                      />
                     </Tab.Pane>
                     <Tab.Pane
                       className="tabPage-sustainability"

@@ -10,7 +10,11 @@ import {
   getModulePurchases,
   getModulePurchaseById,
 } from "src/apiClient/orders";
-import { MODULE_ACCESS } from "src/constants/moduleAccess";
+import {
+  MODULE_ACCESS,
+  isModuleExpired,
+  cachePurchasedModules,
+} from "src/constants/moduleAccess";
 import { getFormattedDate, getFormattedTime } from "src/helpers/formatDateTime";
 import formatCurrency from "src/helpers/formatCurrency";
 
@@ -159,7 +163,7 @@ const resolveInvoiceUrl = (filePath, fileName) => {
   return null;
 };
 
-const ModulePurchases = ({ moduleSupported = [] }) => {
+const ModulePurchases = ({ moduleSupported = [], onActiveModulesChange }) => {
   const { addToast } = useToasts();
   const [purchases, setPurchases] = useState([]);
   const [activeModules, setActiveModules] = useState(moduleSupported || []);
@@ -360,8 +364,15 @@ const ModulePurchases = ({ moduleSupported = [] }) => {
         }
       });
     });
-    return list.filter((mod) => !mod.expiry || mod.expiry > now);
-  }, [activeModules, purchases, now]);
+    return list.filter((mod) => !isModuleExpired(mod?.expiry ?? mod?.moduleExpiresAt));
+  }, [activeModules, purchases]);
+
+  useEffect(() => {
+    if (allActiveModules && allActiveModules.length > 0) {
+      cachePurchasedModules(allActiveModules);
+      onActiveModulesChange?.(allActiveModules);
+    }
+  }, [allActiveModules, onActiveModulesChange]);
 
   const moduleDetails = useMemo(
     () =>

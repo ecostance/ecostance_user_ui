@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import ModuleLockedModal from "./ModuleLockedModal";
-import { hasAnyModuleAccess, hasModuleAccess, MODULE_ACCESS } from "src/constants/moduleAccess";
+import {
+  hasAnyModuleAccess,
+  hasModuleAccess,
+  MODULE_ACCESS,
+  mergeModuleLists,
+  getCachedPurchasedModules,
+} from "src/constants/moduleAccess";
 import { me } from "src/apiClient/auth";
 
 import { useRouter } from "next/router";
@@ -45,7 +51,8 @@ const ModuleAccessGate = ({
     }
   }, [profile, userData?.isLoggedIn]);
 
-  const moduleSupported = profile?.moduleSupported || profile?.data?.moduleSupported || [];
+  const rawModules = profile?.moduleSupported || profile?.data?.moduleSupported || [];
+  const moduleSupported = mergeModuleLists(rawModules, getCachedPurchasedModules());
   const access =
     ids.length > 1
       ? hasAnyModuleAccess(moduleSupported, ids)

@@ -51,6 +51,7 @@ import { unApplyCouponToAPI } from "src/apiClient/coupon";
 import { BsCloudDownload } from "react-icons/bs";
 import { MdContentCopy } from "react-icons/md";
 import axios from "axios";
+import { fetchUserPurchasedModules } from "src/constants/moduleAccess";
 // import { SlBadge } from "react-icons/sl";
 
 const NewSuccess = ({
@@ -589,6 +590,7 @@ const NewSuccess = ({
             pollModuleInvoiceBySession(sessionId);
           }
           cleanupModuleCheckoutStorage();
+          fetchUserPurchasedModules().catch(() => {});
           setIsOrderLoaded(true);
           return;
         }
@@ -822,6 +824,7 @@ const NewSuccess = ({
 
           // Set the updated order data
           setOrder(updatedOrderData);
+          fetchUserPurchasedModules().catch(() => {});
           console.log("Updated order state set successfully");
           
           // Set quote URL based on business order
